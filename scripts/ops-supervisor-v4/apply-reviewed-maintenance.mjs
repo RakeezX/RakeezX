@@ -259,6 +259,30 @@ export function verifiedSourcePathRepair(task,result,update) {
 // inert source-only publication. Preserve every provider/served/check proof.
 export function verifiedSourceOnlyDeclarationRepair(task, result, update) {
   const card=update.card, proof=card.verificationRepair, d=task.deliveryReceipt, a=card.preparationAuthority;
+  if(task.id==='continuous-n88-actor-qualified-installer-20261030') {
+    const sameFields=Object.entries(card).every(([k,v])=>['completionMode','verificationRepair','releaseAuthority'].includes(k)||same(v,task[k]));
+    return card.completionMode==='reconcile_source_only_declaration' && task.status==='blocked'
+      && task.lastFailure==='Publisher returned incomplete or mismatched deployment proof'
+      && task.productId==='N88' && task.activationId==='po-20261012-continuous'
+      && task.executionMode==='synthetic' && task.liveMutation===false && !task.liveAuthorizationRef
+      && task.approvedNote?.source==='n88-actor-qualified-installer-20261030.json'
+      && task.approvedNote.sha256==='497ccc6b8e37b17885770c42e053c23f30cef4a944594fc4cdeb7550a7caef03'
+      && task.preparationAuthority?.publication===true
+      && task.preparationAuthority.publicationScope==='inactive source-only actor-qualified N88 installer candidate and native synthetic qualification; no live installation'
+      && sameFields && card.releaseAuthority===task.releaseAuthority+' [Exact inactive source-only classification; no hosted activation.]'
+      && result.state==='LOCAL_READY' && result.runId==='7563b16d-ddf9-4d85-b310-f13767ade597'
+      && result.candidateSha==='800ce9cea1ee21fef6e546585497f23332b61352'
+      && result.baseSha==='2ef68e981839db16450ad7927a0e9e8dd7a540c4'
+      && task.requiredChecks?.length===3 && task.requiredChecks.every(n=>result.checks?.some(c=>c.name===n&&c.status==='PASS'))
+      && result.checks?.every(c=>c.status==='PASS'||c.name==='hosted_installation_and_deployment'&&c.status==='NOT_RUN'&&!task.requiredChecks.includes(c.name))
+      && !result.blocker && result.blockerType==='none'
+      && d?.publishedSha==='b5d8ecd10dd28488bc868b297b2a2bddb3b3a2ba' && d.candidateSha===result.candidateSha
+      && proof?.kind==='n88-actor-source-declaration-v1' && proof.publishedSha===d.publishedSha
+      && proof.priorReceiptSha256==='c7dbfb5459d4a4f09a084bed98f6d80592a0ae8c688f92d101a4d8697fb84768' && sha256(bytes(d))===proof.priorReceiptSha256
+      && proof.originalResultSha256==='c74f11b3d0350e981d3b91242032973e32d0bd712be5f699deaeadb492b14401' && sha256(bytes(result))===proof.originalResultSha256
+      && SHA256.test(proof.reviewedFixtureSha256??'') && proof.reason?.length>=100
+      && verifiedDeployment({...task,...card},d);
+  }
   if(task.id==='n88-authorized-read-preflight-1028') {
     const sameFields=Object.entries(card).every(([k,v])=>['completionMode','verificationRepair','releaseAuthority'].includes(k)||same(v,task[k]));
     return card.completionMode==='reconcile_source_only_declaration' && task.status==='blocked'

@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-actor-qualified-installer-20261030",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -2500,
+      "scopeKey": "n88-local-installer-actor-qualification",
+      "riskClass": "HIGH",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs",
+        "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql",
+        "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/manifest.json",
+        "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/README.md",
+        "tests/n88-v2-actor-qualified-20261030.test.mjs",
+        "docs/automation-evidence/20261030/N88_ACTOR_QUALIFIED_INSTALLER.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/manifest.json",
+        "docs/automation-evidence/20261030/N88_ACTOR_QUALIFIED_INSTALLER.md"
+      ],
+      "requiredChecks": [
+        "n88_actual_actor_capability_rejects_before_ddl",
+        "n88_native_managed_role_new_owner_setup",
+        "n88_legacy_guards_and_runtime_isolation_preserved"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only actor-qualified N88 installer candidate and native synthetic qualification; no live installation",
+        "realDataActions": 0,
+        "liveQueries": 0,
+        "serviceChanges": 0
+      },
+      "releaseAuthority": "Latest direct PO 2026-10-30 explicitly requests full N88/N44 diagnosis and architectural corrections where necessary. Read-only review found a NEW source-level installer defect, separate from the preserved old-helper SQLSTATE42501: no explicit SET capability for ownership transfer of newly created V2 guard routines under actual non-superuser actor and empty createrole_self_grant; runtime GRANT occurs after ownership transfer. Authorizes this concrete inactive local candidate, native synthetic qualification and source publication through original controller/publisher. Existing denied hosted route remains blocked. No live grants, membership/role changes, installation, accounts, credentials, backend deployment or real data operations; no rewrite of immutable original packet or nine-query contract. [Exact inactive source-only classification; no hosted activation.]",
+      "objective": "Complete a concrete code correction from current focused architecture diagnosis, NOT another unchanged installer retry or documentation-only review. Preserve original source packet and actual SQLSTATE42501/rollback. Create a new inactive candidate under the declared directory, a pure actor-capability evaluator, and native non-superuser qualification. Fix only newly-created V2 object setup; no live service action. Main base2ef68e981839db16450ad7927a0e9e8dd7a540c4.\n\nFRESH ROOT READ-ONLY METADATA 30Oct~20:32UTC: hosted actor postgres, PostgreSQL170006, SUPERUSERfalse, CREATEROLEtrue, BYPASSRLStrue, INHERITtrue, createrole_self_grant empty. n88_guard NOLOGIN NOINHERIT NOSUPERUSER NOCREATEROLE NOBYPASSRLS. Existing postgres->n88_guard membership: one grantor supabase_admin ADMINtrue/INHERITfalse/SETfalse, another postgres ADMINfalse/INHERITfalse/SETfalse. n88_private.lock_canonical_sources(uuid,integer) and lock_projection_sources(uuid,integer) owned by n88_guard: actor USAGE/SET/EXECUTE/EXECUTE WITH GRANT OPTION allfalse. lock_current_session(uuid,uuid) is postgres-owned and those capabilities true. n88_v2_guard/runtime absent. These facts are enough to reject live installation; they are not permission to grant old-role SET or change old helper ACLs. Do not acquire another live connection or repeat metadata queries.\n\nSource issue: v2-package-1028/schema.sql around218 / v2-external-plan-1028/install.sql around268 tries existing-helper grants without proving grant authority. New roles around189+ then function owner transfers around249+ do not establish creator SET capability, and each new runtime EXECUTE grant follows ALTER OWNER without retained effective owner privileges. A local superuser test can hide both. Read exact schemas, external preflight/manifest, existing native package tests/results, and actual staged migration ownership pattern. Do not copy credentials or private saved reports. Root fresh capability facts above and historical public evidence are sufficient.\n\nImplement a PURE actor-capability evaluator accepting minimized recorded metadata. Distinguish target identity from installer ability; require all needed existing-helper grants or already-correct granted prerequisites, new-role CREATE/SET/owner/grant order, target/schema constraints. Output exact blocked stage/functions with no secrets. No active connection, arbitrary SQL, credential loader or live read operation. Keep original nine-query preflight and immutable packet untouched; new candidate has its own manifest, source hashes and explicit inactive status. It must refuse unknown/incomplete capability evidence.\n\nImplement a new guarded inactive SQL candidate based on the qualified original delta with no table/operation behavior relaxation. It must reject the actual missing old-helper capability BEFORE V2 objects are created. Correct only NEW V2 guard ownership setup: explicit temporary SET-capable non-inheriting membership for the authorized installer actor in the newly created guard when needed, grant each NEW routine's runtime EXECUTE while installer still owns it, then transfer ownership; remove temporary membership and verify absence. Do not alter existing n88_guard memberships/owners/helper ACLs, broaden old n88_backend, use SECURITY DEFINER as a permission workaround, grant raw private/Auth writes to runtime, or change original helper locking semantics. Existing legitimate narrowly scoped V2 routines retain their original function contracts/guards; no redesign into broad definer.\n\nUse existing native PostgreSQL fixture strategy from tests/n88-backend-package-1028/native-composition.test.mjs. Bootstrap may create ONLY the disposable fixture topology. Execute the installer under a separate NOSUPERUSER CREATEROLE BYPASSRLS actor with empty createrole_self_grant and the observed old-role ADMINtrue/SETfalse/INHERITfalse membership, never under bootstrap superuser. Meaningful case1: exact hosted capabilities -> evaluator/SQL refuse missing helper grants before DDL; no V2 object leftovers; legacy membership/ACL fingerprints unchanged. Meaningful case2: explicitly separate SYNTHETIC prerequisite supplied by fixture owner (old required helpers already correctly accessible or grant authority supplied for fixture only), then execute corrected NEW-role setup as nonsuperuser. Prove original14 operation identities, owner/ACL, forcedRLS and runtime private-read denial, no PUBLIC/anon/authenticated execution, no leftover temporary actor/V2 membership, no oldguardchanges. Clearly record synthetic prerequisite as unavailable in real project. If necessary tailor fresh fixture baseline using existing native helpers; do not create live grants or claim fixture proof is hosted readiness.\n\nPreserve original grant denial, UNKNOWN/rollback and native isolation tests. Never mark actual installation PASS. Do not emit a runnable live launcher; inactive SQL/manifest only. Use fresh loopback test resources under existing harness, no personal browser/phone, remote network/student data or service changes. If native engine unavailable, report exact dependency rather than substituting text assertions/PGlite superuser claims for native role qualification.\n\nRecord concise evidence plus root architectural diagnosis in report: current legacy teacher/student credential/receipt path is distinct from unfinished V2 publication/runtime/lifecycle attachment. Legacy repository global advisory lock + private snapshot design creates a wider contention/failure domain; this is a structural scale concern, not measured outage proof. Preserve transactional COMMIT uncertainty and grade/owner/Sync/Delete lineage. Document remaining genuine old-helper owner capability and later dedicated runtime/host/writer lifecycle attachment; no full N88 closure. Optional index findings are not this patch. No broad benchmark/repeated unchanged suites. Source-only publisher must classify as inactive candidate delivery, not operational backend.\n\nSol6.1 Medium Standard Fast disabled. Original controller owns Product worker and sole publisher owns scoped Git delivery. Native local tests may mutate only disposable fixture database; root/staging/native actual live database strings must never be used or printed.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "2ef68e981839db16450ad7927a0e9e8dd7a540c4",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-package-1028/schema.sql",
+          "drafts/n88-student-portal/activation/v2-package-1028/manifest.json",
+          "drafts/n88-student-portal/activation/v2-package-1028/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/install.sql",
+          "drafts/n88-student-portal/activation/v2-external-plan-1028/PLAN.md",
+          "tests/n88-backend-package-1028/native-composition.test.mjs",
+          "tests/n88-backend-package-1028/results.json",
+          "supabase/migrations/20261018034356_n88_exact_activation_staged.sql"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/manifest.json",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/README.md",
+          "tests/n88-v2-actor-qualified-20261030.test.mjs",
+          "docs/automation-evidence/20261030/N88_ACTOR_QUALIFIED_INSTALLER.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/manifest.json",
+          "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/README.md",
+          "tests/n88-v2-actor-qualified-20261030.test.mjs",
+          "docs/automation-evidence/20261030/N88_ACTOR_QUALIFIED_INSTALLER.md"
+        ],
+        "workerChecks": [
+          "n88_actual_actor_capability_rejects_before_ddl",
+          "n88_native_managed_role_new_owner_setup",
+          "n88_legacy_guards_and_runtime_isolation_preserved"
+        ],
+        "publisherChecks": []
+      },
+      "completionMode": "reconcile_source_only_declaration",
+      "verificationRepair": {
+        "kind": "n88-actor-source-declaration-v1",
+        "publishedSha": "b5d8ecd10dd28488bc868b297b2a2bddb3b3a2ba",
+        "priorReceiptSha256": "c7dbfb5459d4a4f09a084bed98f6d80592a0ae8c688f92d101a4d8697fb84768",
+        "originalResultSha256": "c74f11b3d0350e981d3b91242032973e32d0bd712be5f699deaeadb492b14401",
+        "reviewedFixtureSha256": "a2930be23a0ed5249d9b743d9a9146eda5d696c4f56b9f9951889c527698fea8",
+        "reason": "Original card already authorizes inactive source-only publication in preparationAuthority and objective, but releaseAuthority says source publication and omits the exact source-only token required by the unchanged verifier. Append only that classification, preserving original successful provider, immutable/Production assets, original run and all native checks. Hosted installation remains NOT_RUN; no Product rerun, activation or republish."
+      }
+    }
+  ]
+}
