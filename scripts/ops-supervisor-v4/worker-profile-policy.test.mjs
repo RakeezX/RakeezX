@@ -25,3 +25,5 @@ test('controller and actual CLI arguments consume the same current policy',()=>{
  assert.match(controller,/import workerProfile from '\.\/worker-profile-policy\.json' with \{type:'json'\}/);assert.match(controller,/model: workerProfile\.model, effort: workerProfile\.effort/);assert.doesNotMatch(controller,/model: task\.model \?\? lane\.model/);
  assert.match(runner,/\$executionProfile = Get-WorkerExecutionProfile \$task \$spec/);assert.match(runner,/\$arguments\.Add\(\[string\]\$executionProfile\.model\)/);assert.match(runner,/model_reasoning_effort=' \+ \[string\]\$executionProfile\.effort/);assert.doesNotMatch(runner,/Get-N44ExecutionProfile|gpt-6-astra|features\.fast_mode=true/);
 });
+
+test('complete controller module parses before worker profile installation',()=>{execFileSync(process.execPath,['--check',path.join(here,'controller.mjs')],{windowsHide:true,timeout:15000});});

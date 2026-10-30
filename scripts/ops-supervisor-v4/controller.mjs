@@ -1,5 +1,5 @@
-import workerProfile from './worker-profile-policy.json' with {type:'json'};
 #!/usr/bin/env node
+import workerProfile from './worker-profile-policy.json' with {type:'json'};
 /** One durable owner of the activated queue. No model planner and no PM polling. */
 import fs from 'node:fs/promises';
 import path from 'node:path';
