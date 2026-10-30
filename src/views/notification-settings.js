@@ -39,9 +39,11 @@ const eligibilityText = {
   "ready": "تذكيرات الجهاز غير جاهزة حاليًا."
 };
 const verificationText = {
+  current_verified: 'تطابقت حالة التذكير الحالية مع المصدر المحفوظ. هذا لا يثبت الإرسال أو الوصول.',
+  changed: 'تختلف حالة التذكير المحفوظة عن المصدر الحالي. لم يُعد الحفظ.',
   confirmed: 'تأكد تفويض التذكير الحالي. هذا لا يثبت الإرسال أو الوصول.',
   rejected: 'رُفض التحقق من التذكير الحالي.',
-  unknown: 'UNKNOWN — نتيجة التحقق غير معروفة. لن تُعاد المحاولة تلقائيًا.',
+  unknown: 'لم تتأكد حالة التذكير الحالية. يمكنك التحقق مجددًا؛ لن يُعاد الحفظ تلقائيًا.',
   pending: 'حفظ المصدر لم يُؤكد بعد. لم يُطلب تفويض التذكير.',
   cleanup_confirmed: 'تأكد إيصال حذف المصدر والعناصر التابعة.',
 };
@@ -91,7 +93,7 @@ function normalEvidence(ui, scope, disclosures) {
         <dt>معرّف المصدر</dt><dd dir="ltr">${r.targetId}</dd><dt>البند</dt><dd dir="ltr">${r.itemId ?? '—'}</dd>
         <dt>التدريس</dt><dd dir="ltr">${r.teachingId}</dd></dl></details>
       <button type="button" class="btn btn--quiet" data-act="notification-verify" data-choice="${r.token}" data-scope="${scope}"
-        ${!ui.canVerify || ui.verifying || ui.verification?.token === r.token && ui.verification.status === 'unknown' ? 'disabled' : ''}>التحقق من هذا التذكير</button>
+        ${!ui.canVerify || ui.verifying ? 'disabled' : ''}>التحقق من هذا التذكير</button>
       ${ui.verification?.token === r.token ? html`<p role="status" data-n44-verification="${ui.verification.status}">${verificationText[ui.verification.status]}</p>
         ${ui.verification.authorization ? html`<details data-n44-disclosure="authorization:${r.id}" ${disclosureOpen(disclosures, `authorization:${r.id}`, true)}><summary>إيصال التحقق</summary><dl data-n44-authorization-receipt>
           <dt>HTTP / التفويض / عدد الطلبات</dt><dd dir="ltr">${ui.verification.authorization.httpStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.authorizationStatus ?? 'UNKNOWN'} / ${ui.verification.authorization.attempts ?? 0}</dd>

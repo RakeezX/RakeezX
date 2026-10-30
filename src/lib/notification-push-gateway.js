@@ -63,6 +63,16 @@ async function readConfigFailurePhase(stream, signal) {
   } catch { /* Optional evidence only; never retain the body or read/decode error. */ }
   finally { signal.removeEventListener('abort', cancel); cancel(); reader.releaseLock(); }
 }
+// AI: bound recovery bytes while streaming, including an unending response body.
+async function readProjectionResponse(stream, signal) {
+ if(!stream)throw Error('unavailable');
+ const reader=stream.getReader(),parts=[];let size=0;
+ const cancel=()=>{void reader.cancel().catch(()=>{});};signal.addEventListener('abort',cancel,{once:true});
+ try {for(;;){if(signal.aborted)throw Error('unavailable');const {done,value}=await reader.read();if(signal.aborted)throw Error('unavailable');if(done)break;size+=value.byteLength;if(size>65536)throw Error('unavailable');parts.push(value);}
+  const bytes=new Uint8Array(size);let offset=0;for(const part of parts){bytes.set(part,offset);offset+=part.byteLength;}
+  return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
+ }finally{signal.removeEventListener('abort',cancel);cancel();reader.releaseLock();}
+}
 export function createPushGateway({ fetch: send = globalThis.fetch, authorization, context, preferences,
   storage = globalThis.localStorage, randomUUID = () => crypto.randomUUID(), valid = () => true, readValid = valid, contextChanged = () => {}, invalidated = () => {}, cleanupAuthorization = () => typeof authorization === 'function' ? authorization() : authorization, bindConsent = async () => false, clearConsent = async () => true }) {
   const scope = { workspaceId: context.workspaceId, deviceId: context.deviceId };
@@ -99,6 +109,10 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
       }
       if (!response.ok || (!cleanup && !current())) { const error=Error('unavailable'); error.httpStatus=response.status; error.projectionDisposition=response.status>=400&&response.status<500?'rejected':'unknown'; throw error; }
       phase = 'response_read';
+      if(path === 'events/read') {
+        if(response.headers?.get('content-type')?.split(';',1)[0].trim().toLowerCase()!=='application/json')throw Error('unavailable');
+        const value=await readProjectionResponse(response.body,abort.signal);if(!current()||abort.signal.aborted)throw Error('unavailable');return value;
+      }
       const raw = await response.text(); phase = !cleanup && !current() ? 'context' : 'response_size';
       if (raw.length > 8192 || !cleanup && !current()) throw Error('unavailable');
       phase = 'decode';
@@ -221,6 +235,20 @@ export function createPushGateway({ fetch: send = globalThis.fetch, authorizatio
       return await this.authorizationResult(event) === 'confirmed';
     },
     expiresAt: () => Math.min(remote?.sessionExpiresAt ?? 0, receipt?.expiresAt ?? Infinity),
+    async readProjection(sourceKind, sourceId) {
+      if(!valid()||!remote?.pushConsent||!receipt||!['lesson','due'].includes(sourceKind)||![sourceId,scope.workspaceId,scope.deviceId,remote.consentRevision].every(v=>typeof v==='string'&&/^[A-Za-z0-9_.:-]{1,180}$/.test(v))||!(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/).test(receipt.registrationId??'')||remote.sessionExpiresAt<=Date.now()||receipt.expiresAt<=Date.now())throw Error('stale');
+      const nonce=randomUUID(),started=Date.now(),revision=remote.consentRevision,sessionRevision=remote.sessionRevision,registration={...receipt};
+      const r=await request('events/read',{...scope,sourceKind,sourceId,registrationId:registration.registrationId,consentRevision:revision,nonce});
+      const exact=(v,keys)=>v&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join(',')===keys.split(',').sort().join(',');
+      if(!valid()||remote.sessionExpiresAt<=Date.now()||receipt?.expiresAt<=Date.now()||remote?.consentRevision!==revision||remote.sessionRevision!==sessionRevision||receipt?.registrationId!==registration.registrationId||receipt?.expiresAt!==registration.expiresAt||
+        !exact(r,'status,sourceStamp,sourceRevisionDigest,events,nonce,workspaceId,deviceId,sourceKind,sourceId,registrationId,registrationExpiresAt,consentRevision,sessionRevision,observedAt')||
+        !['verified','changed','absent','unknown'].includes(r.status)||!sourceStamp(r.sourceStamp)||!sourceStamp(r.sourceRevisionDigest)||r.status==='verified'&&(r.sourceStamp===null||r.sourceRevisionDigest===null)||
+        r.nonce!==nonce||r.workspaceId!==scope.workspaceId||r.deviceId!==scope.deviceId||r.sourceKind!==sourceKind||r.sourceId!==sourceId||r.registrationId!==registration.registrationId||r.registrationExpiresAt!==registration.expiresAt||r.consentRevision!==revision||r.sessionRevision!==sessionRevision||
+        !Number.isSafeInteger(r.observedAt)||r.observedAt<started-5000||r.observedAt>Date.now()+5000||Date.now()-started>N44_RESPONSE_DEADLINE_MS||
+        !Array.isArray(r.events)||r.events.length>100||r.status==='verified'&&!r.events.length||new Set(r.events.map(e=>e.id)).size!==r.events.length||
+        r.events.some(e=>!exact(e,'id,kind,dueAt,expiresAt,actionPath')||typeof e.id!=='string'||!/^[a-zA-Z0-9_:%.-]{1,240}$/.test(e.id)||e.kind!==sourceKind||!Number.isSafeInteger(e.dueAt)||!Number.isSafeInteger(e.expiresAt)||e.expiresAt<=e.dueAt||e.expiresAt<=r.observedAt||typeof e.actionPath!=='string'||e.actionPath.length>800||!/^\/teaching\/[A-Za-z0-9_.%:-]+\/(?:items|attendance\?session=[A-Za-z0-9_.%:-]+)$/.test(e.actionPath)))throw Error('unavailable');
+      return r;
+    },
     async project(kind, sourceId, expectedStamp) {
       let r = await request('events/update', { ...scope, kind, sourceId, expectedStamp });
       if (r.status === 'stale' && sourceStamp(r.sourceStamp)) r = await request('events/update', { ...scope, kind, sourceId, expectedStamp: r.sourceStamp });

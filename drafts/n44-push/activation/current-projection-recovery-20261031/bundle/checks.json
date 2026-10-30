@@ -1,0 +1,49 @@
+{
+  "taskId": "continuous-n44-current-projection-recovery-20261031",
+  "runId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+  "recordedAt": "2026-10-30T22:36:22.754Z",
+  "checks": [
+    {
+      "name": "service protocol/backend/gateway",
+      "command": "node --test tests/n44-current-projection-recovery-service-20261031.test.mjs",
+      "status": "PASS",
+      "subtests": 4,
+      "evidence": "Real ingress/Auth/backend/gateway and qualified native with synthetic ports; finite negative cases plus real15s cancellation. Native subtest repeated only after canonical-LF bundle material correction."
+    },
+    {
+      "name": "mounted reload/negative boundaries",
+      "command": "node --test tests/n44-current-projection-recovery-20261031.test.mjs",
+      "status": "PASS",
+      "subtests": 1,
+      "evidence": "Expanded real app HTTP DOM/handlers/CSS journey including repeat current proof, saved lost ACK reload, six delayed binding/source switches, unchanged grade4, zero replay and no enrollment."
+    },
+    {
+      "name": "exact HTTP400 stale boundary",
+      "command": "node --test --test-name-pattern=n44_http400|n44_stale_response|transport,503 tests/n44-stale-projection-http-20261031.test.mjs",
+      "status": "PASS",
+      "subtests": 3
+    },
+    {
+      "name": "prior permission-race evidence reuse",
+      "status": "PASS",
+      "evidence": "Permission block exact to base; prior9-scenario evidence reused, not rerun.",
+      "sha256": "e21273d5b1e9ed88c52e656f16e5b6b4ac31a78f793017dea7dfd7ddfd944076"
+    },
+    {
+      "name": "offline shell/syntax/diff",
+      "status": "PASS",
+      "evidence": "Only SW v101->v102; shell inventory unchanged; affected imports already cached; syntax and git diff --check."
+    },
+    {
+      "name": "actual private SQL-shape identities",
+      "status": "PASS",
+      "evidence": "bundle/private-boundary-readback.json, all fields compare exactly to existing contract."
+    },
+    {
+      "name": "modified-service deployment/readback",
+      "status": "NOT_RUN",
+      "evidence": "Authenticated current ingress source prerequisite blocked; zero qualified updates."
+    }
+  ],
+  "scope": "Local synthetic product proofs; no live account/fixture/registration/projection/send; actual pg_catalog reads only."
+}

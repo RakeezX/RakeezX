@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-30T22:31:59.453Z",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "operation": "read-only pg_catalog definitions/ACL for three existing exact shapes",
+  "rows": [
+    {
+      "name": "boundary_4c02517c5dfbdffd1c5b454c",
+      "definition": "0888da3efd3d1f45c7ae91412d48e7bad0f7898828a7190b3f9fd2a3697c4f92",
+      "arguments": "p1 text",
+      "definer": false,
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n44_backend:EXECUTE",
+        "postgres:EXECUTE"
+      ]
+    },
+    {
+      "name": "boundary_ad31702f95cafad7fa108a0b",
+      "definition": "c748072917110f4b38a8e8039cd889e509c38b9318e5f1dbbdbdacb1aa38f605",
+      "arguments": "p1 text, p2 text",
+      "definer": false,
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n44_backend:EXECUTE",
+        "postgres:EXECUTE"
+      ]
+    },
+    {
+      "name": "boundary_e5608f0030522cd46dc1e398",
+      "definition": "e0c9d2497567ff3e51c1f87d06423748f11e7688bda8dae5ac10cf5f8f692355",
+      "arguments": "p1 text, p2 text, p3 text",
+      "definer": false,
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "acl": [
+        "n44_backend:EXECUTE",
+        "postgres:EXECUTE"
+      ]
+    }
+  ],
+  "schemaOrGrantChanges": 0,
+  "observation": "Actual connected Supabase execute_sql read returned in this attempt before this evidence file was recorded."
+}

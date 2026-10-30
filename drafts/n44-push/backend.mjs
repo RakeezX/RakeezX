@@ -8,7 +8,7 @@ import {createPostgresRepository} from './postgres-repository.mjs';
 import {createRegistrationBoundary} from './registration.mjs';
 import {createDeliveryBoundary,quietNow} from './delivery.mjs';
 import {normalizePushPayload} from '../../src/lib/notification-push-core.js';
-import {readSource,sourcePayload} from './canonical-source.mjs';
+import {readSource,sourcePayload,compareCurrentProjection} from './canonical-source.mjs';
 import {id,record,uuid,LIMITS} from './shared.mjs';
 import {deviceApproval,publicDeviceConfiguration,oneDeviceGuard,admitDeviceRegistration,classifyDeviceRegistration} from './one-device-test.mjs';
 import {DISPOSAL,DISPOSITION,disposalApproval,disposalRequest,disposeExactHosted} from './activation/hosted-disposal.mjs';
@@ -118,7 +118,7 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
    const verified=await verify(authorization,signal,ports);if(!verified)return {status:'rejected'};
    const auth={...verified,sessionRevision:policySessionRevision(verified.sessionId,policy)};
    // Discovery may precede consent; every activating operation remains privately scoped.
-   if(mobile&&(path==='/push/register'||path==='/context/update'&&body?.pushConsent!==false||path.startsWith('/events/'))){
+   if(mobile&&(path==='/push/register'||path==='/context/update'&&body?.pushConsent!==false||path.startsWith('/events/')&&path!=='/events/read')){
     if(!mobile.allowsScope(auth.ownerId,body,now()))return {status:'disabled'};
     ports.beforeCommit(()=>mobile.assertBeforeCommit(now()));
    }
@@ -180,6 +180,27 @@ export function createBackend({acquire,authUrl,apiKey,fetch,providerOrigins,cryp
       tx.releaseEndpoint(r.fingerprint,r.registrationId);tx.set('registrations',r.registrationId,{...r,state:'revoked',sealed:null,fingerprint:null,bindingFingerprint:null});}
      return {status:'updated',context:ctx};
     });
+   }
+   // AI: explicit present-state observation, never an acknowledgement or send permit.
+   if(path==='/events/read') {
+    exact(body,['workspaceId','deviceId','sourceKind','sourceId','registrationId','consentRevision','nonce']);scope(body);
+    if(!['lesson','due'].includes(body.sourceKind)||!id(body.sourceId)||!uuid(body.registrationId)||!id(body.consentRevision)||!uuid(body.nonce))fail();
+    let context,registration;
+    await local.atomic(auth.ownerId,tx=>{
+     const ctx=tx.context(body.workspaceId,body.deviceId),r=tx.get('registrations',body.registrationId);
+     if(!ctx?.active||ctx.sessionId!==auth.sessionId||ctx.sessionRevision!==auth.sessionRevision||ctx.sessionExpiresAt<=now()||!ctx.pushConsent||ctx.consentRevision!==body.consentRevision||ctx.preferences[body.sourceKind]!==true)fail();
+     if(!r||r.workspaceId!==body.workspaceId||r.deviceId!==body.deviceId||r.sessionId!==auth.sessionId||r.sessionRevision!==auth.sessionRevision||r.consentRevision!==ctx.consentRevision||r.state!=='active'||r.expiresAt<=now())fail();
+     context=ctx;registration=r;
+    });
+    const source=await readSource(ports.query,auth.ownerId,body.sourceKind,body.sourceId,context.preferences);
+    const stored=await ports.query('select * from n44_push_draft.events where owner_id=$1 order by workspace_id,device_id,event_id limit 101',[auth.ownerId]);
+    if(stored.rows.length>100)fail();
+    const observedAt=now();
+    if(context.sessionExpiresAt<=observedAt||registration.expiresAt<=observedAt)fail();
+    return {...compareCurrentProjection(source,stored.rows,body,observedAt),nonce:body.nonce,
+     workspaceId:body.workspaceId,deviceId:body.deviceId,sourceKind:body.sourceKind,sourceId:body.sourceId,
+     registrationId:registration.registrationId,registrationExpiresAt:registration.expiresAt,
+     consentRevision:context.consentRevision,sessionRevision:context.sessionRevision,observedAt};
    }
    if(path==='/events/authorize') {
     exact(body,['workspaceId','deviceId','consentRevision','registrationId','event']);scope(body);
