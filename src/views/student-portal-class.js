@@ -1,6 +1,6 @@
 import { html } from '../lib/dom.js';
 /** AI: reusable existing-class section; no route, runtime import, publication or network at import time. */
-import { classContextKey, PORTAL_FIELDS } from '../lib/student-portal-class-client.js';
+import { classContextKey, PORTAL_FIELDS, classifyClassMutationError } from '../lib/student-portal-class-client.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 export function buildStudentAccessMessage(student, url) {
  return `مرحبًا ${student.label}،\nرمز دخولك: ${student.credential}\n${url}\nافتح صفحة الطالب وأدخل الرمز لعرض مساحتك الدراسية.`;
@@ -181,9 +181,16 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
       const outcomeMessage=message,outcomeLines=outcomes;
       mutating=false;busy=false;queued=false;const refreshing=refresh(),refreshGeneration=generation;await refreshing;
       if(valid(refreshGeneration,k)&&roster){message=outcomeMessage;outcomes=outcomeLines;draw();}
-    } catch {
+    } catch (error) {
       if (!valid(g, k)) return;
-      clearSecrets(); queued = false; retry = true; uncertainMutation = true; message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.';
+      clearSecrets(); queued = false; retry = true;
+      if (classifyClassMutationError(error)?.state === 'not_started') {
+        // This invocation did not start; any earlier unknown still needs its own ACK.
+        message = 'لم تبدأ العملية. راجع الحالة الحالية قبل المحاولة.';
+      } else {
+        uncertainMutation = true;
+        message = 'نتيجة العملية غير مؤكدة؛ راجع القائمة قبل أي تغيير. الإعدادات المعروضة من آخر قراءة مؤكدة.';
+      }
     } finally { mutating = false; busy = !!readWork; if (!disposed) { if (key() !== boundKey) invalidate(); draw(); if (queued) { queued = false; scheduleRead(); } } }
   }
   const toggleRoster = e => { if(!e.target.matches('.n88-code-management')||e.target.open===rosterOpen)return; if(key()!==boundKey){invalidate();draw();return;} rosterOpen=e.target.open; if(rosterOpen)void refresh();else{clearSecrets();selected=null;draw();} };
