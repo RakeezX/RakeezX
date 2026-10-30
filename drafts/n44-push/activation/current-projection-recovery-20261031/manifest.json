@@ -20,7 +20,14 @@
   "actualServicePrerequisite": "BLOCKED",
   "readback": "service-readback.json",
   "serviceMaintenanceUpdatesConsumed": 0,
-  "ingress": "CURRENT SOURCE REQUIRED",
+  "ingress": {
+    "actualMcpRead": true,
+    "baselineSha256": "0a324c5e4538b5184f0ff460f9c0a907eafd35e2f423ed970145db70919882bc",
+    "qualifiedSha256": "f56fed121df72b6e760b8c77849284850f88c49149e31b4c1b9094c55e08027b",
+    "module": "worker.mjs",
+    "onlyDelta": "events/read route allowlist",
+    "allOtherBytesPreserved": true
+  },
   "sourceHashEncoding": "UTF-8 LF Git canonical text; bundle hashes exact bytes",
   "sourceHashes": {
     "drafts/n44-push/backend.mjs": "6bbb48ba4597655967920e62fb8671d69c508e146e40200b0d76c9fb1b31e076",
@@ -30,5 +37,6 @@
     "src/lib/notification-push-gateway.js": "476b9952285daaceab27fa8545920be9d905adf218c8ea634a36081433e4037b",
     "src/views/notification-settings.js": "3712431998f19c3d0f871cbb9758398741af007a34042d3953d47c6756a6a590",
     "sw.js": "f42168ee56debfe13c33da717463de891853699233e29b1e6d532cbd5129f705"
-  }
+  },
+  "continuationRunId": "e79c62d4-4515-45ec-b187-1c019f63758c"
 }

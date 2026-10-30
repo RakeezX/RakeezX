@@ -71,7 +71,14 @@ test('exact Native181 composition executes the qualified read through real signe
   else {names.push(spec);values.push(m.default??m);}native=native.replace(line,'');
  }
  const factory=new Function(...names,'Deno','addEventListener',native+'\nreturn createWebEntry;')(...values,{serve(){}},()=>{});
- const compiledEdge=factory(options),relay=createCloudflareEntry({now:()=>now,fetch:async(url,init)=>compiledEdge(new Request(url,init))});
+ const qualifiedIngress=await import('../drafts/n44-push/activation/current-projection-recovery-20261031/bundle/qualified/ingress.mjs');
+ const compiledEdge=factory(options),relay=qualifiedIngress.createCloudflareEntry({now:()=>now,fetch:async(url,init)=>compiledEdge(new Request(url,init))});
  const request=async()=>{const req=new Request(origin+'/api/n44/events/read',{method:'POST',headers:{origin,'content-type':'application/json','x-n44-csrf':'1','sec-fetch-site':'same-origin','cf-connecting-ip':'192.0.2.1',authorization:'Bearer '+token},body:JSON.stringify({...scope,nonce:randomUUID()})});Object.defineProperty(req,'cf',{value:{tlsVersion:'TLSv1.3'}});return relay(req,{N44_ENABLED:'true',N44_PUBLIC_ORIGIN:origin,N44_EDGE_URL:authUrl+'/functions/v1/n44-notifications',N44_INGRESS_KEY:'01'.repeat(32)});};
  rows=[];let v=await(await request()).json();assert.equal(v.status,'absent');assert(v.sourceRevisionDigest);rows=stored(v.events,v.sourceStamp);v=await(await request()).json();assert.equal(v.status,'verified');assert.equal(v.events.length,2);
+});
+
+test('separate original maintenance dispatcher rejects legacy/send and foreign run before capability use',async()=>{
+ const m=await import('file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019/drafts/n44-push/activation/device-custodian.mjs');
+ for(const action of ['send','register','activate','enrollment','coreFinitePhoneV2'])await assert.rejects(m.currentProjectionMaintenance(action,{runId:'e79c62d4-4515-45ec-b187-1c019f63758c'}));
+ await assert.rejects(m.currentProjectionMaintenance('prepare',{runId:'a28ecd62-83bf-4c8f-8aa7-b511048e76ec'}));
 });
