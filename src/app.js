@@ -955,28 +955,28 @@ async function resolve() {
 
 /* ---------- الإقلاع ---------- */
 
-// AI N145: only this informational route can render before workspace/auth boot.
-// Leaving it resumes the original boot and all protected-route guards.
+// AI N147: public information is a fallback only after existing workspace guards.
 let cleanupInformationNavigation = () => {};
+async function mountPublicInformation() {
+  if (currentPath().split('?')[0] !== '/about') return false;
+  const { default: about } = await import('./views/about.js');
+  if (currentPath().split('?')[0] !== '/about') return false;
+  render(app, html`<main class="page about-public" id="main">
+    <header class="about-public__bar"><a class="btn btn--ghost" href="#/" data-about-back>رجوع</a><h1>عن ركيز المعلم</h1></header>
+    ${about.render()}
+  </main>`);
+  about.afterPaint(app);
+  app.querySelector('[data-about-back]').addEventListener('click', event => {
+    event.preventDefault();
+    backWithinApp('/');
+  });
+  cleanupInformationNavigation = onNavigate(boot);
+  registerServiceWorker();
+  return true;
+}
 async function boot() {
   cleanupInformationNavigation();
   cleanupInformationNavigation = () => {};
-  if (currentPath().split('?')[0] === '/about') {
-    const { default: about } = await import('./views/about.js');
-    if (currentPath().split('?')[0] !== '/about') return boot();
-    render(app, html`<main class="page about-public" id="main">
-      <header class="about-public__bar"><a class="btn btn--ghost" href="#/" data-about-back>رجوع</a><h1>عن ركيز المعلم</h1></header>
-      ${about.render()}
-    </main>`);
-    about.afterPaint(app);
-    app.querySelector('[data-about-back]').addEventListener('click', event => {
-      event.preventDefault();
-      backWithinApp('/');
-    });
-    cleanupInformationNavigation = onNavigate(boot);
-    registerServiceWorker();
-    return;
-  }
   cleanupSessionAutoTriggers();
   // تبويب آخر يرقّي القاعدة: أعد التحميل بدل العمل على مخطط قديم
   db.setVersionChangeHandler(() => {
@@ -1010,6 +1010,10 @@ async function boot() {
       await registry.close();
     }
     if (import.meta.env?.DEV) window.__workspaceRouting = workspaceRouting;
+    if (workspaceRouting.status !== 'ready') {
+      store.deactivateWorkspace(workspaceRouting.reason);
+      if (await mountPublicInformation()) return;
+    }
     if (workspaceRouting.status !== 'ready' && cloud.session && cloud.user &&
         ['initial-restore-required', 'initial-restore-pending', 'account-provisioning-pending', 'initial-restore-recovery-required'].includes(workspaceRouting.reason)) {
       await mountAndRunInitialRestore();
@@ -1046,6 +1050,8 @@ async function boot() {
     if (isDemoWorkspace()) markDemoReady();
   } catch (err) {
     console.error('[rakeezx] فشل فتح قاعدة البيانات', err);
+    store.deactivateWorkspace('workspace-boot-failed');
+    if (await mountPublicInformation()) return;
     render(
       app,
       html`<div class="page">

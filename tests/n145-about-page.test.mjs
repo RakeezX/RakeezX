@@ -30,8 +30,8 @@ test('N145 actual public About and Settings navigation on phone and desktop', {t
         await expect(page.locator('[data-about-version]')).toContainText(version);
         await expect(page.locator('time')).toHaveAttribute('datetime','2026-10-30');
         const privacy=page.locator('#about-privacy');
-        for(const fact of ['Umami','Cloudflare','Supabase','ap-south-1','خارج السعودية','النسخ الاحتياطية','التصحيح','الحذف']) await expect(privacy).toContainText(fact);
-        const jump=page.getByRole('link',{name:'سياسة الخصوصية',exact:true});await jump.focus();await page.keyboard.press('Enter');
+        for(const fact of ['مومباي، الهند','خارج السعودية','النسخ الاحتياطية','التصحيح','الحذف']) await expect(privacy).toContainText(fact);
+        const jump=page.getByRole('button',{name:'سياسة الخصوصية',exact:true});await jump.focus();await page.keyboard.press('Enter');
         await expect(privacy).toBeFocused();await expect(page).toHaveURL(url+'/#/about');
         const question=page.getByText('هل ركيز جهة تعليمية رسمية؟',{exact:true});await question.focus();await page.keyboard.press('Enter');
         await expect(question.locator('..')).toHaveAttribute('open','');
