@@ -34,108 +34,81 @@ function teamsRoster(teachingId, session) {
 async function openTeamsImport(teachingId) {
   if (importOpen || !activeSessionId) return;
   const sessionId = activeSessionId, selectedDate = date, workspace = store.getActiveWorkspace();
-  const mount = opening;
+  const mount = opening, timing = store.getSession(sessionId);
+  const startTime = timing?.startTime, endTime = timing?.endTime;
   const current = () => {
     const session = store.getSession(sessionId);
-    if (opening !== mount || activeSessionId !== sessionId || date !== selectedDate ||
+    if (mount?.signal.aborted || opening !== mount || activeSessionId !== sessionId || date !== selectedDate ||
         store.getActiveWorkspace() !== workspace || !session || session.teachingId !== teachingId ||
-        session.date !== selectedDate || ['cancelled', 'cancelled_holiday'].includes(session.status)) {
-      throw Error('TEAMS_CONTEXT_CHANGED');
-    }
+        session.date !== selectedDate || session.startTime !== startTime || session.endTime !== endTime ||
+        ['cancelled', 'cancelled_holiday'].includes(session.status)) throw Error('TEAMS_CONTEXT_CHANGED');
     store.assertClassOperationsAccess(teachingId);
     return session;
   };
   try { current(); } catch { toast('تحقق من الحساب والحصة النشطة قبل الاستيراد.', 'danger'); return; }
-  importOpen = true;
+  const owner = importOpen = {};
   let disposed = false;
+  const dispose = () => { disposed = true; if (importOpen === owner) importOpen = false; };
+  mount?.signal.addEventListener('abort', dispose, {once: true});
   try {
     await openSheet({
       title: 'استيراد حضور Teams',
-      desc: `الحصة ${store.getSession(sessionId).period} · ${selectedDate}. معاينة محلية فقط؛ لن يُرصد الغياب ولن يتغير الرصد السابق.`,
+      desc: `الحصة ${timing.period} · ${selectedDate}. اختيار التقرير يرصد النتائج مباشرة حسب توقيت الحصة المحفوظ، ويحفظ الرصد السابق.`,
       body: html`<label class="field"><span class="field__label">تقرير حضور Teams (.csv، حتى 1MB و300 صف)</span>
-          <input class="input" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" data-teams-file></label>
-        <label class="field"><span class="field__label">تحذير المشاركة الأقل من (دقائق)</span>
-          <input class="input" type="number" min="0" max="240" step="1" value="5" data-teams-short></label>
-        <div data-teams-preview aria-live="polite"></div>`,
-      foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
-        <button class="btn btn--primary" data-teams-apply disabled>رصد الحاضرين المطابقين</button>`,
+        <input class="input" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" data-teams-file></label>
+        <div data-teams-result role="status" aria-live="polite"></div>`,
+      foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>`,
       onMount(root) {
-        let report = null, rows = [], busy = false, version = 0;
-        const fileInput = root.querySelector('[data-teams-file]');
-        const threshold = root.querySelector('[data-teams-short]');
-        const preview = root.querySelector('[data-teams-preview]');
-        const apply = root.querySelector('[data-teams-apply]');
-        const labels = { matched: 'مطابق', unmatched: 'غير مطابق', ambiguous: 'اسم ملتبس', duplicate: 'مطابق مكرر — لن يُرصد مرتين' };
-        const render = () => {
-          apply.disabled = true;
-          if (!report || disposed || !root.isConnected) return;
-          let session;
-          try { session = current(); } catch { preview.textContent = 'تغير الحساب أو الحصة. أغلق المعاينة وافتحها مجددًا.'; return; }
-          rows = matchTeamsAttendance(report, teamsRoster(teachingId, session), Number(threshold.value));
-          const recorded = new Set(store.attendanceIn(sessionId).map(r => r.studentId));
-          const sameDate = report.reportDate === selectedDate;
-          const counts = state => rows.filter(r => r.state === state).length;
-          preview.innerHTML = html`<p role="status">وُجد ${rows.length} · مطابق ${counts('matched')} · غير مطابق ${counts('unmatched')} · ملتبس ${counts('ambiguous')} · مشاركة قصيرة ${rows.filter(r => r.short).length} · منظم مستبعد ${report.organizerIgnored} · مكرر مستبعد ${report.duplicates + counts('duplicate')}</p>
-            <p class="${sameDate ? 't-3' : 't-danger'}">${sameDate ? `تاريخ التقرير مطابق: ${report.reportDate}` : `اختلاف التاريخ: التقرير ${report.reportDate || 'غير معروف'}، والحصة ${selectedDate}. لا يمكن الرصد بهذا التقرير.`}</p>
-            ${isBeforeScheduledStart(session) ? html`<p>لم يبدأ وقت الحصة بعد؛ الضغط على زر الرصد يؤكد قصدك الرصد الآن.</p>` : ''}
-            <div class="list">${rows.map((r, i) => html`<label class="field" style="overflow-wrap:anywhere">
-              <span><input type="checkbox" data-teams-row="${i}" ${r.studentId && !recorded.has(r.studentId) ? 'checked' : ''}
-                ${!sameDate || !r.studentId || recorded.has(r.studentId) ? 'disabled' : ''}>
-              ${r.name} · ${labels[r.state]}${recorded.has(r.studentId) ? ' · مرصود سابقًا (محفوظ)' : ''}
-              · ${r.seconds === null ? 'مدة غير معروفة' : `${r.seconds} ثانية`}${r.short ? ' · مشاركة قصيرة (يمكن إلغاء اختيارها)' : ''}</span></label>`)}</div>`;
-          apply.disabled = !sameDate || !rows.some(r => r.studentId && !recorded.has(r.studentId));
+        let busy = false, completed = false;
+        const input = root.querySelector('[data-teams-file]'), result = root.querySelector('[data-teams-result]');
+        const verify = () => {
+          if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
+          return current();
         };
-        fileInput.addEventListener('change', async () => {
-          const token = ++version;
-          report = null; rows = []; apply.disabled = true; preview.textContent = '';
-          const file = fileInput.files?.[0];
-          if (!file) return;
+        input.addEventListener('change', async () => {
+          const file = input.files?.[0];
+          if (!file || busy || completed || disposed) return;
+          busy = true; input.disabled = true;
+          result.textContent = 'جارٍ قراءة التقرير ورصد النتائج…';
+          let rows = [], saved = 0, skipped = 0, failed = false;
+          const counts = {present: 0, late: 0, absent: 0};
           try {
-            if (file.size > 1024 * 1024) throw Error('SIZE');
+            if (file.size > 1024 * 1024) throw Error('TEAMS_FILE_INVALID');
             const buffer = await file.arrayBuffer();
-            if (disposed || !root.isConnected || token !== version) return;
-            current();
-            report = parseTeamsAttendance(buffer);
-            render();
-          } catch {
-            if (root.isConnected && token === version) preview.textContent = 'تعذّر قراءة التقرير أو تغيرت الحصة. اختر تقرير Teams الأصلي حتى 1MB و300 صف.';
-          } finally { fileInput.value = ''; }
-        });
-        threshold.addEventListener('change', () => {
-          if (!threshold.checkValidity()) { apply.disabled = true; return; }
-          render();
-        });
-        apply.addEventListener('click', async () => {
-          if (busy || apply.disabled || report?.reportDate !== selectedDate) return;
-          const selected = [...root.querySelectorAll('[data-teams-row]:checked:not(:disabled)')].map(el => rows[Number(el.dataset.teamsRow)]);
-          if (!selected.length) return;
-          busy = true;
-          root.querySelectorAll('input, button').forEach(el => { el.disabled = true; });
-          let saved = 0, skipped = 0, failed = false;
+            const session = verify();
+            // Only IDs/statuses survive classification; release report identities before writes.
+            rows = matchTeamsAttendance(parseTeamsAttendance(buffer), teamsRoster(teachingId, session), session);
+          } catch (error) {
+            if (root.isConnected) result.textContent = error.message === 'TEAMS_CLASS_WINDOW_INVALID'
+              ? 'لم يُرصد شيء. تحقق من توقيت الحصة المحفوظ وتاريخ التقرير وصيغة أوقاته.'
+              : 'لم يُرصد شيء. تعذّر قراءة التقرير أو تغيّر الحساب أو الحصة؛ اختر تقرير Teams الأصلي حتى 1MB و300 صف.';
+            return;
+          } finally {
+            input.value = '';
+            if (!rows.length) { busy = false; input.disabled = disposed; }
+          }
+          const invalidTiming = rows.filter(row => row.state === 'invalid').length;
+          completed = true; input.disabled = true;
+          skipped = rows.filter(row => !row.studentId).length;
+          const selected = rows.filter(row => row.studentId);
           try {
             for (const row of selected) {
-              if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
-              const session = current();
-              const stillMatches = matchTeamsAttendance(report, teamsRoster(teachingId, session), Number(threshold.value))
-                .some(r => r.studentId === row.studentId && r.name === row.name);
-              if (!stillMatches) throw Error('TEAMS_ROSTER_CHANGED');
-              if (store.attendanceIn(sessionId).some(r => r.studentId === row.studentId)) { skipped++; continue; }
-              const result = await store.fillSelectedAttendance(sessionId, [row.studentId], { verifyCurrent: () => {
-                current();
-                if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
-              } });
-              saved += result.saved;
-              skipped += result.skipped;
+              verify();
+              if (!teamsRoster(teachingId, current()).some(student => student.id === row.studentId)) throw Error('TEAMS_ROSTER_CHANGED');
+              const outcome = await store.fillSelectedAttendance(sessionId, [row.studentId], {
+                status: row.status, verifyCurrent: verify,
+              });
+              saved += outcome.saved; counts[row.status] += outcome.saved; skipped += outcome.skipped;
             }
           } catch { failed = true; }
-          // Never replay after partial success or expose raw exception/report data.
-          preview.textContent = `تأكد رصد ${saved} حاضرًا · مرصود سابقًا ${skipped}. ${failed ? 'توقف الرصد بسبب تغير السياق أو تعذّر الحفظ؛ راجع سجل الحصة قبل أي محاولة جديدة.' : 'اكتمل رصد المختارين فقط. بقية الطلاب دون تغيير.'}`;
-          root.querySelectorAll('[data-sheet-close]').forEach(el => { el.disabled = false; });
+          const remaining = rows.length - saved - skipped;
+          result.textContent = `حاضر ${counts.present} · متأخر ${counts.late} · غائب ${counts.absent} · متجاوز ${skipped} · غير محفوظ ${remaining}. ${failed ? 'توقف الرصد بسبب تغير السياق أو تعذّر الحفظ؛ راجع سجل الحصة قبل أي محاولة جديدة.' : 'اكتمل الرصد. بقية الطلاب دون تغيير.'}${invalidTiming ? ' توقيت ناقص لبعض المشاركين؛ تحقق من توقيت الحصة وصيغة أوقات التقرير.' : ''}`;
+          rows = []; busy = false;
           repaint();
         });
       },
     });
-  } finally { disposed = true; importOpen = false; }
+  } finally { mount?.signal.removeEventListener('abort', dispose); dispose(); }
 }
 
 // AI N144: page-owned intent survives a changed-markup repaint, never a changed

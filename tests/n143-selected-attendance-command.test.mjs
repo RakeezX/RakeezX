@@ -114,7 +114,7 @@ test('n143_existing_full_roster_fill_unchanged', {timeout:120000},async()=>{
   } finally {await server.close();}
 });
 
-test('n143_selected_account_store_outbox_and_cloud', {timeout:120000},async()=>{
+test('n143_selected_status_store_sync_atomicity_and_partial_failure', {timeout:120000},async()=>{
   await import('fake-indexeddb/auto');
   globalThis.document={documentElement:{setAttribute(){},removeAttribute(){},classList:{add(){},remove(){}}},querySelector:()=>({setAttribute(){}})};
   globalThis.matchMedia=()=>({matches:false});
@@ -144,15 +144,13 @@ test('n143_selected_account_store_outbox_and_cloud', {timeout:120000},async()=>{
       teachings:[canonical({id:'override-teaching',sectionId:section.id,subjectId:'override-subject',termId:store.activeTerm().id})],
       students:['a','b','c'].map(id=>canonical({id:`override-${id}`,name:`طالب اصطناعي ${id}`,status:'active'})),
       enrollments:['a','b','c'].map((id,i)=>canonical({id:`en-${id}`,studentId:`override-${id}`,sectionId:section.id,status:'active',rollNo:i+1})),
-      sessions:[canonical({id:'override-session',teachingId:'override-teaching',date:'2026-09-06',period:1,status:'scheduled'})],
+      sessions:['present','late','absent','excused'].map((status,i)=>canonical({id:i===0?'override-session':`status-${status}`,teachingId:'override-teaching',date:'2026-09-06',period:i+1,status:'scheduled'})),
     },{queue:false});
     await db.clearStore('outbox');
-    const outcome=await store.fillSelectedAttendance('override-session',['override-b']);
-    assert.deepEqual(outcome,{saved:1,skipped:0});
-    const rows=await db.getAll('outbox');
-    assert.equal(rows.length,1); assert.equal(rows[0].ownerId,owner);
-    assert.equal(rows[0].command,'attendance:selected-fill');
-    assert.deepEqual(rows[0].patch.studentIds,['override-b']);
+    const invalidBefore=await db.getAll('attendance');
+    for (const status of [null,'unknown',{},['late']]) await assert.rejects(store.fillSelectedAttendance('override-session',['override-b'],{status}));
+    assert.deepEqual(await db.getAll('attendance'),invalidBefore);
+    assert.equal((await db.getAll('outbox')).length,0);
     let body;
     globalThis.fetch=async(url,options)=>{
       assert.ok(String(url).endsWith('/rpc/apply_sync_v2_selected_attendance_command'));
@@ -162,13 +160,30 @@ test('n143_selected_account_store_outbox_and_cloud', {timeout:120000},async()=>{
       return new Response(JSON.stringify(receipt),{status:200,headers:{'Content-Type':'application/json'}});
     };
     const engine=createSyncV2Engine({database:db,ownershipGuard:runtimeSyncOwnershipGuard,currentAuthenticatedUserId:()=>cloud.user?.id});
-    const result=await engine.dispatchPending();
-    assert.equal(result.acknowledged,1);
-    assert.deepEqual(body.p_student_ids,['override-b']);
-    assert.equal(body.p_status,'present');
-    assert.equal((await db.getAll('outbox')).length,0);
-    assert.deepEqual((await server.fetchRecords('attendance')).map(r=>r.student_id),['override-b']);
+    for (const [i,status] of ['present','late','absent','excused'].entries()) {
+      const sessionId=i===0?'override-session':`status-${status}`;
+      if(i)await server.pg.query(`insert into rakeezx.sessions(id,teaching_id,date,period,status) values($1,'override-teaching','2026-09-06',$2,'scheduled')`,[sessionId,i+1]);
+      const outcome=await store.fillSelectedAttendance(sessionId,['override-b'],i?{status}:undefined);
+      assert.deepEqual(outcome,{saved:1,skipped:0});
+      const rows=await db.getAll('outbox');
+      assert.equal(rows.length,1);assert.equal(rows[0].ownerId,owner);
+      assert.equal(rows[0].command,'attendance:selected-fill');
+      assert.deepEqual(rows[0].patch.studentIds,['override-b']);assert.equal(rows[0].patch.status,status);
+      const result=await engine.dispatchPending();
+      assert.equal(result.acknowledged,1);
+      assert.deepEqual(body.p_student_ids,['override-b']);assert.equal(body.p_status,status);
+      assert.equal((await db.getAll('outbox')).length,0);
+      const remote=(await server.fetchRecords('attendance')).filter(r=>r.session_id===sessionId);
+      assert.deepEqual(remote.map(r=>[r.student_id,r.status]),[['override-b',status]]);
+      const repeated=await store.fillSelectedAttendance(sessionId,['override-b'],{status:'absent'});
+      assert.deepEqual(repeated,{saved:0,skipped:1});assert.equal((await db.getAll('outbox')).length,0);
+    }
     const before=await db.getAll('attendance');
+    const schedule=await db.get('sessions','override-session');
+    await db.put('sessions',{...schedule,startTime:'09:00',endTime:'09:40'});
+    await assert.rejects(store.fillSelectedAttendance('override-session',['override-c'],{status:'late'}),/TEAMS_WRITE_FAILED/);
+    assert.deepEqual(await db.getAll('attendance'),before);assert.equal((await db.getAll('outbox')).length,0);
+    await db.put('sessions',schedule);
     const student=await db.get('students','override-c');
     await db.put('students',{...student,ownerId:'22222222-2222-4222-8222-222222222222'});
     await assert.rejects(store.fillSelectedAttendance('override-session',['override-c']));

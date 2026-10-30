@@ -5501,9 +5501,9 @@ export async function setAttendance(sesId, studentId, status) {
 }
 
 /** AI N143: atomic selected-only local preparation; no manual edit semantics change. */
-export async function fillSelectedAttendance(sesId, studentIds, { verifyCurrent } = {}) {
+export async function fillSelectedAttendance(sesId, studentIds, { verifyCurrent, status = 'present' } = {}) {
   const workspace = activeWorkspace, ses = getSession(sesId);
-  if (!ses || !Array.isArray(studentIds) || studentIds.length > 300 ||
+  if (!['present', 'late', 'absent', 'excused'].includes(status) || !ses || !Array.isArray(studentIds) || studentIds.length > 300 ||
       new Set(studentIds).size !== studentIds.length || studentIds.some(id => typeof id !== 'string' || !id.trim())) throw Error('TEAMS_SELECTION_INVALID');
   assertClassOperationsAccess(ses.teachingId);
   const ids = new Set(studentIds);
@@ -5521,7 +5521,7 @@ export async function fillSelectedAttendance(sesId, studentIds, { verifyCurrent 
     const recorded = new Set(current.attendance.filter(r => r.sessionId === sesId).map(r => r.studentId));
     return [...ids].filter(id => !recorded.has(id)).map(studentId => ({
       id: attendanceId(studentId, sesId), studentId, sessionId: sesId,
-      teachingId: session.teachingId, date: session.date, status: 'present',
+      teachingId: session.teachingId, date: session.date, status,
       note: '', deleted: false, updatedAt: stamp,
     }));
   }, 'selected-fill', { selectedFill: true, verifyCurrent(current) {
@@ -5529,7 +5529,7 @@ export async function fillSelectedAttendance(sesId, studentIds, { verifyCurrent 
     assertClassOperationsAccess(ses.teachingId);
     const session = current.sessions.find(r => r.id === sesId && !r.deleted);
     if (activeWorkspace !== workspace || !session || session.teachingId !== ses.teachingId ||
-        session.date !== ses.date || ['cancelled', 'cancelled_holiday'].includes(session.status)) throw Error('TEAMS_CONTEXT_CHANGED');
+        session.date !== ses.date || session.startTime !== ses.startTime || session.endTime !== ses.endTime || ['cancelled', 'cancelled_holiday'].includes(session.status)) throw Error('TEAMS_CONTEXT_CHANGED');
   } });
   if (!['snapshot', 'empty'].includes(mutation.kind)) throw Error('TEAMS_WRITE_FAILED');
   return { saved: mutation.records.length, skipped: ids.size - mutation.records.length };
