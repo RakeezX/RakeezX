@@ -1,0 +1,91 @@
+{
+  "taskId": "continuous-n44-current-projection-recovery-20261031",
+  "runId": "e79c62d4-4515-45ec-b187-1c019f63758c",
+  "savedCandidate": "b25be0e5eebc7899d4f3289ffc283c2a5d2d31ce",
+  "serviceSourceSha": "09eede2ff222612ba50b0eb733be5478a4bb2ff7",
+  "recordedAt": "2026-10-30T23:15:16.139Z",
+  "reuse": {
+    "sourceHashes": {
+      "drafts/n44-push/backend.mjs": "6bbb48ba4597655967920e62fb8671d69c508e146e40200b0d76c9fb1b31e076",
+      "drafts/n44-push/canonical-source.mjs": "89df837d8162f0fe271a7f1b5892c06ba14ad49974b7113873f793b1d1cbdf73",
+      "drafts/n44-push/web-protocol.mjs": "6084a27b4e100583d740517fbc064baadd3335cdd867c24bccc9f960db71c727",
+      "src/lib/notification-push-runtime.js": "84832d7a44cb89b18900033ead858c648571ecaf5c7e40fb2ec1780877904e3f",
+      "src/lib/notification-push-gateway.js": "476b9952285daaceab27fa8545920be9d905adf218c8ea634a36081433e4037b",
+      "src/views/notification-settings.js": "3712431998f19c3d0f871cbb9758398741af007a34042d3953d47c6756a6a590",
+      "sw.js": "f42168ee56debfe13c33da717463de891853699233e29b1e6d532cbd5129f705"
+    },
+    "priorLocalProof": "bundle/checks.json:4 focused service subtests + mounted HTTP journey +3 HTTP400 checks; unchanged affected source",
+    "permissionRace": "Unchanged prior source/evidence; not rerun"
+  },
+  "newChecks": [
+    {
+      "name": "current ingress plus exact native authenticated integration",
+      "status": "PASS",
+      "command": "node --test --test-name-pattern=Native181|maintenance dispatcher tests/n44-current-projection-recovery-service-20261031.test.mjs",
+      "subtests": 2
+    },
+    {
+      "name": "original MCP three current GETs and postreadbacks",
+      "status": "PASS",
+      "sourceOnlyDelta": true,
+      "settingsExact": true,
+      "cron": []
+    },
+    {
+      "name": "actual original Edge/source-policy install",
+      "status": "PASS",
+      "readOnlyReconciled": true,
+      "entrySha256": "019478108fce80a1396216aeafc8dc0529ccbc49307c79d2fb969a1356b259ba",
+      "archive": "1587845f2adf45c72bd992f297dc2f8eeeadf30a4c3ff6d5e3a818a9acc04d9a"
+    },
+    {
+      "name": "actual signed private backend readiness",
+      "status": "PASS",
+      "httpStatus": 200,
+      "sourceSha": "09eede2ff222612ba50b0eb733be5478a4bb2ff7"
+    },
+    {
+      "name": "authenticated live teacher fixture",
+      "status": "NOT_RUN",
+      "reason": "No active permitted authenticated fixture established or used; none created or re-enrolled."
+    },
+    {
+      "name": "actual deployed ingress signed-envelope and teacher-auth rejection",
+      "status": "PASS",
+      "httpStatus": 400,
+      "evidence": "Exact route reached backend and rejected synthetic invalid bearer; proves retained secret binding and both allowlists, not positive live teacher equality."
+    },
+    {
+      "name": "service-maintenance helper syntax and candidate diff",
+      "status": "PASS",
+      "evidence": "Changed public helper/build and two original private modules syntax checks; git diff --check. No unchanged full-suite or mounted rerun."
+    }
+  ],
+  "providerOperations": {
+    "edgeUpdate": 1,
+    "ingressUpdate": 1,
+    "bindingUpdate": 1,
+    "registrations": 0,
+    "projectionWrites": 0,
+    "sends": 0,
+    "sqlAuthSchemaRoleChanges": 0,
+    "newCredentials": 0
+  },
+  "oldFailureAndCleanupDenialPreserved": true,
+  "privateCustodyRepair": {
+    "root": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019/",
+    "publicCommit": false,
+    "paths": [
+      {
+        "path": "drafts/n44-push/activation/device-custodian.mjs",
+        "sha256": "7c6cbb324c89f4d64b6bab495fa166160158a85b3170659f720adb48de1c86dc",
+        "change": "Separate finite current-projection maintenance export appended; historical trial logic/IDs/counters not executed or reset."
+      },
+      {
+        "path": "drafts/n44-push/activation/core-v1-live.mjs",
+        "sha256": "02d8d34d51003f2e27283dc99cfb2b2f7cbf93484d619b5356227b59fe78c336",
+        "change": "Separate finite current-projection maintenance export appended; historical trial logic/IDs/counters not executed or reset."
+      }
+    ]
+  }
+}

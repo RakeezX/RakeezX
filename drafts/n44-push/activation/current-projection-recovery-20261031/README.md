@@ -1,40 +1,42 @@
-# N44 current projection recovery — AI-authored candidate
+# N44 current projection recovery - AI-authored candidate
 
-This directory prepares the explicit read of CURRENT stored projection. It does
-not recover an original operation acknowledgement or prove notification delivery.
-Actual service installation is **BLOCKED**, so the frontend must not be published
-as operational recovery. See `service-readback.json`.
+The original custodian completed and read back the sole authorized Edge update,
+source/session-policy binding update and existing-ingress update. Delivery and
+scheduler remain OFF; cron is empty. See service-readback.json and
+bundle/continuation-e79c62d4.json for exact identities and preserved failures.
+Frontend Production publication remains the sole publisher's step.
 
-`build.mjs` takes the exact official Native181 source saved in `bundle/before`,
-adds the authenticated read branch, complete event comparison, canonical version
-digest and read-only exemption from enrollment admission, and extends its route
-allowlist. Its inverse assertion proves every other native byte is preserved.
-It never recompiles older main over current private/native changes. The unchanged
-import map remains pinned. `bundle/qualified/edge.mjs` is locally qualified only.
+This is an explicit read of CURRENT projection, never an original operation ACK
+or evidence of notification delivery. Actual native/ingress source parity is
+paired with positive authenticated integration of those exact bundles using
+synthetic Auth/query ports and actual signed private backend readiness. No active
+permitted live teacher fixture was established or used. No account, registration,
+projection, source or send was created for verification; physical phone proof
+remains separate and unproven.
 
-The live three-function private-boundary definition/ACL read is recorded in
-`bundle/private-boundary-readback.json`; every field matches the existing contract.
-No schema, grant, role, Auth, event, registration, consent or delivery mutation ran.
-Existing ingress admission/rate and repository owner-clock bookkeeping remain.
+build.mjs <fresh-current-ingress-module> composes only the admitted changes over
+the official Native181 baseline and the freshly MCP-read ingress. Inverse
+assertions preserve all other source bytes; the import map stays pinned. A
+rebuild preserves completed service receipts only if qualified hashes match.
+The deployed source-policy pin is immutable commit
+09eede2ff222612ba50b0eb733be5478a4bb2ff7; subsequent candidate changes record
+reconciliation and evidence without changing the deployed bundles/frontend.
 
-`service-admission.mjs prepare` validates this active card, exact intake hash and
-original custody owner, then writes only three finite current-ingress GET requests.
-The original CurrentUser policy is read from the exact preserved named capsule;
-its approval ID, activation timestamps and effective policy are not renewed.
-The `inspect` path performs original official CLI metadata checks, then reports
-the authenticated operator prerequisite. It does not install or start a trial.
+All service capabilities enter through the separate finite export on the ORIGINAL
+private custodian. Public standalone inspect reads local evidence only;
+prepare writes the bounded request recipe. Historical trial dispatchers,
+identities, spent/UNKNOWN records and approval timestamps are untouched. Durable
+authority-wide reservations prevent deployment or binding replay across run IDs.
 
-The attempted official Wrangler `init --from-dash` route unexpectedly delegated
-to setup/install/login, then timed out. That route has been removed from the
-helper and must not be retried. Its generated `bundle/current-ingress` directory
-is retained outside the candidate commit after the cleanup command was rejected
-with `blocked by policy`. Fresh process observation found its login children
-absent. No current ingress source, source/settings parity, empty-cron readback,
-qualified service installation or authenticated hosted recovery is claimed.
+Raw MCP responses remain untracked under
+artifacts/n44-current-projection-recovery-e79c62d4/. Settings returned only the
+secret binding name, never its value. Private maintenance sources and sealed
+journals remain outside public Git. Actual three SQL-shape/ACL reads are
+retained in bundle/private-boundary-readback.json.
 
-Resume only with authenticated official responses for
-`bundle/provider-read-requests.json`, then qualify the minimal ingress delta and
-finish the original non-sending maintenance path: at most one exact function and
-one existing-ingress update, preserved original policy identity and flags OFF,
-and actual source/configuration/route readback. Current update allowances consumed:
-zero. Old spent/UNKNOWN trials and identities remain unchanged.
+The initial post-install peer-version comparison failed after a provider revision
+advance caused by the binding update. Read-only reconciliation proved all source
+identities/configuration unchanged and exact installed native parity; no mutation
+was repeated. The prior Wrangler setup/login failure and rejected cleanup remain
+preserved. Generated bundle/current-ingress stays uncommitted; its deletion was
+not retried. Owned leases are released and no helper/server remains active.

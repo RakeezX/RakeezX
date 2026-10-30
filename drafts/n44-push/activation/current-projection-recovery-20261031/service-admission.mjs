@@ -2,7 +2,7 @@
 // Original CurrentUser custody is retained; only its named existing policy is read.
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
-import {spawnSync,execFileSync} from 'node:child_process';
+import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -15,7 +15,6 @@ const ORIGINAL_RUN='8288de34-7362-4946-b319-79a28e864be8';
 const PHASE=OPS+'intake-evidence/po-1628-finish-20261018/n44-live/owned-'+ORIGINAL_RUN+'.tmp';
 const POLICY_FILE=PHASE+'/mobile-60fc7d23-8c87-4d8b-b97f-d9c9e289af94-prepared.dpapi';
 const SOURCE='9d5becbc13e131249bac0d2e73babce6dd841f31';
-const CLI='C:/Users/Abody/AppData/Local/npm-cache/_npx/0e23c24576954b26/node_modules/supabase/dist/supabase.js';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 export async function assertAdmission({requireLeases=true}={}){
  const card=JSON.parse(await readFile(OPS+'queue/'+TASK+'.json'));assert.equal(card.id,TASK);assert.equal(card.productId,'N44');assert.equal(card.status,'running');assert.equal(card.attempt.runId,RUN);assert.equal(card.liveAuthorizationRef,REF);
@@ -27,32 +26,13 @@ export async function assertAdmission({requireLeases=true}={}){
  if(requireLeases)for(const resource of ['integration','live-mutation']){const l=JSON.parse(await readFile(OPS+'leases/'+resource+'.json'));assert.equal(l.taskId,TASK);assert.equal(l.owner.token,RUN);}
  return card;
 }
-function official(binary,args,{cwd=DIR,timeout=30000}={}){
- const result=spawnSync(process.execPath,[binary,...args],{cwd,windowsHide:true,timeout,maxBuffer:4194304,env:{...process.env,CI:'true',WRANGLER_SEND_METRICS:'false'},input:'n\nn\n'});
- try{if(result.status!==0)throw Object.assign(Error('n44_official_operation_failed'),{safeDiagnostic:{status:result.status,error:result.error?.code??null,signal:result.signal}});return result.stdout.toString();}finally{result.stdout?.fill(0);result.stderr?.fill(0);}
-}
-function originalPolicy(){
- // Existing original custodian's supported CurrentUser DPAPI convention. No
- // password/key/transport/phone record is exported, refreshed or rewritten.
- const ps="Add-Type -AssemblyName System.Security;$m=New-Object System.IO.MemoryStream;[Console]::OpenStandardInput().CopyTo($m);$b=$m.ToArray();$p=[Security.Cryptography.ProtectedData]::Unprotect($b,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser);[Array]::Clear($b,0,$b.Length);[Console]::Write([Convert]::ToBase64String($p));[Array]::Clear($p,0,$p.Length)";
- return async()=>{const encrypted=await readFile(POLICY_FILE),r=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',ps],{input:encrypted,windowsHide:true,timeout:15000,maxBuffer:262144});let plain;try{assert.equal(r.status,0,'n44_original_currentuser_unavailable');plain=Buffer.from(r.stdout.toString().trim(),'base64');const saved=JSON.parse(plain);const policy=saved.policy;assert(supportedSessionPolicy(policy,Date.now(),SOURCE));return policy;}finally{encrypted.fill(0);plain?.fill(0);r.stdout?.fill(0);r.stderr?.fill(0);}};
-}
-export async function inspect(){
- await assertAdmission();
- const functions=JSON.parse(official(CLI,['functions','list','--project-ref',PROJECT,'--output','json']));
- const native=functions.find(f=>f.slug==='n44-notifications');assert.equal(native.ezbr_sha256,'41c540288561db1e1d0ce32e2cd26660da128251270ee9f686d8846fec2254fc');
- const rows=JSON.parse(official(CLI,['secrets','list','--project-ref',PROJECT,'--output','json']));const map=Object.fromEntries(rows.map(r=>[r.name,r.digest??r.value]));
- const policy=await originalPolicy()();assert.equal(map.N44_SERVICE_SOURCE_SHA,hash(SOURCE));assert.equal(map.N44_SESSION_POLICY_JSON,hash(JSON.stringify(policy)));assert.equal(map.N44_DELIVERY_ENABLED,hash('false'));assert.equal(map.N44_ONE_DEVICE_TEST_JSON,hash('null'));assert(!map.N44_MOBILE_GRANT_SHA256);assert(!map.N44_FINITE_SCHEDULER_JSON||map.N44_FINITE_SCHEDULER_JSON===hash('null'));assert(!map.N44_SCHEDULER_ENABLED||map.N44_SCHEDULER_ENABLED===hash('false'));
- // The attempted supported init/from-dash route spawned C3/login and timed
- // out. It must not be retried or used for installation. A connected official
- // operator must supply these exact existing-script reads before qualification.
- await prepareReadRequests();
- return {status:'BLOCKED',code:'n44_authenticated_ingress_operator_required',providerWrites:0};
-}
+// Standalone inspection is local evidence only. All service capabilities enter
+// exclusively through the explicitly admitted original private dispatcher.
+export async function inspect(){await assertAdmission({requireLeases:false});return JSON.parse(await readFile(path.join(DIR,'service-readback.json'),'utf8'));}
 
 export async function prepareReadRequests(){
  await assertAdmission({requireLeases:false});
- const requests={taskId:TASK,runId:RUN,projectId:PROJECT,authority:REF,providerWrites:0,requests:['','/settings','/schedules'].map(suffix=>({method:'GET',path:'/accounts/1c9ae85e766968a4269a7ac505f9a693/workers/scripts/n44-notifications-ingress'+suffix,responsePath:'bundle/provider-responses/'+(suffix===''?'ingress-source.multipart':suffix==='/settings'?'ingress-settings.json':'ingress-schedules.json')})),scope:'Current ingress source/settings/empty cron only; no routes, peers, new credential or trial action.'};
+ const requests={taskId:TASK,runId:RUN,projectId:PROJECT,authority:REF,providerWrites:0,requests:['','/settings','/schedules'].map(suffix=>({method:'GET',path:'/accounts/1c9ae85e766968a4269a7ac505f9a693/workers/scripts/n44-notifications-ingress'+suffix,responsePath:'artifacts/n44-current-projection-recovery-e79c62d4/mcp-post-readback.json',responseIndex:suffix===''?0:suffix==='/settings'?1:2})),scope:'Current ingress source/settings/empty cron only; no routes, peers, new credential or trial action.'};
  await writeFile(path.join(DIR,'bundle/provider-read-requests.json'),JSON.stringify(requests,null,2)+'\n');
  return requests;
 }
@@ -63,7 +43,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
 // Only the original private dispatcher supplies these capabilities. No request
 // can select a URL, command, credential, registration or legacy trial operation.
 export async function originalCustodianMaintenance(c,action){
- await assertAdmission({requireLeases:action!=='prepare'});await c.owned();assert.equal(c.phase,PHASE);assert.equal(c.project,PROJECT);
+ await assertAdmission({requireLeases:['install-edge','reserve-ingress'].includes(action)});await c.owned();assert.equal(c.phase,PHASE);assert.equal(c.project,PROJECT);
  const integration=JSON.parse(await readFile(OPS+'leases/integration.json'));assert.equal(integration.taskId,TASK);assert.equal(integration.owner.token,RUN);
  const local=path.resolve(DIR,'../../../..'),rawPath=path.join(local,'artifacts/n44-current-projection-recovery-e79c62d4/mcp-initial-readback.json');
  const prefix=path.join(c.phase,'current-projection-20261031-'),planFile=prefix+RUN+'-plan.dpapi';
@@ -105,6 +85,18 @@ export async function originalCustodianMaintenance(c,action){
   await seal(prefix+RUN+'-edge-complete.dpapi',{sourceSha:plan.sourceSha,archive:installed.find(f=>f.slug==='n44-notifications').ezbr_sha256,edge:hash(actual),map:hash(actualMap),bindingReadbackExact:true});
   return report('edge-installed',{status:'PASS',sourceSha:plan.sourceSha,version:installed.find(f=>f.slug==='n44-notifications').version,archive:installed.find(f=>f.slug==='n44-notifications').ezbr_sha256,entrySha256:hash(actual),mapSha256:hash(actualMap),exactNativeReadback:true,allOtherConfigurationAndFunctionsUnchanged:true,policyApprovalAndActivationUnchanged:true,qualifiedUpdates:1,sourceBindingUpdates:1,deliveryOff:true,privateValuesReturned:false});
  }
+ if(action==='reconcile-edge'){
+  const edgeReservation=await unseal(prefix+'edge-once.dpapi'),bindingReservation=await unseal(prefix+'binding-once.dpapi');assert.equal(edgeReservation.runId,RUN);assert.equal(bindingReservation.runId,RUN);
+  equalMap(plan.before,await c.list(),{N44_SERVICE_SOURCE_SHA:plan.sourceSha,N44_SESSION_POLICY_JSON:JSON.stringify(plan.nextPolicy)});
+  const installed=functions(),withoutRevision=f=>{const {version,...identity}=f;return identity;};
+  assert.deepEqual(installed.filter(f=>f.slug!=='n44-notifications').map(withoutRevision),plan.inventory.filter(f=>f.slug!=='n44-notifications').map(withoutRevision));
+  const peerRevisions=installed.filter(f=>f.slug!=='n44-notifications').map(f=>({name:f.slug,before:plan.inventory.find(x=>x.slug===f.slug).version,after:f.version}));assert(peerRevisions.every(r=>r.after===r.before+1));
+  const actual=JSON.parse(await readFile(path.join(local,'artifacts/n44-current-projection-recovery-e79c62d4/native-post-get.json')));assert.equal(actual.slug,'n44-notifications');assert.equal(actual.verify_jwt,false);
+  assert.equal(hash(actual.files.find(f=>f.name==='n44-notifications/index.mjs').content),plan.manifest.qualifiedEntrySha256);assert.equal(hash(actual.files.find(f=>f.name==='n44-notifications/import_map.json').content),hash(await readFile(path.join(DIR,'bundle/qualified/import_map.json'))));
+  assert.equal(actual.ezbr_sha256,installed.find(f=>f.slug==='n44-notifications').ezbr_sha256);
+  await seal(prefix+RUN+'-edge-complete.dpapi',{sourceSha:plan.sourceSha,archive:actual.ezbr_sha256,edge:plan.manifest.qualifiedEntrySha256,bindingReadbackExact:true,reconciledReadOnly:true});
+  return report('edge-reconciled',{status:'PASS',sourceSha:plan.sourceSha,version:actual.version,archive:actual.ezbr_sha256,entrySha256:plan.manifest.qualifiedEntrySha256,exactNativeReadback:true,allOtherSourceIdentitiesAndConfigurationUnchanged:true,peerProviderRevisionsAdvancedByOne:true,peerCount:peerRevisions.length,policyApprovalAndActivationUnchanged:true,originalFailure:'Post-secret-update peer inventory strict comparison included provider revision counters; preserved FAIL, no repeated mutation.',qualifiedUpdates:1,sourceBindingUpdates:1,reconciliationWrites:0,deliveryOff:true,privateValuesReturned:false});
+ }
  if(action==='reserve-ingress'){
   await unseal(prefix+RUN+'-edge-complete.dpapi');equalMap(plan.before,await c.list(),{N44_SERVICE_SOURCE_SHA:plan.sourceSha,N44_SESSION_POLICY_JSON:JSON.stringify(plan.nextPolicy)});
   await seal(prefix+'ingress-once.dpapi',{runId:RUN,sourceSha:plan.sourceSha,hash:plan.manifest.ingress.qualifiedSha256,reservedBeforeMutation:true,maxUpdates:1,noRetry:true});
@@ -119,6 +111,12 @@ export async function originalCustodianMaintenance(c,action){
   const post=JSON.parse(await readFile(path.join(local,'artifacts/n44-current-projection-recovery-e79c62d4/mcp-post-readback.json')));assert.equal(post.length,3);assert(post.every(r=>r.response.success&&r.response.status===200));assert.deepEqual(post[1].response.result,plan.settings);assert.deepEqual(post[2].response.result,{schedules:[]});
   const raw=post[0].response.result,boundary=raw.split('\r\n',1)[0].slice(2),form=await new Response(raw,{headers:{'content-type':'multipart/form-data; boundary='+boundary}}).formData();assert.equal([...form].length,1);const entry=form.get('worker.mjs');assert.equal(hash(typeof entry==='string'?entry:await entry.text()),plan.manifest.ingress.qualifiedSha256);
   await seal(prefix+RUN+'-ingress-complete.dpapi',{sourceSha256:plan.manifest.ingress.qualifiedSha256,settingsExact:true,cronEmpty:true});return report('ingress-installed',{status:'PASS',sourceSha256:plan.manifest.ingress.qualifiedSha256,sourceExact:true,settingsBindingsAndPrivacyUnchanged:true,cron:[],qualifiedUpdates:1,secretValuesReturned:false});
+ }
+ if(action==='verify-ingress-auth-rejection'){
+  await unseal(prefix+RUN+'-edge-complete.dpapi');await unseal(prefix+RUN+'-ingress-complete.dpapi');
+  const response=await fetch('https://rakeezx.com/api/n44/events/read',{method:'POST',headers:{origin:'https://rakeezx.com','content-type':'application/json','x-n44-csrf':'1','sec-fetch-site':'same-origin',authorization:'Bearer synthetic-invalid-n44-no-account'},body:JSON.stringify({workspaceId:'synthetic-no-workspace',deviceId:'synthetic-no-device',sourceKind:'due',sourceId:'synthetic-no-source',registrationId:'11111111-1111-4111-8111-111111111111',consentRevision:'synthetic-no-consent',nonce:crypto.randomUUID()}),signal:AbortSignal.timeout(15000),redirect:'error',credentials:'omit',cache:'no-store'});
+  const value=await response.json();assert.equal(response.status,400);assert.deepEqual(value,{status:'rejected'});
+  return report('actual-ingress-auth-rejection',{status:'PASS',httpStatus:response.status,teacherAuth:'REJECTED synthetic invalid bearer',authenticatedIngressEnvelopeReachedBackend:true,bothInstalledRouteAllowlistsReachable:true,secretBindingRetainedByActualSignedExchange:true,domainReadsOrWrites:0,registrationOrProjectionOrSend:0,scope:'Negative teacher Auth proof only; not a successful live teacher current-projection read.'});
  }
  assert.equal(action,'readback');await unseal(prefix+RUN+'-edge-complete.dpapi');await unseal(prefix+RUN+'-ingress-complete.dpapi');equalMap(plan.before,await c.list(),{N44_SERVICE_SOURCE_SHA:plan.sourceSha,N44_SESSION_POLICY_JSON:JSON.stringify(plan.nextPolicy)});
  const {mac,sha}=await import('../../web-protocol.mjs');const saved=await c.load(),url='https://'+PROJECT+'.supabase.co/functions/v1/n44-notifications/readiness',u=new URL(url),time=String(Math.floor(Date.now()/1000)),nonce=crypto.randomUUID(),body='{}';

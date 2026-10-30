@@ -1,7 +1,7 @@
 {
   "aiAuthored": true,
   "taskId": "continuous-n44-current-projection-recovery-20261031",
-  "runId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+  "runId": "e79c62d4-4515-45ec-b187-1c019f63758c",
   "nativeBaselineVersion": 181,
   "nativeBaselineArchive": "41c540288561db1e1d0ce32e2cd26660da128251270ee9f686d8846fec2254fc",
   "baselineEntrySha256": "09d902f57abbb43ac459121072c3a1c28c3c83310aa790a5e8e43d5b744475d2",
@@ -16,10 +16,14 @@
   "deliveryEnabled": false,
   "schedulerEnabled": false,
   "cron": [],
-  "deployment": "NOT_RUN",
-  "actualServicePrerequisite": "BLOCKED",
+  "deployment": "ORIGINAL_CUSTODIAN_SERVICE_UPDATES_READ_BACK",
+  "actualServicePrerequisite": "PASS_WITH_EXPLICIT_LIVE_FIXTURE_LIMIT",
   "readback": "service-readback.json",
-  "serviceMaintenanceUpdatesConsumed": 0,
+  "serviceMaintenanceUpdatesConsumed": {
+    "edge": 1,
+    "ingress": 1,
+    "sourceBinding": 1
+  },
   "ingress": {
     "actualMcpRead": true,
     "baselineSha256": "0a324c5e4538b5184f0ff460f9c0a907eafd35e2f423ed970145db70919882bc",
@@ -38,5 +42,10 @@
     "src/views/notification-settings.js": "3712431998f19c3d0f871cbb9758398741af007a34042d3953d47c6756a6a590",
     "sw.js": "f42168ee56debfe13c33da717463de891853699233e29b1e6d532cbd5129f705"
   },
-  "continuationRunId": "e79c62d4-4515-45ec-b187-1c019f63758c"
+  "continuationRunId": "e79c62d4-4515-45ec-b187-1c019f63758c",
+  "serviceSourceSha": "09eede2ff222612ba50b0eb733be5478a4bb2ff7",
+  "installedEdgeArchive": "1587845f2adf45c72bd992f297dc2f8eeeadf30a4c3ff6d5e3a818a9acc04d9a",
+  "installedEdgeVersion": 183,
+  "installedIngressDeploymentId": "295dd3d33eed469995e7e8e5d763cc3f",
+  "originalCandidateRunId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec"
 }

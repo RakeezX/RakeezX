@@ -1,4 +1,75 @@
-# N44 current projection recovery — local candidate, service blocked
+# N44 current projection recovery — service prerequisite completed
+
+## Material continuation e79c62d4
+
+The saved candidate `b25be0e5eebc7899d4f3289ffc283c2a5d2d31ce` and its successful
+local proofs were retained. Run `e79c62d4-4515-45ec-b187-1c019f63758c` discovered
+and used the configured ORIGINAL `mcp__rakeez_cloudflare__execute` connection.
+The three exact ingress source/settings/schedules GETs succeeded with HTTP200.
+The actual source hash was
+`0a324c5e4538b5184f0ff460f9c0a907eafd35e2f423ed970145db70919882bc`;
+only its events/read allowlist changed. All other source bytes, bindings/settings
+and empty cron were preserved and independently read back after the sole update.
+
+A separate finite maintenance export was appended inside the two explicitly
+authorized ORIGINAL private-custodian files, outside public Git. It is bound to
+this task/run/session, exact authority/intake, qualified hashes and owned leases.
+It does not invoke or edit old trial admissions. Independent authority-wide
+append-only reservations enforce one Edge update, one binding update and one
+ingress update, without resetting closed/spent grants. Wrong-run and legacy/send
+actions reject before capability use.
+
+Actual installed Edge: provider revision183, archive
+`1587845f2adf45c72bd992f297dc2f8eeeadf30a4c3ff6d5e3a818a9acc04d9a`, entry
+`019478108fce80a1396216aeafc8dc0529ccbc49307c79d2fb969a1356b259ba`.
+Actual ingress source:
+`f56fed121df72b6e760b8c77849284850f88c49149e31b4c1b9094c55e08027b`, deployment
+`295dd3d33eed469995e7e8e5d763cc3f`. Both installed bundles contain events/read.
+Source/session-policy binding names the immutable qualified source commit
+`09eede2ff222612ba50b0eb733be5478a4bb2ff7`; later candidate changes record
+reconciliation/evidence without changing those deployed bundles or frontend code.
+Original policy approval ID, effective policy and activation timestamps stayed
+unchanged. General delivery and scheduler remain false; cron remains empty.
+
+The initial post-install strict peer-inventory assertion FAILED because the
+source-policy secret update advanced26 peer provider revision counters by one.
+No mutation was repeated. A separate READ-ONLY reconciliation compared every
+other identity field, exact code archives and all configuration digests. They
+matched; the exact new native source was independently retrieved through the
+official Supabase tool. The failure remains recorded in service-readback.json.
+
+Actual private signed readiness returned HTTP200/ready for the bound source,
+restricted login/role, TLS and exact source boundary. Positive authenticated
+current-projection integration executed the exact installed Edge and freshly
+qualified ingress code with synthetic Auth/query ports. Its current-source
+positive test and the new finite dispatcher negative test both pass. The prior
+four focused service proofs, real mounted HTTP reload/guard journey, three stale
+checks, permission evidence and SWv102 preservation remain reused where unchanged.
+
+No active permitted live teacher fixture was established or used; no registration
+was created/re-enrolled, and no projection/source/student/teacher mutation or send
+ran. This is exact installed-source/configuration parity plus qualified real
+backend integration and actual signed backend readiness, not a claim of a live
+teacher event-read success or physical phone arrival. No public401 substitutes
+for those proofs. Frontend Production publication remains the sole publisher's
+step; N44 remains open.
+
+Sanitized current results are in `service-readback.json` and
+`bundle/continuation-e79c62d4.json`. Raw MCP responses remain untracked under
+`artifacts/n44-current-projection-recovery-e79c62d4/`; secret values were not
+returned. Both phase leases were released. No browser/server started in this
+continuation. The prior generated setup directory and its blocked-by-policy
+cleanup rejection remain untouched and uncommitted. No temporary function was
+created or used; prior unrelated temporary-function cleanup is NOT_VERIFIED.
+
+A bounded real ingress POST with a synthetic invalid bearer returned HTTP400
+and exactly `{"status":"rejected"}` through the newly installed read route.
+This verifies both route allowlists and the retained signed-envelope secret
+binding without accessing a teacher source. It is negative teacher-Auth evidence,
+not a successful live teacher current-state equality observation. Ordinary ingress
+admission/rate bookkeeping remains; domain reads/writes, registration and send0.
+
+The original attempt below is historical evidence, including its real blocker.
 
 Task `continuous-n44-current-projection-recovery-20261031`
 Run `a28ecd62-83bf-4c8f-8aa7-b511048e76ec`
