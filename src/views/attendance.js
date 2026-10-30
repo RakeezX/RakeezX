@@ -138,121 +138,10 @@ async function openTeamsImport(teachingId) {
   } finally { disposed = true; importOpen = false; }
 }
 
-// AI N144: page-owned intent survives a changed-markup repaint, never a changed
-// workspace/visit/session. Only setAttendance owns persistence and write guards.
-let interactionScope = 0;
-let interactionListeners = null;
-const attendanceWrites = new Map();
-const attendanceFeedback = new Map();
-const writeKey = (workspace, sessionId, studentId) => JSON.stringify([workspace?.databaseName, sessionId, studentId]);
-function invalidateAttendanceIntent() {
-  if ([...attendanceWrites.values()].some(entry => entry.scope === interactionScope && entry.desired !== entry.submitted)) {
-    toast('تغيّر سياق الحضور؛ لم يُرسل الاختيار المنتظر', 'info');
-  }
-  interactionScope++;
-  attendanceFeedback.clear();
-}
-function attendanceIntent(el, params) {
-  const workspace = store.getActiveWorkspace();
-  const session = store.getSession(el.dataset.session);
-  if (!el.isConnected || !workspace || !ATTENDANCE_ORDER.includes(el.dataset.status) ||
-      el.dataset.scope !== String(interactionScope) || el.dataset.teaching !== params.id ||
-      el.dataset.session !== activeSessionId || el.dataset.date !== date ||
-      session?.date !== date || session?.teachingId !== params.id || store.isTeachingArchived(params.id)) return null;
-  return { workspace, scope: interactionScope, sessionId: session.id, teachingId: params.id,
-    date, studentId: el.dataset.id, status: el.dataset.status };
-}
-function currentAttendanceIntent(intent) {
-  const session = store.getSession(intent.sessionId);
-  return store.getActiveWorkspace() === intent.workspace && interactionScope === intent.scope &&
-    activeSessionId === intent.sessionId && date === intent.date && session?.date === intent.date &&
-    session?.teachingId === intent.teachingId && !store.isTeachingArchived(intent.teachingId);
-}
-async function acceptAttendanceIntent(intent) {
-  if (!currentAttendanceIntent(intent)) return;
-  const key = writeKey(intent.workspace, intent.sessionId, intent.studentId);
-  const pending = attendanceWrites.get(key);
-  if (pending) {
-    if (pending.scope !== intent.scope || pending.workspace !== intent.workspace) {
-      toast('جارٍ إنهاء الرصد السابق؛ انتظر ثم اختر الحالة', 'info');
-      return;
-    }
-    pending.desired = intent.status;
-    repaint();
-    return;
-  }
-  const entry = { ...intent, desired: intent.status, phase: 'pending' };
-  attendanceWrites.set(key, entry);
-  attendanceFeedback.set(key, entry);
-  repaint();
-  try {
-    while (currentAttendanceIntent(entry)) {
-      const status = entry.desired;
-      entry.submitted = status;
-      const saved = await store.setAttendance(entry.sessionId, entry.studentId, status);
-      // A null/failed/uncertain outcome is terminal for this gesture chain.
-      // Never replay an intermediate request or imply a cloud acknowledgement.
-      const persisted = store.attendanceIn(entry.sessionId).find(record => record.studentId === entry.studentId);
-      if (!saved || saved.status !== status || persisted?.status !== status) throw new Error('ATTENDANCE_NOT_CONFIRMED');
-      if (!currentAttendanceIntent(entry)) return;
-      if (entry.desired !== status) continue;
-      entry.phase = 'saved';
-      entry.status = status;
-      return;
-    }
-  } catch {
-    if (currentAttendanceIntent(entry)) {
-      entry.phase = 'failed';
-      toast('تعذّر تأكيد حفظ الحضور؛ تحقق من الحالة ثم أعد الاختيار', 'danger');
-    }
-  } finally {
-    attendanceWrites.delete(key);
-    if (currentAttendanceIntent(entry)) repaint();
-  }
-}
-function mountAttendancePointers(root, params) {
-  interactionListeners?.abort();
-  const controller = interactionListeners = new AbortController();
-  const options = { capture: true, signal: controller.signal };
-  let press = null, suppressClick = null;
-  const buttonAt = target => target?.closest?.('.attendance-01c [data-act="set"]');
-  root.addEventListener('pointerdown', event => {
-    if (!event.isPrimary || event.button !== 0) { press = null; return; }
-    const button = buttonAt(event.target);
-    const intent = button && attendanceIntent(button, params);
-    press = intent ? { intent, pointerId: event.pointerId, x: event.clientX, y: event.clientY } : null;
-  }, options);
-  // The main root survives region replacement. On release require the same
-  // visible choice under the pointer; a drag, scroll or context change cancels.
-  document.addEventListener('pointermove', event => {
-    if (press?.pointerId === event.pointerId && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 12) press.cancelled = true;
-  }, options);
-  document.addEventListener('pointercancel', () => { press = null; }, options);
-  document.addEventListener('pointerup', event => {
-    if (press?.pointerId !== event.pointerId) return;
-    const prior = press; press = null;
-    suppressClick = { pointerId: event.pointerId, until: performance.now() + 500 };
-    const button = buttonAt(document.elementFromPoint(event.clientX, event.clientY));
-    const next = button && attendanceIntent(button, params);
-    if (next && !prior.cancelled && Math.hypot(event.clientX - prior.x, event.clientY - prior.y) <= 12 &&
-        currentAttendanceIntent(prior.intent) && next.studentId === prior.intent.studentId && next.status === prior.intent.status) {
-      void acceptAttendanceIntent(prior.intent);
-    }
-  }, options);
-  document.addEventListener('click', event => {
-    if (suppressClick && performance.now() <= suppressClick.until && event.detail > 0 && event.pointerId === suppressClick.pointerId) {
-      suppressClick = null;
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }, options);
-}
-
 // Abort stale mounts/date selections before they can adopt another occurrence.
 let opening = null;
 const dayOptions = (tchId, day) => store.operationalSessionsOn(day).filter(s => s.teachingId === tchId);
 async function ensureActive(tchId) {
-  invalidateAttendanceIntent();
   opening?.abort();
   const controller = opening = new AbortController();
   const selectedDate = date;
@@ -341,8 +230,6 @@ export default {
   `,
 
   async onMount(root, p) {
-    invalidateAttendanceIntent();
-    mountAttendancePointers(root, p);
     date = todayISO();
     query = '';
     activeSessionId = p.session ?? null;
@@ -354,10 +241,7 @@ export default {
     repaint();
   },
 
-  onUnmount() {
-    opening?.abort(); interactionListeners?.abort();
-    invalidateAttendanceIntent(); activeSessionId = null;
-  },
+  onUnmount() { opening?.abort(); activeSessionId = null; },
 
   render(p) {
     const tch = store.getTeaching(p.id);
@@ -478,29 +362,22 @@ export default {
                     ${shownRoster.map((s) => {
                       const rec = byStudent.get(s.id);
                       const status = rec?.status ?? null;
-                      const feedback = attendanceFeedback.get(writeKey(store.getActiveWorkspace(), ses.id, s.id));
-                      const feedbackText = feedback?.scope !== interactionScope ? '' : feedback.phase === 'pending'
-                        ? `جارٍ الحفظ: ${ATTENDANCE[feedback.desired].label}…`
-                        : feedback.phase === 'failed' ? 'تعذّر تأكيد الحفظ؛ أعد الاختيار'
-                        : feedback.status === status ? `حُفظ ${ATTENDANCE[status].label}` : '';
                       const notesCount = store.notesOf(s.id).length;
                       return html`
                         <div class="att-row attendance-01c__row ${status ? '' : 'is-unmarked'}">
                           <span class="rollno">${s.displayNo ?? '—'}</span>
-                          <span class="att-row__name"><strong>${s.name}</strong><small>الرقم ${s.displayNo ?? '—'}</small><small data-feedback="${s.id}" role="status" aria-live="polite">${feedbackText}</small></span>
+                          <span class="att-row__name"><strong>${s.name}</strong><small>الرقم ${s.displayNo ?? '—'}</small></span>
                           <button class="att-row__note ${notesCount > 0 ? 'has-notes' : ''}"
                                   data-act="quick-note" data-id="${s.id}"
                                   title="${notesCount > 0 ? `ملاحظات الطالب (${notesCount})` : 'إضافة ملاحظة سريعة'}"
                                   aria-label="ملاحظة لـ ${s.name}">
                             ${icon('note')}
                           </button>
-                          <span class="segbtns attendance-01c__status-options" role="group" aria-label="حالة حضور ${s.name}" aria-busy="${feedback?.scope === interactionScope && feedback.phase === 'pending'}">
+                          <span class="segbtns attendance-01c__status-options" role="group" aria-label="حالة حضور ${s.name}">
                             ${ATTENDANCE_ORDER.map(
                               (k) => html`
                                 <button class="segbtn attendance-01c__status ${status === k ? 'is-on' : ''}" data-color="${ATTENDANCE[k].color}"
                                         data-act="set" data-id="${s.id}" data-status="${k}"
-                                        data-fk="attendance:${ses.id}:${s.id}:${k}"
-                                        data-session="${ses.id}" data-teaching="${tch.id}" data-date="${date}" data-scope="${interactionScope}"
                                         title="${ATTENDANCE[k].label}" aria-label="${s.name}: ${ATTENDANCE[k].label}"
                                         aria-pressed="${status === k ? 'true' : 'false'}">
                                   ${ATTENDANCE[k].label}
@@ -571,9 +448,9 @@ export default {
       toast(saved ? 'حُفظت الملاحظة في سجل الطالب' : 'اكتب ملاحظة لا تتجاوز 1200 حرفًا', saved ? 'ok' : 'danger');
       repaint();
     },
-    async set(el, ev, params) {
-      const intent = attendanceIntent(el, params);
-      if (intent) await acceptAttendanceIntent(intent);
+    async set(el) {
+      if (!activeSessionId) return;
+      await store.setAttendance(activeSessionId, el.dataset.id, el.dataset.status);
     },
 
     'fill-remaining'(el) {
@@ -650,7 +527,6 @@ export default {
       const nextPeriod = Math.max(0, ...existing.map((s) => s.period)) + 1;
       const ses = await store.ensureSession(params.id, date, nextPeriod);
       if (!ses) return;
-      invalidateAttendanceIntent();
       activeSessionId = ses.id;
       toast(`أُضيفت الحصة ${nextPeriod} في هذا اليوم`);
       repaint();
