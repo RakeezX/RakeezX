@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n148-test-account-cleanup-20261030",
+      "productId": "N148",
+      "activationId": "po-20261012-continuous",
+      "priority": -2299,
+      "scopeKey": "n148-exact-test-account-cleanup",
+      "riskClass": "SENSITIVE",
+      "validationTier": "AFFECTED_DATA",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261030-EXACT-TEST-ACCOUNT-HARD-DELETE",
+      "resourceClass": "live-mutation",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 12,
+      "dependsOn": [],
+      "objective": "Execute the latest PO's explicit permanent account-and-data cleanup now, through this specifically activated card and existing live-mutation phase lease. This is an exact one-time deletion authority, not mere preparation. Private allowlist/exception/IDs are in C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/n148-cleanup-20261030/selection.json (SHA256 b671dc27a08c9553df385ef15c340801df4581a4a44b378f8698b5e5bec947e9). Root matched 56 total Auth users, 50 delete IDs and 6 keep IDs, including the user-specified exception. 2149 stored student rows belong to targets; 927 to kept users; storage.objects target count0. Exact user domain/email selectors are in manifest. Delete matching target accounts and all their dependent live DB data permanently; preserve EVERY other account/data and the explicit exception. This new deletion authority supersedes older fixture-preservation rules for only these targeted accounts; do not provision replacement accounts or alter core contracts. Do not stop for redundant user confirmation.\nKnown working access: installed official Supabase CLI at C:/Users/Abody/AppData/Local/npm-cache/_npx/0e23c24576954b26/node_modules/supabase/dist/supabase.js, Node invocation db query --linked --project-ref xlrubcwjqktzzunrvuns --file OWNED_SQL_FILE --output json. Root verified CLI help and live SELECT returned postgres/56 accounts at 2026-10-30. Use existing authenticated CLI; no reading/exporting credentials or other custodians' private recovery. Official docs allow direct auth.users deletion, which cascades auth.sessions and invalidates refresh; outstanding stateless JWT may expire later. No new key/role/permission needed.\nInspect current ownership/FK/trigger metadata first; only necessary technical metadata/counts, no names/student payloads. Main data in rakeezx; n44_push_draft and n88_private MUST be covered too, including owner-bearing tables without direct auth FKs (n88_private class_credential_receipts/class_visibility/contexts/credentials/memberships/numeric_credentials/numeric_sessions/publications/sessions/task_guidance, n44_push_draft.endpoint_claims, rakeezx.support_notification_outbox). Find child FK data lacking owner_id and any exact target auth sessions/refresh/flow residuals. Most owner FKs cascade; NO ACTION auth FKs include assignments,submissions,score_distribution_plans,n58_foundation_repair_receipts. Other ordering hazards: submissions before assignments/students, closed_term_reports supersedes self-FK + RESTRICT year/term, sync_restore_receipts before stages, slots before terms. Preserve all constraints and the original persistent trigger definitions/states; the exact transactional administrative suspension described in the corrective scope below is permitted for these already authorized 50 accounts only. Plan exact dependent order and one transaction when possible, with row counts and kept-owner checks inside before COMMIT. No persistent migration/schema/RLS/function/role change, TRUNCATE, whole-table deletes, messages, or broad backup.\nImplement generic reviewed cleanup script using the private manifest input and strict project/selector/ID/exception guards; account IDs/emails/credentials/student content must never be committed to this PUBLIC repo or printed in logs. Private per-account counts/ID list stay in the already ignored intake directory. Public evidence only aggregate counts, scoped table list, checks and actual transaction result. A short meaningful selector/exception/dependency check is sufficient; avoid new test framework or broad suite. Before the actual DML acquire and verify owned resource-lease.ps1 live-mutation lease; release owned lease in finally. If a concrete FK/trigger failure rolls back, inspect and correct only that bounded dependency; never drop guards or disable anything outside the exact transaction-scoped allowlist below. On partial uncertainty read current state before retry.\nRequired readback after actual commit: all 50 target Auth IDs absent, all target owner data/session/token/portal/push/support references absent, all 6 kept users still present and their pre/post domain-table counts (ideally aggregate fingerprints for protected relevant rows) unchanged, exception preserved. Verify root can independently query result. If service execution unavailable, actual blocker; no fake completed cleanup based on SQL preparation. Make exact code/evidence candidate and return runner schema; sole publisher integrates sanitized script/evidence. Do not publish private manifest. No frontend change or need to rebuild unrelated UI.\n\nMATERIAL CARD-SCOPE CORRECTION 2026-10-30: The PO already explicitly ordered permanent removal of the named test accounts AND all their data. Root added a too-narrow generic no-trigger-change restriction, now corrected to permit the necessary bounded administrative operation. The prior rollback-only P0001 n88_numeric_unavailable is a Product immutability constraint, not a managed tool/security-policy refusal; preserve its FAIL and all prior evidence. Root independently verified actual immutable guard function definitions and target counts. Exact further dependency: n88_private.code_recovery has DEFERRABLE FK credential_id -> numeric_credentials.id, 45 records linked to targeted credentials and 7 linked to kept users, with recovery_immutable guard. No user confirmation is missing. Do not retry the same failed probe; implement and execute the materially different single-transaction cleanup below.\nReuse already obtained metadata and the pinned original manifest/IDs. Build the exact target dependency closure, including code_recovery45 through the frozen targeted credential IDs, relevant auth audit/flow/refresh/session references and owner-bearing n88/n44/support data. Only proven target references; no global orphan cleanup or unrelated platform logs. Fix snapshot predicates for non-owner child tables so the preserved seven recovery rows, seven numeric credentials and five kept class receipts remain byte-for-byte equivalent. The prior snapshot treated all no-owner tables as protected, which is insufficient for target-dependent deletion. Hold normal transaction table locks for the affected ownership/dependency tables in consistent order before final baseline/selector checks, to prevent concurrent inserts/writes. Preserve existing FK/ownership constraints and use exact scoped DELETE statements; no SET session_replication_role, DISABLE TRIGGER ALL/USER or broad policy bypass.\nInside ONE bounded transaction only, inspect and pin exact current definitions/function identities/enabled states of the allowlisted deletion guards; temporarily suspend only proved necessary named triggers while locks exclude other writes, delete exact target closure in FK-safe order, then restore EVERY trigger to its exact original mode and verify definitions/states before COMMIT. The allowlist names only the observed immutable N88/report guards plus the observed N58 selected-calendar delete/revalidation guards; not permission to suspend unrelated triggers. Prefer a dependency order that needs fewer suspensions. Root verified n58_guard_calendar_contract blocks selected-year,calendar,day and term deletions; n58 revalidation may require terms/calendars/restore-marker ordering. Restore all guards transactionally even on error via rollback. Never modify guard functions or constraints. Compare protected counts/fingerprints across the affected domain tables and kept Auth identities before commit; assert all50 target accounts and enumerated target refs absent, all6 kept accounts+exception preserved. Force deferred constraints checked before the final success/COMMIT gate. If any asserted state changes, rollback, keep actual error evidence, correct only that concrete issue. Read back actual committed counts and all restored guard states. Do not claim old invalidated access JWTs immediately disappear or historical provider backups were wiped.\nOriginal RUN constant in utility must follow the exact current attempt runId and its lease, not the consumed first probe run. Root has already reviewed this administrative strategy independently; use only focused cleanup correctness checks and execute the authorized result. No new accounts, frontend work, unrelated tests, model changes or service configuration. Return LOCAL_READY only after actual live hard deletion and preserved-data proof.",
+      "allowedPaths": [
+        "scripts/n148-test-account-cleanup.mjs",
+        "tests/n148-account-cleanup.test.mjs",
+        "docs/automation-evidence/20261030/N148_TEST_ACCOUNT_CLEANUP.md"
+      ],
+      "verificationPaths": [],
+      "requiredChecks": [
+        "n148_exact_selection_and_kept_accounts_guard",
+        "n148_live_hard_delete_and_dependent_data_zero",
+        "n148_kept_accounts_and_data_unchanged"
+      ],
+      "postDeliveryChecks": [
+        "production_publication"
+      ],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N148",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "liveAuthorizationRef": "PO-20261030-EXACT-TEST-ACCOUNT-HARD-DELETE",
+        "publication": true,
+        "publicationScope": "Sanitized generic cleanup utility and aggregate execution evidence only",
+        "privateManifest": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/n148-cleanup-20261030/selection.json",
+        "privateManifestSha256": "b671dc27a08c9553df385ef15c340801df4581a4a44b378f8698b5e5bec947e9",
+        "targetAccountCount": 50,
+        "keepAccountCount": 6,
+        "operations": [
+          "metadata-and-counts-read",
+          "exact-target-dependent-data-hard-delete",
+          "exact-target-auth-users-hard-delete",
+          "post-delete-readback"
+        ],
+        "schemaChanges": 0,
+        "rlsChanges": 0,
+        "roleChanges": 0,
+        "providerConfigChanges": 0,
+        "secretValuesExported": false,
+        "messages": 0,
+        "replacementAccounts": 0,
+        "temporaryTriggerSuspension": {
+          "version": 1,
+          "authorityRef": "PO-20261030-EXACT-TEST-ACCOUNT-HARD-DELETE",
+          "reason": "Necessary administrative implementation of explicitly authorized permanent deletion of exact50 test accounts, while preserving all other data and restoring guards before commit.",
+          "allowlist": [
+            {
+              "table": "n88_private.numeric_credentials",
+              "trigger": "numeric_tombstones"
+            },
+            {
+              "table": "n88_private.class_credential_receipts",
+              "trigger": "class_receipts_immutable"
+            },
+            {
+              "table": "n88_private.code_recovery",
+              "trigger": "recovery_immutable"
+            },
+            {
+              "table": "rakeezx.closed_term_reports",
+              "trigger": "closed_term_reports_immutable"
+            },
+            {
+              "table": "rakeezx.years",
+              "trigger": "01_n58_calendar_contract"
+            },
+            {
+              "table": "rakeezx.calendars",
+              "trigger": "01_n58_calendar_contract"
+            },
+            {
+              "table": "rakeezx.calendar_days",
+              "trigger": "01_n58_calendar_contract"
+            },
+            {
+              "table": "rakeezx.terms",
+              "trigger": "01_n58_calendar_contract"
+            },
+            {
+              "table": "rakeezx.calendars",
+              "trigger": "99_n58_revalidate_calendar"
+            },
+            {
+              "table": "rakeezx.terms",
+              "trigger": "99_n58_revalidate_term"
+            },
+            {
+              "table": "rakeezx.n58_restore_transactions",
+              "trigger": "99_n58_revalidate_restore"
+            }
+          ],
+          "transactionOnly": true,
+          "restoreOriginalStateBeforeCommit": true,
+          "normalTableLocksBeforeSuspension": true,
+          "definitionsChanged": false,
+          "foreignKeysDisabled": false,
+          "replicationRoleChanged": false,
+          "allOrUserTriggersDisabled": false,
+          "manifestUnchanged": true
+        },
+        "persistentSchemaChanges": 0
+      },
+      "releaseAuthority": "Direct PO 2026-10-30 names exact domains/emails to permanently delete with all their data, explicitly excepts one account and keeps ALL others. The private manifest records that exact selection; this activated card authorizes the named live Auth/DML deletion, then sanitized publication. The same explicit hard-delete instruction covers the necessary exact transaction-scoped administrative trigger suspension declared here; original constraints/functions/states persist unchanged after commit/rollback. This corrects a root-imposed card restriction, not a service access or tool denial.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "571fc483d711780af666be4926c80ab00eeaba91",
+        "requiredSourcePaths": [
+          "scripts/ops-supervisor-v4/resource-lease.ps1",
+          "docs/RAKEEZ_OPS_CONTRACT.md"
+        ],
+        "editPaths": [
+          "scripts/n148-test-account-cleanup.mjs",
+          "tests/n148-account-cleanup.test.mjs",
+          "docs/automation-evidence/20261030/N148_TEST_ACCOUNT_CLEANUP.md"
+        ],
+        "newPaths": [
+          "scripts/n148-test-account-cleanup.mjs",
+          "tests/n148-account-cleanup.test.mjs",
+          "docs/automation-evidence/20261030/N148_TEST_ACCOUNT_CLEANUP.md"
+        ],
+        "workerChecks": [
+          "n148_exact_selection_and_kept_accounts_guard",
+          "n148_live_hard_delete_and_dependent_data_zero",
+          "n148_kept_accounts_and_data_unchanged"
+        ],
+        "publisherChecks": [
+          "production_publication"
+        ]
+      }
+    }
+  ]
+}
