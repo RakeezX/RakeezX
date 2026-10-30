@@ -7,6 +7,21 @@ const revision = v => Number.isSafeInteger(v) && v >= 0;
 const rosterRevision = v => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v);
 const exact = (v, keys) => v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === keys.length && keys.every(k => Object.hasOwn(v, k));
 const deny = code => { const e = new Error(code); e.code = code; throw e; };
+// AI: provenance belongs only to newly minted synchronous preparation failures.
+// Never tag a request error or infer dispatch from its public properties.
+const mutationPreflightErrors = new WeakMap();
+export function classifyClassMutationError(error) {
+  return mutationPreflightErrors.get(error) ?? null;
+}
+function prepareMutation(prepare) {
+  try { return prepare(); }
+  catch (error) {
+    const reason = ['busy','review_required','stale_context','unavailable'].includes(error?.code) ? error.code : 'unavailable';
+    const refusal = new Error(reason); refusal.code = reason;
+    mutationPreflightErrors.set(refusal, Object.freeze({state:'not_started',reason}));
+    throw refusal;
+  }
+}
 // AI: local receipt hints are never authorization or mutation payloads. Expiry
 // retires automatic receipt lookup, never resolves an uncertain command.
 const HINT_PREFIX='rakeezx-n88-uncertain-v1:', HINT_LIMIT=8, HINT_BYTES=8192, HINT_AGE=30*86400000;
@@ -134,14 +149,18 @@ export function createClassPortalClient({ request, getContext = () => null, getR
     return { c, r: roster };
   }
   function mutate(teachingId, body, action, validate) {
-    const { c, r } = snapshot(teachingId);
-    if (!id(body.requestId)) deny('review_required');
-    if (pending) deny('busy');
-    if(action==='issue-missing'&&!rosterRevision(r.credentialRevision))deny('review_required');
-    const command={ ...body, expectedRosterRevision: r.rosterRevision,...(action==='issue-missing'?{expectedCredentialRevision:r.credentialRevision}:{}) };
-    if(consumed.has(command.requestId))deny('review_required');
-    const hint=reserve(c,action,command);
-    consumed.add(command.requestId); readSequence++;
+    const {c,command,hint} = prepareMutation(() => {
+      const { c, r } = snapshot(teachingId);
+      if (!id(body.requestId)) deny('review_required');
+      if (pending) deny('busy');
+      if(action==='issue-missing'&&!rosterRevision(r.credentialRevision))deny('review_required');
+      const command={ ...body, expectedRosterRevision: r.rosterRevision,...(action==='issue-missing'?{expectedCredentialRevision:r.credentialRevision}:{}) };
+      if(consumed.has(command.requestId))deny('review_required');
+      const hint=reserve(c,action,command);
+      consumed.add(command.requestId); readSequence++;
+      return {c,command,hint};
+    });
+    // The trusted boundary ends BEFORE call(), including its deferred current check.
     const work = call(action, teachingId, command, data=>validate(data,command), c).then(result=>{if(result.uncertain!==true)settle(c,[hint]);return result;});
     pending = work;
     return work.finally(() => { roster = null; if (pending === work) pending = null; });
@@ -207,8 +226,11 @@ export function createClassPortalClient({ request, getContext = () => null, getR
       roster = {...data,students:data.students.map(({credential,...s})=>s)}; rosterKey = c.key;lastConfirmedRoster=structuredClone(roster);lastConfirmedKey=c.key;return data;
     },
     issueMissingClassCodes(teachingId, body) {
-      const { r } = snapshot(teachingId);
-      if (!exact(body, ['requestId','expectedRosterRevision']) || body.expectedRosterRevision !== r.rosterRevision) deny('review_required');
+      const r = prepareMutation(() => {
+        const { r } = snapshot(teachingId);
+        if (!exact(body, ['requestId','expectedRosterRevision']) || body.expectedRosterRevision !== r.rosterRevision) deny('review_required');
+        return r;
+      });
       return mutate(teachingId, body, 'issue-missing', (d,command) => {
         if (!exact(d, ['requestId','created','skipped','failed','uncertain']) || d.requestId !== command.requestId || typeof d.uncertain !== 'boolean' || !['created','skipped','failed'].every(k => Array.isArray(d[k]))) return false;
         const seen = new Set();
@@ -226,17 +248,23 @@ export function createClassPortalClient({ request, getContext = () => null, getR
     rotate: body => selective('rotate', body),
     revoke: body => selective('revoke', body),
     saveVisibility(teachingId, body) {
-      const { r } = snapshot(teachingId);
-      if (!exact(body, ['policyRevision','fields']) || body.policyRevision !== r.policyRevision || !validPortalFields(body.fields)) deny('review_required');
-      const fields = structuredClone(body.fields);
-      return mutate(teachingId, { ...body, fields, requestId: crypto.randomUUID() }, 'visibility', d => exact(d, ['updated','policyRevision','fields']) && d.updated === true && revision(d.policyRevision) && d.policyRevision > r.policyRevision && validPortalFields(d.fields) && PORTAL_FIELDS.every(k => fields[k] === d.fields[k]));
+      const {r,fields,command} = prepareMutation(() => {
+        const { r } = snapshot(teachingId);
+        if (!exact(body, ['policyRevision','fields']) || body.policyRevision !== r.policyRevision || !validPortalFields(body.fields)) deny('review_required');
+        const fields = structuredClone(body.fields);
+        return {r,fields,command:{ ...body, fields, requestId: crypto.randomUUID() }};
+      });
+      return mutate(teachingId, command, 'visibility', d => exact(d, ['updated','policyRevision','fields']) && d.updated === true && revision(d.policyRevision) && d.policyRevision > r.policyRevision && validPortalFields(d.fields) && PORTAL_FIELDS.every(k => fields[k] === d.fields[k]));
     },
   });
   function selective(action, body) {
-    const teachingId = readContext()?.teachingId, { r } = snapshot(teachingId);
-    if (!exact(body, ['studentId','enrollmentId','revision','credentialVersion','requestId'])) deny('review_required');
-    const s = r.students.find(s => s.studentId === body.studentId);
-    if (!s || s.credentialVersion < 1 || ['enrollmentId','revision','credentialVersion'].some(k => body[k] !== s[k])) deny('review_required');
+    const {teachingId,s} = prepareMutation(() => {
+      const teachingId = readContext()?.teachingId, { r } = snapshot(teachingId);
+      if (!exact(body, ['studentId','enrollmentId','revision','credentialVersion','requestId'])) deny('review_required');
+      const s = r.students.find(s => s.studentId === body.studentId);
+      if (!s || s.credentialVersion < 1 || ['enrollmentId','revision','credentialVersion'].some(k => body[k] !== s[k])) deny('review_required');
+      return {teachingId,s};
+    });
     return mutate(teachingId, body, action, d => exact(d, action === 'rotate' ? ['rotated','studentId','enrollmentId','credentialVersion','credential'] : ['revoked','studentId','enrollmentId','credentialVersion']) && d[action === 'rotate' ? 'rotated' : 'revoked'] === true && d.studentId === s.studentId && d.enrollmentId === s.enrollmentId && revision(d.credentialVersion) && d.credentialVersion === s.credentialVersion + (action === 'rotate' ? 1 : 0) && (action !== 'rotate' || typeof d.credential === 'string' && /^1[0-9]{5}$/.test(d.credential)));
   }
 }
