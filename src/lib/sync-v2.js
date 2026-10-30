@@ -9,7 +9,7 @@
 import { importScoreBinding } from './grade-transfer.js';
 import { REPAIR_PROTOCOL, REPAIR_STORES, repairAuditId, repairSnapshot, buildSessionRepairPlan, sessionRepairEntry } from './session-recovery.js';
 import * as databaseDefault from './db.js';
-import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, applyScoreSubitemCommand, applyScoreConfigurationCommand, applyScoreDistributionCopyCommand, getScoreDomainSnapshot, fetchRecords } from './cloud.js';
+import { applySyncV2Mutation, applySyncV2EnrollmentCommand, applySyncV2AttendanceCommand, applySyncV2SessionDeleteCommand, applySyncV2LifecycleCommand, applySyncV2SectionLifecycleCommand, applySyncV2TeachingCreationCommand, applySyncV2FillAttendanceCommand, applySyncV2SelectedAttendanceCommand, applySyncV2ClosedTermReportCommand, applySyncV2ClassGoalRewardCommand, applyScoreSubitemCommand, applyScoreConfigurationCommand, applyScoreDistributionCopyCommand, getScoreDomainSnapshot, fetchRecords } from './cloud.js';
 import { DEFAULT_TIME_PROFILE_IDS } from '../models.js';
 import { uid } from '../models.js';
 import { projectSubitemScore, scoreCents } from './score-foundation.js';
@@ -627,10 +627,10 @@ function rewriteMutationReferences(mutation, targetStore, oldId, newId) {
       if (serverPatch[field] === oldId) { serverPatch[field] = newId; changed = true; }
     }
   }
-  if (['attendance:record', 'attendance:fill'].includes(String(mutation.command ?? ''))) {
+  if (['attendance:record', 'attendance:fill', 'attendance:selected-fill'].includes(String(mutation.command ?? ''))) {
     const field = targetStore === 'sessions' ? 'sessionId' : targetStore === 'students' ? 'studentId' : null;
     if (field) {
-      if (field === 'studentId' && String(mutation.command ?? '') === 'attendance:fill') {
+      if (field === 'studentId' && ['attendance:fill', 'attendance:selected-fill'].includes(String(mutation.command ?? ''))) {
         for (const patch of [localPatch, serverPatch]) {
           if (Array.isArray(patch.studentIds) && patch.studentIds.includes(oldId)) {
             patch.studentIds = patch.studentIds.map((id) => id === oldId ? newId : id);
@@ -725,6 +725,7 @@ function defaultTransport() {
     applySectionLifecycleCommand: applySyncV2SectionLifecycleCommand,
     applyTeachingCreationCommand: applySyncV2TeachingCreationCommand,
     applyFillAttendanceCommand: applySyncV2FillAttendanceCommand,
+    applySelectedAttendanceCommand: applySyncV2SelectedAttendanceCommand,
     applyClosedTermReportCommand: applySyncV2ClosedTermReportCommand,
     applyClassGoalRewardCommand: applySyncV2ClassGoalRewardCommand,
     applyScoreSubitemCommand,
@@ -1039,6 +1040,16 @@ export function createSyncV2Engine({
   async function queueFillAttendanceCommand({ sessionId, status, studentIds = [] }) {
     if (!sessionId || !['present','late','excused','absent'].includes(status)) throw new Error('Invalid Sync V2 fill attendance command');
     return queueCommand({ store:'attendance', recordId:`fill:${sessionId}`, command:'attendance:fill', patch:{ sessionId,status,studentIds:[...studentIds] }, groups:['status'], dependencies: uniqueDependencies([{ store:'sessions',recordId:sessionId,requiresServerRevision:true }, ...studentIds.map((recordId)=>({store:'students',recordId,requiresServerRevision:true}))]) });
+  }
+
+  async function queueSelectedAttendanceCommand({ sessionId, status, studentIds }) {
+    if (!sessionId || !['present','late','excused','absent'].includes(status) ||
+        !Array.isArray(studentIds) || !studentIds.length || studentIds.length > 300 ||
+        new Set(studentIds).size !== studentIds.length || studentIds.some(id => typeof id !== 'string' || !id.trim())) throw Error('Invalid selected attendance command');
+    return queueCommand({store:'attendance', recordId:`selected:${sessionId}`, command:'attendance:selected-fill',
+      patch:{sessionId,status,studentIds:[...studentIds]},groups:['status'],dependencies:uniqueDependencies([
+        {store:'sessions',recordId:sessionId,requiresServerRevision:true},
+        ...studentIds.map(recordId=>({store:'students',recordId,requiresServerRevision:true}))])});
   }
 
   async function markAttempt(mutation, expectedWorkspace = null, assertContext = () => {}, verifyPending = null) {
@@ -1860,7 +1871,7 @@ export function createSyncV2Engine({
         const live = liveRows.find((row) => row.id === original.id);
         if (!live) continue;
         if (liveRows.some((row) => row.sequence < live.sequence && row.patch?.sessionId === live.patch.sessionId &&
-            (row.command === 'attendance:fill' ||
+            (['attendance:fill','attendance:selected-fill'].includes(row.command) ||
               (row.command === 'attendance:record' && row.patch?.studentId === live.patch.studentId)))) {
           await markDependencyBlock(live, 'attendance-predecessor-pending');
           stoppedKeys.add(live.logicalRecordKey); result.blocked++; continue;
@@ -1985,6 +1996,35 @@ export function createSyncV2Engine({
           const receipt = await transport.applyTeachingCreationCommand({ mutationId: mutation.mutationId, deviceId: mutation.deviceId, teachingId: mutation.recordId, sectionId: mutation.patch.sectionId, subjectId: mutation.patch.subjectId, termId: mutation.patch.termId, order: mutation.patch.order, itemIds: mutation.patch.itemIds, clientUpdatedAt: mutation.clientUpdatedAt });
           await reconcileTeachingCreationReceipt(mutation, receipt); result.acknowledged++;
         } catch (error) { if (isRejectedProtocolError(error)) await markRejected(mutation, 'protocol-rejected', error); else await markFailure(mutation, error); if (isRejectedProtocolError(error)) result.blocked++; else result.failed++; }
+        continue;
+      }
+      if (original.op === 'command' && original.command === 'attendance:selected-fill') {
+        const pendingRows = await database.getAll('outbox');
+        const live = pendingRows.find(row=>row.id===original.id);
+        if (!live) continue;
+        if (pendingRows.some(row=>row.sequence<live.sequence && row.patch?.sessionId===live.patch.sessionId &&
+            (['attendance:fill','attendance:selected-fill'].includes(row.command) ||
+              row.command==='attendance:record' && live.patch.studentIds.includes(row.patch?.studentId)))) {
+          await markDependencyBlock(live,'attendance-predecessor-pending'); result.blocked++; continue;
+        }
+        if (typeof transport.applySelectedAttendanceCommand !== 'function') {
+          await markDependencyBlock(live,'selected-attendance-transport-unavailable'); result.blocked++; continue;
+        }
+        const ready=await dependencyReadiness(live,(await database.getAll('outbox')).filter(row=>row.id!==live.id));
+        if (ready.state==='blocked') { await markDependencyBlock(live,ready.reason); result.blocked++; continue; }
+        if (ready.state==='rejected') { await markRejected(live,ready.reason); result.blocked++; continue; }
+        const mutation=await markAttempt(live); result.attempted++;
+        try {
+          const receipt=await transport.applySelectedAttendanceCommand({mutationId:mutation.mutationId,deviceId:mutation.deviceId,
+            sessionId:mutation.patch.sessionId,studentIds:mutation.patch.studentIds,status:mutation.patch.status,clientUpdatedAt:mutation.clientUpdatedAt});
+          const returned=[...(receipt?.applied??[]),...(receipt?.skipped??[])];
+          if (returned.some(row=>!mutation.patch.studentIds.includes(row.student_id) || row.session_id!==mutation.patch.sessionId) ||
+              new Set(returned.map(row=>row.student_id)).size!==mutation.patch.studentIds.length || returned.length!==mutation.patch.studentIds.length) throw Error('Selected attendance receipt scope mismatch');
+          await reconcileFillAttendanceReceipt(mutation,receipt); result.acknowledged++;
+        } catch(error) {
+          if(isRejectedProtocolError(error)) await markRejected(mutation,'protocol-rejected',error); else await markFailure(mutation,error);
+          if(isRejectedProtocolError(error)) result.blocked++; else result.failed++;
+        }
         continue;
       }
       if (original.op === 'command' && original.command === 'attendance:fill' && typeof transport.applyFillAttendanceCommand === 'function') {
@@ -2512,6 +2552,7 @@ export function createSyncV2Engine({
     queueLifecycleCommand,
     queueTeachingCreationCommand,
     queueFillAttendanceCommand,
+    queueSelectedAttendanceCommand,
     dispatchPending,
     recoverRejectedScoreCreates,
     reviewSessionRepairs,

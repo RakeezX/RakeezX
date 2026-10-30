@@ -18,10 +18,125 @@ import {
   todayISO, shiftDate, isWeekend, WEEKDAYS, weekday, normalizeSearchText, displayRoster,
 } from '../models.js';
 import { repaint } from '../repaint.js';
+import { parseTeamsAttendance, matchTeamsAttendance } from '../lib/teams-attendance-csv.js';
 
 let date = todayISO();
 let activeSessionId = null;
 let query = '';
+let importOpen = false;
+
+// AI N143: session membership AND current active enrollment are required.
+function teamsRoster(teachingId, session) {
+  const active = new Set(store.students(teachingId).map(s => s.id));
+  return store.sessionRoster(session).members.filter(s => active.has(s.id));
+}
+
+async function openTeamsImport(teachingId) {
+  if (importOpen || !activeSessionId) return;
+  const sessionId = activeSessionId, selectedDate = date, workspace = store.getActiveWorkspace();
+  const mount = opening;
+  const current = () => {
+    const session = store.getSession(sessionId);
+    if (opening !== mount || activeSessionId !== sessionId || date !== selectedDate ||
+        store.getActiveWorkspace() !== workspace || !session || session.teachingId !== teachingId ||
+        session.date !== selectedDate || ['cancelled', 'cancelled_holiday'].includes(session.status)) {
+      throw Error('TEAMS_CONTEXT_CHANGED');
+    }
+    store.assertClassOperationsAccess(teachingId);
+    return session;
+  };
+  try { current(); } catch { toast('تحقق من الحساب والحصة النشطة قبل الاستيراد.', 'danger'); return; }
+  importOpen = true;
+  let disposed = false;
+  try {
+    await openSheet({
+      title: 'استيراد حضور Teams',
+      desc: `الحصة ${store.getSession(sessionId).period} · ${selectedDate}. معاينة محلية فقط؛ لن يُرصد الغياب ولن يتغير الرصد السابق.`,
+      body: html`<label class="field"><span class="field__label">تقرير حضور Teams (.csv، حتى 1MB و300 صف)</span>
+          <input class="input" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" data-teams-file></label>
+        <label class="field"><span class="field__label">تحذير المشاركة الأقل من (دقائق)</span>
+          <input class="input" type="number" min="0" max="240" step="1" value="5" data-teams-short></label>
+        <div data-teams-preview aria-live="polite"></div>`,
+      foot: html`<button class="btn btn--ghost" data-sheet-close>إغلاق</button>
+        <button class="btn btn--primary" data-teams-apply disabled>رصد الحاضرين المطابقين</button>`,
+      onMount(root) {
+        let report = null, rows = [], busy = false, version = 0;
+        const fileInput = root.querySelector('[data-teams-file]');
+        const threshold = root.querySelector('[data-teams-short]');
+        const preview = root.querySelector('[data-teams-preview]');
+        const apply = root.querySelector('[data-teams-apply]');
+        const labels = { matched: 'مطابق', unmatched: 'غير مطابق', ambiguous: 'اسم ملتبس', duplicate: 'مطابق مكرر — لن يُرصد مرتين' };
+        const render = () => {
+          apply.disabled = true;
+          if (!report || disposed || !root.isConnected) return;
+          let session;
+          try { session = current(); } catch { preview.textContent = 'تغير الحساب أو الحصة. أغلق المعاينة وافتحها مجددًا.'; return; }
+          rows = matchTeamsAttendance(report, teamsRoster(teachingId, session), Number(threshold.value));
+          const recorded = new Set(store.attendanceIn(sessionId).map(r => r.studentId));
+          const sameDate = report.reportDate === selectedDate;
+          const counts = state => rows.filter(r => r.state === state).length;
+          preview.innerHTML = html`<p role="status">وُجد ${rows.length} · مطابق ${counts('matched')} · غير مطابق ${counts('unmatched')} · ملتبس ${counts('ambiguous')} · مشاركة قصيرة ${rows.filter(r => r.short).length} · منظم مستبعد ${report.organizerIgnored} · مكرر مستبعد ${report.duplicates + counts('duplicate')}</p>
+            <p class="${sameDate ? 't-3' : 't-danger'}">${sameDate ? `تاريخ التقرير مطابق: ${report.reportDate}` : `اختلاف التاريخ: التقرير ${report.reportDate || 'غير معروف'}، والحصة ${selectedDate}. لا يمكن الرصد بهذا التقرير.`}</p>
+            ${isBeforeScheduledStart(session) ? html`<p>لم يبدأ وقت الحصة بعد؛ الضغط على زر الرصد يؤكد قصدك الرصد الآن.</p>` : ''}
+            <div class="list">${rows.map((r, i) => html`<label class="field" style="overflow-wrap:anywhere">
+              <span><input type="checkbox" data-teams-row="${i}" ${r.studentId && !recorded.has(r.studentId) ? 'checked' : ''}
+                ${!sameDate || !r.studentId || recorded.has(r.studentId) ? 'disabled' : ''}>
+              ${r.name} · ${labels[r.state]}${recorded.has(r.studentId) ? ' · مرصود سابقًا (محفوظ)' : ''}
+              · ${r.seconds === null ? 'مدة غير معروفة' : `${r.seconds} ثانية`}${r.short ? ' · مشاركة قصيرة (يمكن إلغاء اختيارها)' : ''}</span></label>`)}</div>`;
+          apply.disabled = !sameDate || !rows.some(r => r.studentId && !recorded.has(r.studentId));
+        };
+        fileInput.addEventListener('change', async () => {
+          const token = ++version;
+          report = null; rows = []; apply.disabled = true; preview.textContent = '';
+          const file = fileInput.files?.[0];
+          if (!file) return;
+          try {
+            if (file.size > 1024 * 1024) throw Error('SIZE');
+            const buffer = await file.arrayBuffer();
+            if (disposed || !root.isConnected || token !== version) return;
+            current();
+            report = parseTeamsAttendance(buffer);
+            render();
+          } catch {
+            if (root.isConnected && token === version) preview.textContent = 'تعذّر قراءة التقرير أو تغيرت الحصة. اختر تقرير Teams الأصلي حتى 1MB و300 صف.';
+          } finally { fileInput.value = ''; }
+        });
+        threshold.addEventListener('change', () => {
+          if (!threshold.checkValidity()) { apply.disabled = true; return; }
+          render();
+        });
+        apply.addEventListener('click', async () => {
+          if (busy || apply.disabled || report?.reportDate !== selectedDate) return;
+          const selected = [...root.querySelectorAll('[data-teams-row]:checked:not(:disabled)')].map(el => rows[Number(el.dataset.teamsRow)]);
+          if (!selected.length) return;
+          busy = true;
+          root.querySelectorAll('input, button').forEach(el => { el.disabled = true; });
+          let saved = 0, skipped = 0, failed = false;
+          try {
+            for (const row of selected) {
+              if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
+              const session = current();
+              const stillMatches = matchTeamsAttendance(report, teamsRoster(teachingId, session), Number(threshold.value))
+                .some(r => r.studentId === row.studentId && r.name === row.name);
+              if (!stillMatches) throw Error('TEAMS_ROSTER_CHANGED');
+              if (store.attendanceIn(sessionId).some(r => r.studentId === row.studentId)) { skipped++; continue; }
+              const result = await store.fillSelectedAttendance(sessionId, [row.studentId], { verifyCurrent: () => {
+                current();
+                if (disposed || !root.isConnected) throw Error('TEAMS_CLOSED');
+              } });
+              saved += result.saved;
+              skipped += result.skipped;
+            }
+          } catch { failed = true; }
+          // Never replay after partial success or expose raw exception/report data.
+          preview.textContent = `تأكد رصد ${saved} حاضرًا · مرصود سابقًا ${skipped}. ${failed ? 'توقف الرصد بسبب تغير السياق أو تعذّر الحفظ؛ راجع سجل الحصة قبل أي محاولة جديدة.' : 'اكتمل رصد المختارين فقط. بقية الطلاب دون تغيير.'}`;
+          root.querySelectorAll('[data-sheet-close]').forEach(el => { el.disabled = false; });
+          repaint();
+        });
+      },
+    });
+  } finally { disposed = true; importOpen = false; }
+}
 
 // AI N144: page-owned intent survives a changed-markup repaint, never a changed
 // workspace/visit/session. Only setAttendance owns persistence and write guards.
@@ -344,6 +459,7 @@ export default {
                      value="${query}" placeholder="ابحث بالاسم أو الرقم" aria-label="بحث في قائمة الحضور" autocomplete="off">
               ${query ? html`<button class="iconbtn" data-act="clear-search" aria-label="مسح">${icon('x')}</button>` : ''}
             </div>
+            <button class="btn btn--sm btn--ghost" data-act="import-teams">استيراد Teams</button>
             ${unmarked > 0 ? html`<button class="btn btn--primary attendance-fill-trigger" data-act="fill-remaining"
               popovertarget="attendance-fill-choices" aria-controls="attendance-fill-choices">
               رصد الباقين (${unmarked}) <span aria-hidden="true">▾</span></button>
@@ -405,6 +521,7 @@ export default {
   },
 
   actions: {
+    'import-teams'(el, ev, params) { return openTeamsImport(params.id); },
     search(el) {
       query = el.value.trim();
       repaint();

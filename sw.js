@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v97';
+const VERSION = 'rakeezx-v98';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -214,6 +214,7 @@ const SHELL = [
   './src/views/class-rules.js',
   './src/views/students.js',
   './src/views/attendance.js',
+  './src/lib/teams-attendance-csv.js',
   './src/views/quicklog.js',
   './src/views/grades.js',
   './src/views/items.js',
