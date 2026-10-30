@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-browser-outcome-producer-1030",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100040,
+      "scopeKey": "n44-source-ui-readonly-binding",
+      "riskClass": "LOW",
+      "validationTier": "TARGETED",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 75,
+      "idleMinutes": 15,
+      "dependsOn": [
+        "n44-support-paste-challenge-1029"
+      ],
+      "allowedPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/notification-source-readiness.js",
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-browser.js",
+        "sw.js",
+        "tests/n44-browser-outcome-producer-1030.test.mjs",
+        "docs/automation-evidence/20261030/N44_BROWSER_OUTCOME_PRODUCER.md"
+      ],
+      "verificationPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/notification-source-readiness.js",
+        "src/lib/notification-push-gateway.js",
+        "src/lib/notification-push-browser.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "browser_outcome_pre_enrollment_scope_fences",
+        "encrypted_producer_and_authenticated_host_provenance",
+        "service_worker_actual_empty_unknown_and_foreign_denials"
+      ],
+      "postDeliveryChecks": [],
+      "releaseAuthority": "Direct PO continuing fix/readiness outcome authorizes exact browser-local read producer correction and source-only publication. No live install/send/registration or grant consumption.",
+      "objective": "Implement the EXACT missing frontend read capability now. Read source diagnosis in .worktrees/n44-core-live-1028/docs/automation-evidence/20261028/N44_CORE_V1_FINITE_TRIAL.md receive evidence source correction, preserved original private candidate196b3c57/currentd5f2dfe4. Actual receive receipt evidence is BROWSER-LOCAL, not server context/read; do not alter backend or invent server null. Five exact public paths now authorized. Runtime readinessSnapshot must expose bounded own-device outcome without requiring enrollment first. SW existing n44-device-outcome binding-only path cannot establish legitimate pre-enrollment absence; extend SAME read-only controlled-client path to distinguish successfully read empty outcome from missing ownership binding, corrupt/unreadable store, stale/foreign context, unavailable worker/timeouts. No missing/null/UNKNOWN/present=false becomes authenticated empty. Preserve owner/generation/session/consent fences and no cross-account device read or write/reset/registration. Source producer exports exact bounded outcome inside existing encrypted fresh own-device checkpoint, no names/grades/tokens/server/peer assertions. Gateway assemblePhoneReadiness separates browser absence provenance from original authenticated server registration provenance; missing/UNKNOWN still blocks, no server receiveReceipt requirement for browser fact. Original private classifier already rejects browser server-proof and foreign/stale outcomes; preserve its contract or document exact compatible wire shape. Do not touch/export private custody files or re-run29+14+11 proofs, metadata reads, old captures or provider install. Focus affected real app/SW integration on true scoped empty read vs unknown/unavailable/binding mismatch and existing registration outcome, encrypted report and exact assembly; a source string/mock alone cannot qualify worker/client contract. Publish actual source-only frontend fix through existing sole publisher and verify served files/SW identity. No real account/device context writes, enrollment, source creation, notification sends, service install or live clock, no ownership/storage resets. Root original custodian will use new qualified producer after publication and actual readiness, not an expiring challenge now. Deliver functioning capability not plan; truthful BLOCKED only for actual identified external input, not this now-authorized missing path.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "3cf6204556553be4b9e775928eac379e11568cf4",
+        "requiredSourcePaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-source-readiness.js",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-browser.js",
+          "sw.js"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-source-readiness.js",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-browser.js",
+          "sw.js",
+          "tests/n44-browser-outcome-producer-1030.test.mjs",
+          "docs/automation-evidence/20261030/N44_BROWSER_OUTCOME_PRODUCER.md"
+        ],
+        "newPaths": [
+          "tests/n44-browser-outcome-producer-1030.test.mjs",
+          "docs/automation-evidence/20261030/N44_BROWSER_OUTCOME_PRODUCER.md"
+        ],
+        "workerChecks": [
+          "browser_outcome_pre_enrollment_scope_fences",
+          "encrypted_producer_and_authenticated_host_provenance",
+          "service_worker_actual_empty_unknown_and_foreign_denials"
+        ],
+        "publisherChecks": []
+      },
+      "acceptance": [
+        "Saved quiet ON/OFF plainly visible even when control disabled; no behavior changes.",
+        "Exact served source verified by publisher; no claim of phone state or live acceptance."
+      ],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "source-only correction of actual capture UI runtime"
+      }
+    }
+  ]
+}
