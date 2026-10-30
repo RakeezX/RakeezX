@@ -67,6 +67,11 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   const revisionKey = c => 'rakeezx-n44-consent:' + JSON.stringify([c.ownerId, c.workspaceId, c.deviceId]);
   const consentRevision = c => { try { return storage.getItem(revisionKey(c)); } catch { return undefined; } };
   const currentToken = () => { try { const value=JSON.parse(storage.getItem(cloud.AUTH_STORAGE_KEY)||'null'); return value?.user?.id===cloud.user?.id&&typeof value.access_token==='string'?value.access_token:null; } catch { return null; } };
+  let outcomeObservation=null;
+  const outcomeFence=()=>({generation,context:current(),session:cloud.session,token:currentToken(),lease:leaseRevision(),consent:current()?consentRevision(current()):null,controller:win.navigator?.serviceWorker?.controller,binding,gateway,registration:gateway?.registration()?.registrationId??null});
+  const sameOutcomeFence=(a,b)=>a.generation===b.generation&&JSON.stringify(a.context)===JSON.stringify(b.context)&&a.session===b.session&&a.token===b.token&&a.lease===b.lease&&a.consent===b.consent&&a.controller===b.controller&&a.binding===b.binding&&a.gateway===b.gateway&&a.registration===b.registration;
+  const currentOutcome=()=>outcomeObservation&&sameOutcomeFence(outcomeObservation.fence,outcomeFence())&&Date.now()-outcomeObservation.value.observedAt<=60000?structuredClone(outcomeObservation.value):{source:'browser-service-worker',state:'unknown'};
+
   // An UNTRUSTED hint can reject a changed credential or select a server recheck.
   // It never establishes Auth, owner, or session continuity.
   const sessionHint = (token,owner) => { try {
@@ -484,7 +489,17 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   }
   return Object.freeze({
     refresh, invalidate, verifyReminder, readSourceStatus, recheckConfiguration,
-    // Read only: no refresh, permission request, worker or provider operation.
+    // Read-only support query; no refresh, permission, subscription or provider operation.
+    async readReadinessOutcome() {
+      outcomeObservation=null;
+      const before=outcomeFence();if(disposed||!before.context||!before.token)return null;
+      const bytes=await win.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(before.context)));
+      const scopeHash=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
+      if(!sameOutcomeFence(before,outcomeFence()))return null;
+      const value=await browser.readinessOutcome({scopeHash,binding:before.binding&&matches(before.binding)?before.registration:null});
+      if(disposed||!sameOutcomeFence(before,outcomeFence()))return null;
+      outcomeObservation={fence:before,value};return structuredClone(value);
+    },
     readinessSnapshot() {
       const context = current(); if (!context || disposed) return null;
       let quiet;
@@ -496,6 +511,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       const bound = binding && matches(binding), receipt = bound ? gateway?.registration() : undefined;
       return {context:{...context}, permission:browser.permission(), quiet, status,
         registration:receipt ? {state:'observed',registrationId:receipt.registrationId,expiresAt:receipt.expiresAt} : {state:'unknown'},
+        deviceOutcome:currentOutcome(),
         serverProof:false, peerProof:false};
     },
     normalUiSnapshot() {

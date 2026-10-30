@@ -84,7 +84,9 @@ async function captureReadiness(raw, teachingId, mountedElement, phoneMode) {
     const {getPushRuntime} = await import('./notification-push-runtime.js');
     const {readNotificationTiming} = await import('./notification-state.js');
     const runtime = getPushRuntime();
-    requireValue(runtime?.readinessSnapshot, 'runtime_unavailable');
+    requireValue(runtime?.readinessSnapshot && runtime?.readReadinessOutcome, 'runtime_unavailable');
+    await runtime.readReadinessOutcome();
+    requireValue(checkpoint() === before, 'snapshot_changed');
     phoneCheckpoint = () => {
       requireValue(getPushRuntime() === runtime, 'context_replaced');
       const snapshot = runtime.readinessSnapshot();

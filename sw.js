@@ -463,6 +463,45 @@ async function n44Write(value) {
 async function n44Close() {
   for (const n of await self.registration.getNotifications()) if (String(n.tag).startsWith('n44:')) n.close();
 }
+// Read-only support inspection. Never opens a missing cache or clears expiry.
+async function n44OutcomeStore() {
+  const response=await caches.match(N44_CONSENT_KEY,{cacheName:N44_CONSENT_CACHE});
+  if (!response) return {raw:null,empty:true};
+  const raw=await response.text();
+  if (!raw || raw.length>40000) throw Error('store_unreadable');
+  const value=JSON.parse(raw);
+  // Explicit cleared record and missing record are successful empty reads.
+  if(value===null)return {raw,empty:true};
+  if (!value || !['binding,expiresAt,seen','binding,expiresAt,outcome,seen'].includes(Object.keys(value).sort().join(',')) ||
+      !n44Uuid(value.binding) || !Number.isSafeInteger(value.expiresAt) || value.expiresAt<=Date.now() || value.expiresAt>Date.now()+2592000000 ||
+      !Array.isArray(value.seen) || value.seen.length>100 || value.seen.some(e=>!e||Object.keys(e).sort().join(',')!=='expiresAt,id'||typeof e.id!=='string'||!/^[a-zA-Z0-9_:%.-]{1,240}$/.test(e.id)||!Number.isSafeInteger(e.expiresAt)) ||
+      Object.hasOwn(value,'outcome') && (!value.outcome || Object.keys(value.outcome).sort().join(',')!=='minute,stage' || !n44OutcomeStages.includes(value.outcome.stage) || !Number.isSafeInteger(value.outcome.minute) || value.outcome.minute<0 || value.outcome.minute>Math.floor(Date.now()/60000))) throw Error('store_unreadable');
+  return {raw,empty:false,value};
+}
+async function n44ReadinessOutcome(event,data,epoch) {
+  const q=data.readiness;
+  if(Object.keys(data).sort().join(',')!=='readiness,type'||!q||Object.keys(q).sort().join(',')!=='binding,nonce,scopeHash'||
+      !/^[a-f0-9]{64}$/.test(q.scopeHash)||!/^[a-f0-9]{64}$/.test(q.nonce)||!(q.binding===null||n44Uuid(q.binding)))throw Error('scope_unavailable');
+  const controlled=async()=>event.source.id&&(await n44Clients()).some(c=>c.id===event.source.id&&c.url===event.source.url);
+  if(!await controlled())throw Error('client_unavailable');
+  const before=await n44OutcomeStore(),subscription=await self.registration.pushManager.getSubscription();
+  const notifications=await self.registration.getNotifications();
+  const present=notifications.some(n=>String(n.tag).startsWith('n44:'));
+  const after=await n44OutcomeStore();
+  if(epoch!==n44Epoch||before.raw!==after.raw||!await controlled())throw Error('context_changed');
+  const base={source:'browser-service-worker',scopeHash:q.scopeHash,nonce:q.nonce,binding:q.binding,observedAt:Date.now()};
+  if(before.empty){
+    if(q.binding!==null||subscription!==null||present)throw Error('binding_unavailable');
+    return {...base,state:'empty',stage:null,minute:null,present:false};
+  }
+  const v=before.value;
+  if(q.binding===null||v.binding!==q.binding)throw Error('binding_unavailable');
+  if(!v.outcome){
+    if(v.seen.length!==0||present)throw Error('outcome_unknown');
+    return {...base,state:'empty',stage:null,minute:null,present};
+  }
+  return {...base,state:v.outcome.stage==='unknown'?'unknown':'observed',stage:v.outcome.stage,minute:v.outcome.minute,present};
+}
 self.addEventListener('message', event => {
   if (!n44AppClient(event.source) || !event.ports?.[0]) return;
   const data = event.data, port = event.ports[0];
@@ -471,6 +510,10 @@ self.addEventListener('message', event => {
   const work = async () => {
     let ok = false, answered = false;
     try {
+      if (data.type === 'n44-device-outcome' && Object.hasOwn(data,'readiness')) {
+        let outcome;try{outcome=await n44ReadinessOutcome(event,data,epoch);}catch{outcome=null;}
+        answered=true;port.postMessage({ok:outcome!==null,outcome});return;
+      }
       if (data.type === 'n44-device-outcome') {
         const current=await n44Read(true);
         if(Object.keys(data).sort().join(',')!=='binding,type'||!n44Uuid(data.binding)||current?.binding!==data.binding||!event.source.id||!(await n44Clients()).some(c=>c.id===event.source.id))return;

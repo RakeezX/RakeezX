@@ -237,6 +237,24 @@ export async function admitPhoneReadinessExport({bytes,challenge,observedSha256,
  * verifyHostReadback validates original authenticated receipts outside browser
  * custody and returns their scope-bound facts. No callable crosses a wire.
  */
+// Browser observation only. An empty current worker store is not historical
+// delivery/OS proof and does not establish server registration state.
+export async function phoneBrowserOutcome(value,now=Date.now()) {
+  const o=value.phone?.runtime?.deviceOutcome,c=value.phone?.runtime?.context;
+  if(!o||o.state==='unknown')return null;
+  const check=v=>{if(!v)throw Error('readiness_browser_outcome_rejected');};
+  check(Object.keys(o).sort().join(',')==='binding,minute,nonce,observedAt,present,scopeHash,source,stage,state');
+  check(o.source==='browser-service-worker'&&['empty','observed'].includes(o.state));
+  check(c?.mode==='account'&&c?.verified===true&&c?.ownerId===value.ownerId&&c?.workspaceId===value.workspaceId&&c?.deviceId===value.phone.deviceId);
+  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(c)))),b=>b.toString(16).padStart(2,'0')).join('');
+  check(o.scopeHash===hash&&/^[a-f0-9]{64}$/.test(o.nonce));
+  check(Number.isSafeInteger(o.observedAt)&&o.observedAt<=value.observedAt&&o.observedAt<=now&&now-o.observedAt<=60000&&Date.now()-o.observedAt<=60000);
+  check(o.binding===null||/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(o.binding));
+  check([true,false].includes(o.present));
+  if(o.state==='empty')check(o.stage===null&&o.minute===null);
+  else check(['received','display-requested','display-accepted','display-failed'].includes(o.stage)&&Number.isSafeInteger(o.minute)&&o.minute>=0&&o.minute<=Math.floor(o.observedAt/60000));
+  return o;
+}
 export async function assemblePhoneReadiness({reports,scope,runId,grantId,verifyHostReadback,now=Date.now()}) {
   const check=v=>{if(!v)throw Error('readiness_assembly_rejected');};
   check(Array.isArray(reports)&&reports.length===2&&scope.devices.length===2&&new Set(scope.devices).size===2);
@@ -244,6 +262,8 @@ export async function assemblePhoneReadiness({reports,scope,runId,grantId,verify
   const values=scope.devices.map(deviceId=>{const matches=reports.filter(r=>r.value.phone.deviceId===deviceId);check(matches.length===1);return matches[0].value;});
   for(const v of values){check(v.ownerId===scope.ownerId&&v.workspaceId===scope.workspaceId&&v.runId===runId&&v.grantId===grantId&&v.kind==='n44-phone-readiness');check(v.observedAt<=now&&now-v.observedAt<=60000);check(v.phone.gesture==='trusted-support-click'&&v.provenance.serverProof===false&&v.provenance.peerProof===false);}
   check(JSON.stringify(values[0].ancestry)===JSON.stringify(values[1].ancestry)&&JSON.stringify(values[0].existingSourceIds)===JSON.stringify(values[1].existingSourceIds)&&values[0].proposed.dueAt===values[1].proposed.dueAt);
+  const outcomes=await Promise.all(values.map(v=>phoneBrowserOutcome(v,now)));
+  if(outcomes.some(o=>!o||o.state!=='empty'||o.binding!==null||o.present!==false))return {status:'BROWSER_OUTCOME_REQUIRED',activationReady:false,serverProof:false,peerProof:false};
   check(typeof verifyHostReadback==='function');
   const host=await verifyHostReadback({scope,runId,grantId,receiptDigests:reports.map(r=>r.receiptSha256)});
   // Absence/UNKNOWN is a precise pending result, never a browser-minted proof.
@@ -252,10 +272,10 @@ export async function assemblePhoneReadiness({reports,scope,runId,grantId,verify
   check(host.observedAt<=now&&now-host.observedAt<=60000&&host.authenticated===true&&host.peerReadbackAuthenticated===true);
   check(/^[a-f0-9]{64}$/.test(host.peerBeforeSha256)&&host.peerBeforeSha256===host.peerAfterSha256);
   const hash=async v=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(v)))),x=>x.toString(16).padStart(2,'0')).join('');
-  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000));
-  const phones=values.map(v=>{const h=host.devices?.find(d=>d.deviceId===v.phone.deviceId);check(h&&h.authenticated===true&&h.registrationEnabled===false&&h.receiveReceipt===null);return {deviceId:v.phone.deviceId,present:true,humanGesture:true,timezone:v.phone.timezone,syncHealthy:true,quietEnabled:v.phone.runtime.quiet!==null,lessonLeadMinutes:v.phone.preferences.lessonMinutes,dueOffsets:[...v.phone.preferences.dueDays].sort((a,b)=>a-b),serverReadbackAuthenticated:true,registrationEnabled:h.registrationEnabled,receiveReceipt:h.receiveReceipt,observedAt:Math.min(v.observedAt,host.observedAt)};});
+  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000)&&outcomes.every(o=>Date.now()-o.observedAt<=60000));
+  const phones=values.map(v=>{const h=host.devices?.find(d=>d.deviceId===v.phone.deviceId);check(h&&h.authenticated===true&&h.registrationSource==='authenticated-context-read'&&h.registrationEnabled===false);return {deviceId:v.phone.deviceId,present:true,humanGesture:true,timezone:v.phone.timezone,syncHealthy:true,quietEnabled:v.phone.runtime.quiet!==null,lessonLeadMinutes:v.phone.preferences.lessonMinutes,dueOffsets:[...v.phone.preferences.dueDays].sort((a,b)=>a-b),serverReadbackAuthenticated:true,registrationEnabled:h.registrationEnabled,receiveReceipt:null,receiveReceiptSource:'browser-service-worker',receiveEvidence:{...outcomes[values.indexOf(v)]},observedAt:Math.min(v.observedAt,host.observedAt)};});
   const ancestryDigest=await hash(values[0].ancestry),existingSourceSetDigest=await hash(values[0].existingSourceIds);
-  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000));
+  check(Date.now()-host.observedAt<=60000&&values.every(v=>Date.now()-v.observedAt<=60000)&&outcomes.every(o=>Date.now()-o.observedAt<=60000));
   return {grantId,runId,ownerId:scope.ownerId,workspaceId:scope.workspaceId,hardEnd:null,authenticated:true,syncHealthy:true,observedAt:Math.min(host.observedAt,...values.map(v=>v.observedAt)),documentCheckpoint:host.documentCheckpoint,
     ancestryDigest,existingSourceSetDigest,dueAt:values[0].proposed.dueAt,calendarStillEligible:true,
     peerUnchanged:true,peerReadbackAuthenticated:true,peerBeforeSha256:host.peerBeforeSha256,peerAfterSha256:host.peerAfterSha256,phones};

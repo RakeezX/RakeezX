@@ -78,6 +78,23 @@ export function createPushBrowser({ window: win = globalThis.window, publicKey, 
         return {stage:r.stage,minute:r.minute,present:r.present};
       }catch{return null;}
     },
+    async readinessOutcome({scopeHash,binding=null}) {
+      const unknown=()=>({source:'browser-service-worker',state:'unknown',scopeHash,binding,observedAt:Date.now()});
+      try {
+        if(!/^[a-f0-9]{64}$/.test(scopeHash)||!(binding===null||/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding)))return unknown();
+        const r=await registration(),worker=r?.active,u=new URL(worker?.scriptURL);
+        if(u.origin!==win.location.origin||u.pathname!=='/sw.js'||win.navigator.serviceWorker.controller!==worker)return unknown();
+        const nonce=Array.from(win.crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
+        const start=Date.now(),reply=await message({type:'n44-device-outcome',readiness:{scopeHash,nonce,binding}}),o=reply?.outcome;
+        if(win.navigator.serviceWorker.controller!==worker||(await registration())?.active!==worker||reply?.ok!==true||!o||
+          Object.keys(o).sort().join(',')!=='binding,minute,nonce,observedAt,present,scopeHash,source,stage,state'||o.source!=='browser-service-worker'||o.scopeHash!==scopeHash||o.nonce!==nonce||o.binding!==binding||
+          !Number.isSafeInteger(o.observedAt)||o.observedAt<start||o.observedAt>Date.now()||Date.now()-o.observedAt>60000||![true,false].includes(o.present)||
+          !['empty','observed','unknown'].includes(o.state)||
+          (o.state==='empty'?(o.stage!==null||o.minute!==null):(!['received','display-requested','display-accepted','display-failed','unknown'].includes(o.stage)||!Number.isSafeInteger(o.minute)||o.minute<0||o.minute>Math.floor(o.observedAt/60000)))||
+          (o.state==='observed'&&o.stage==='unknown')||(o.state==='unknown'&&o.stage!=='unknown'))return unknown();
+        return o;
+      } catch {return unknown();}
+    },
     consent: () => message({ type: 'n44-consent-status' }),
     async clearConsent(binding) {
       const result = await message({ type: 'n44-consent-clear', binding: binding ?? null });
