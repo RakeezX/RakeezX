@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "purpose": "Actual source-only storage delivery fixture; no provider operation, retry, runtime activation or new task authority.",
+  "task": {
+    "id": "continuous-n88-owner-admin-storage-install-20261031",
+    "productId": "N88",
+    "activationId": "po-20261012-continuous",
+    "scopeKey": "n88-existing-admin-atomic-storage-install",
+    "executionMode": "live",
+    "liveMutation": true,
+    "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+    "preparationAuthority": {
+      "kind": "scoped_preview_and_fixture_ops",
+      "productId": "N88",
+      "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+      "publication": true,
+      "publicationScope": "source-only implementation and minimized verified storage receipt; generic frontend publisher does not execute SQL or enable service",
+      "projectId": "xlrubcwjqktzzunrvuns",
+      "maxAtomicInstallations": 1,
+      "originalSupportedCustodianOnly": true,
+      "temporaryExistingAdminSetEdge": true,
+      "exactHelperExecuteGrants": 3,
+      "oldMembershipRestoredBeforeCommit": true,
+      "sourceOnlyPublication": true,
+      "serviceEnabled": false,
+      "realDataMutations": 0,
+      "notificationSends": 0,
+      "newCredentials": 0,
+      "authorityEvidence": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/window-continuation-authority.json",
+        "sha256": "e659fc0b19c97df3825638073400e0441120545ee7684a9a5eb5985c13e3f452"
+      },
+      "historicalAuthorityEvidence": {
+        "path": "artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/authority.json",
+        "sha256": "9d4df6d361c6c0aa90fa90f312d1236a28f3afc8f2560f204ac389298e8ed3d5"
+      },
+      "expiredAttemptPreserved": {
+        "runId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+        "sqlSha256": "05851eac5f25c24d99f8d8dafefd479c8b2e812695f2399dcd1f409cc5b4d97e",
+        "neverReplay": true
+      },
+      "maxNewQualifiedDispatches": 1,
+      "onlyAfterExactVerifiedNoChange": true,
+      "maxFreshToolWindowMinutes": 45,
+      "databaseTimeoutsUnchanged": true
+    },
+    "allowedPaths": [
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+      "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+      "tests/n88-v2-owner-admin-install-20261031.test.mjs",
+      "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+    ],
+    "verificationPaths": [
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+      "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md"
+    ],
+    "requiredChecks": [
+      "n88_native_actual_actor_atomic_admin_qualification",
+      "n88_exact_original_target_authority_and_finite_admission",
+      "n88_actual_atomic_install_or_verified_no_change",
+      "n88_actual_postinstall_exact_privilege_and_storage_readback"
+    ],
+    "candidateSha": "223b30e059c43e1bc13984c2fd9b2f2b1c81449a",
+    "baseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
+    "attempt": {
+      "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5"
+    }
+  },
+  "receipt": {
+    "version": 1,
+    "ticketId": "N88",
+    "taskId": "continuous-n88-owner-admin-storage-install-20261031",
+    "candidateSha": "223b30e059c43e1bc13984c2fd9b2f2b1c81449a",
+    "baseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
+    "publishedSha": "7417d8c2833f9036d254d1c07106bf3605db9d7d",
+    "status": "deployed",
+    "state": "DEPLOYED_AWAITING_PO",
+    "productionDeployed": true,
+    "verifiedAt": "2026-10-30T23:05:23.057Z",
+    "deploymentId": "623bf2ff-212b-46dd-b8a2-972ad00736b3",
+    "closed": false,
+    "poPersonallyTested": false,
+    "provider": {
+      "checkRunId": "124359106102",
+      "headSha": "7417d8c2833f9036d254d1c07106bf3605db9d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-30T23:05:07Z",
+      "completedAt": "2026-10-30T23:05:07Z",
+      "headBranch": null,
+      "deploymentId": "623bf2ff-212b-46dd-b8a2-972ad00736b3",
+      "previewUrl": "https://623bf2ff.rakeezx.pages.dev",
+      "detailsUrl": "https://dash.cloudflare.com/?to=/1c9ae85e766968a4269a7ac505f9a693/pages/view/rakeezx/623bf2ff-212b-46dd-b8a2-972ad00736b3"
+    },
+    "binding": {
+      "candidateSha": "223b30e059c43e1bc13984c2fd9b2f2b1c81449a",
+      "declaredBaseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
+      "mainAtPreparation": "0a94265d5022e01f00b22c29cf30d2451b2fc9fa",
+      "integrationSha": "7f450039b4238764c637e9254d2a6d416ccad2b9",
+      "publishedSha": "7417d8c2833f9036d254d1c07106bf3605db9d7d",
+      "candidateAncestorOfPublished": true,
+      "previousMainAncestorOfPublished": true,
+      "mainContainsPublished": true,
+      "checkHeadShaMatches": true,
+      "kind": "merge"
+    },
+    "changedPaths": [
+      "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+      "tests/n88-v2-owner-admin-install-20261031.test.mjs"
+    ],
+    "sourceOnlyPaths": [
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/README.md",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-authority.json",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-bound.sql",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+      "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/installer.inactive.sql",
+      "tests/n88-v2-owner-admin-install-20261031.test.mjs"
+    ],
+    "changedAssets": [],
+    "productSourceChangeObserved": false,
+    "evidence": {
+      "immutable": {
+        "origin": "https://623bf2ff.rakeezx.pages.dev",
+        "checkedAt": "2026-10-30T23:05:20.137Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "observedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "bytes": 5711,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "7ac3d9ef79bf81d1a2c09fb14975adef149a256ba09ffd80073fce7977b2aa3c",
+            "observedSha256": "7ac3d9ef79bf81d1a2c09fb14975adef149a256ba09ffd80073fce7977b2aa3c",
+            "bytes": 29812,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "fde0e81f795be93ad18857344a2043e4634b1c9e2592d00e00fe0e96957108f8",
+            "observedSha256": "fde0e81f795be93ad18857344a2043e4634b1c9e2592d00e00fe0e96957108f8",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+            "urlPath": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "bd598e02190fc7d6e86d6fc3f9ad4cf722cc65046bed80e5d9075a2b8026886b",
+            "observedSha256": "bd598e02190fc7d6e86d6fc3f9ad4cf722cc65046bed80e5d9075a2b8026886b",
+            "bytes": 10165,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+            "urlPath": "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "d9e043c9fd759f71e969e06588a2603a9f24ad87c9a1113647f20a90a6c0d6ab",
+            "observedSha256": "d9e043c9fd759f71e969e06588a2603a9f24ad87c9a1113647f20a90a6c0d6ab",
+            "bytes": 14535,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      },
+      "production": {
+        "origin": "https://rakeezx.com",
+        "checkedAt": "2026-10-30T23:05:20.709Z",
+        "passed": true,
+        "assets": [
+          {
+            "repoPath": "index.html",
+            "urlPath": "/",
+            "requestProfile": "anonymous-browser-entry-chromium154",
+            "statusCode": 200,
+            "expectedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "observedSha256": "39249575424d24595322fb98d1b0301a181c3643e3c342e92e8c3373cbc77a00",
+            "bytes": 7192,
+            "deleted": false,
+            "verified": true,
+            "normalization": "cloudflare-observed-tail-v2",
+            "normalizedSha256": "a9d2bed93029152a60ad466aa21b49fc4676a71ad97e51ef8e889482e23121d6",
+            "normalizedBytes": 5711,
+            "removedProviderBytes": 1481,
+            "removedSha256": "9c02ff3b6afe39ebdb8c6e20e2bc1e6b9031f43613e85faa965de0b99c444b7c",
+            "providerTransforms": [
+              "cloudflare-jsd-20261030",
+              "cloudflare-analytics-20261017"
+            ],
+            "providerAddedWhitespaceBytes": 1
+          },
+          {
+            "repoPath": "sw.js",
+            "urlPath": "sw.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "7ac3d9ef79bf81d1a2c09fb14975adef149a256ba09ffd80073fce7977b2aa3c",
+            "observedSha256": "7ac3d9ef79bf81d1a2c09fb14975adef149a256ba09ffd80073fce7977b2aa3c",
+            "bytes": 29812,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "src/generated/build-meta.generated.js",
+            "urlPath": "src/generated/build-meta.generated.js",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "fde0e81f795be93ad18857344a2043e4634b1c9e2592d00e00fe0e96957108f8",
+            "observedSha256": "fde0e81f795be93ad18857344a2043e4634b1c9e2592d00e00fe0e96957108f8",
+            "bytes": 358,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+            "urlPath": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/manifest.json",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "bd598e02190fc7d6e86d6fc3f9ad4cf722cc65046bed80e5d9075a2b8026886b",
+            "observedSha256": "bd598e02190fc7d6e86d6fc3f9ad4cf722cc65046bed80e5d9075a2b8026886b",
+            "bytes": 10165,
+            "deleted": false,
+            "verified": true
+          },
+          {
+            "repoPath": "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+            "urlPath": "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+            "requestProfile": "static-source",
+            "statusCode": 200,
+            "expectedSha256": "d9e043c9fd759f71e969e06588a2603a9f24ad87c9a1113647f20a90a6c0d6ab",
+            "observedSha256": "d9e043c9fd759f71e969e06588a2603a9f24ad87c9a1113647f20a90a6c0d6ab",
+            "bytes": 14535,
+            "deleted": false,
+            "verified": true
+          }
+        ]
+      }
+    },
+    "build": {
+      "status": "passed"
+    }
+  },
+  "nativeQualificationEncoding": {
+    "version": 1,
+    "observedAt": "2026-10-30T23:27:10.729Z",
+    "taskId": "continuous-n88-owner-admin-storage-install-20261031",
+    "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5",
+    "candidateSha": "223b30e059c43e1bc13984c2fd9b2f2b1c81449a",
+    "normalization": "CRLF-to-LF only; no source character or line removal",
+    "files": [
+      {
+        "file": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs",
+        "manifestField": "admissionSha256",
+        "qualifiedRawSha256": "1efab11fc70be0c1bd529145904ebd2dd4886868bfcd5e869248ed68e40f5db1",
+        "manifestSha256": "1efab11fc70be0c1bd529145904ebd2dd4886868bfcd5e869248ed68e40f5db1",
+        "gitLfSha256": "74ffddf65d4cb36b1d406ff8b60bcd9f28282f9ec7c70851e1abd2b24ed2e969",
+        "normalizedQualifiedSha256": "74ffddf65d4cb36b1d406ff8b60bcd9f28282f9ec7c70851e1abd2b24ed2e969",
+        "rawMatchesQualification": true,
+        "normalizedBytesEqual": true,
+        "crlfCount": 1,
+        "lfCount": 122
+      },
+      {
+        "file": "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs",
+        "manifestField": "relaySha256",
+        "qualifiedRawSha256": "f07ce1fde5ccaedea03c2bceed8966f435e12b07faa7c51fa686320572e9ba10",
+        "manifestSha256": "f07ce1fde5ccaedea03c2bceed8966f435e12b07faa7c51fa686320572e9ba10",
+        "gitLfSha256": "a51c191cce6dba2503331dba6ad3556c2a2b8d469751a09ec9f00a13c8cc5c0b",
+        "normalizedQualifiedSha256": "a51c191cce6dba2503331dba6ad3556c2a2b8d469751a09ec9f00a13c8cc5c0b",
+        "rawMatchesQualification": true,
+        "normalizedBytesEqual": true,
+        "crlfCount": 1,
+        "lfCount": 95
+      },
+      {
+        "file": "tests/n88-v2-owner-admin-install-20261031.test.mjs",
+        "manifestField": "testSha256",
+        "qualifiedRawSha256": "570c75e6dc63b4b5ef450140e04af7a79c1b4179466193b0063e3a605fc1a78f",
+        "manifestSha256": "570c75e6dc63b4b5ef450140e04af7a79c1b4179466193b0063e3a605fc1a78f",
+        "gitLfSha256": "1040f473e5c78be3a542f55a86e644ab9c943059c0ff6102be9e632659b96080",
+        "normalizedQualifiedSha256": "1040f473e5c78be3a542f55a86e644ab9c943059c0ff6102be9e632659b96080",
+        "rawMatchesQualification": true,
+        "normalizedBytesEqual": true,
+        "crlfCount": 2,
+        "lfCount": 384
+      }
+    ]
+  }
+}
