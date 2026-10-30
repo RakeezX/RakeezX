@@ -1,0 +1,34 @@
+{
+  "aiAuthored": true,
+  "taskId": "continuous-n44-current-projection-recovery-20261031",
+  "runId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+  "nativeBaselineVersion": 181,
+  "nativeBaselineArchive": "41c540288561db1e1d0ce32e2cd26660da128251270ee9f686d8846fec2254fc",
+  "baselineEntrySha256": "09d902f57abbb43ac459121072c3a1c28c3c83310aa790a5e8e43d5b744475d2",
+  "qualifiedEntrySha256": "019478108fce80a1396216aeafc8dc0529ccbc49307c79d2fb969a1356b259ba",
+  "composition": [
+    "canonical version digest and complete comparison",
+    "one authenticated teacher read branch",
+    "read exemption from enrollment-only scope gate",
+    "events/read route allowlist"
+  ],
+  "allOtherNativeBytesPreserved": true,
+  "deliveryEnabled": false,
+  "schedulerEnabled": false,
+  "cron": [],
+  "deployment": "NOT_RUN",
+  "actualServicePrerequisite": "BLOCKED",
+  "readback": "service-readback.json",
+  "serviceMaintenanceUpdatesConsumed": 0,
+  "ingress": "CURRENT SOURCE REQUIRED",
+  "sourceHashEncoding": "UTF-8 LF Git canonical text; bundle hashes exact bytes",
+  "sourceHashes": {
+    "drafts/n44-push/backend.mjs": "6bbb48ba4597655967920e62fb8671d69c508e146e40200b0d76c9fb1b31e076",
+    "drafts/n44-push/canonical-source.mjs": "89df837d8162f0fe271a7f1b5892c06ba14ad49974b7113873f793b1d1cbdf73",
+    "drafts/n44-push/web-protocol.mjs": "6084a27b4e100583d740517fbc064baadd3335cdd867c24bccc9f960db71c727",
+    "src/lib/notification-push-runtime.js": "84832d7a44cb89b18900033ead858c648571ecaf5c7e40fb2ec1780877904e3f",
+    "src/lib/notification-push-gateway.js": "476b9952285daaceab27fa8545920be9d905adf218c8ea634a36081433e4037b",
+    "src/views/notification-settings.js": "3712431998f19c3d0f871cbb9758398741af007a34042d3953d47c6756a6a590",
+    "sw.js": "f42168ee56debfe13c33da717463de891853699233e29b1e6d532cbd5129f705"
+  }
+}

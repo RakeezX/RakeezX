@@ -7,6 +7,8 @@ import { readNotificationCategories, readNotificationTiming } from './notificati
 import { LEASE_STORAGE_PREFIX } from './offline-lease.js';
 import { normalizePushPayload, normalizePushEnvelope } from './notification-push-core.js';
 import { toast } from './dom.js';
+import { shiftDate } from '../models.js';
+import { getAll as projectionOutbox } from './db.js';
 
 // Public-key discovery is authenticated and same-origin. This enables discovery,
 // never permission, subscription, a scheduler or delivery on application load.
@@ -21,7 +23,7 @@ export function supportedPushConfiguration(value, now = Date.now()) {
 export function createPushRuntime({ store, cloud, navigate, window: win = globalThis.window,
   configuration = PUSH_CONFIGURATION, fetch, storage = win?.localStorage, changed = () => {} }) {
   let generation = 0, binding = null, client = null, gateway = null, ready = false, status = 'disabled', preparing = false;
-  let stamps = new Map(), projecting = null, cleanup = Promise.resolve();
+  let stamps = new Map(), recoveredProjections = new Set(), projecting = null, cleanup = Promise.resolve();
   let queuedProjection = null;
   let choiceSerial = 0, choices = new Map(), verification = null, sourceStatus = null, verifying = false;
   const choiceSignature = (type, value) => JSON.stringify([generation, current(), type, value]);
@@ -111,7 +113,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     configObservation = null;
     configAttempt = null;
     const old = client, originalGateway = gateway;
-    ++generation; choices.clear(); verification = null; sourceStatus = null; verifying = false; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); client = null;
+    ++generation; choices.clear(); verification = null; sourceStatus = null; verifying = false; renewing = null; queuedProjection = null; ready = false; status = 'unavailable'; eligibility = { reason: 'binding_changed', configuration: 'not_observed' }; binding = null; gateway = null; stamps = new Map(); recoveredProjections = new Set(); client = null;
     let clearing;
     try { clearing = configuration.enabled ? originalGateway?.retire() ?? browser.clearConsent(null) : Promise.resolve(true); } catch { clearing = browser.clearConsent(null); }
     cleanup = Promise.all([cleanup, Promise.resolve(clearing).catch(() => false)]).then(results => results[1] === false ? {status:'cleanup_pending'} : results[0]);
@@ -349,7 +351,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
             storage.removeItem(pendingKey);
             if (binding !== b || !usable()) break;
             const currentSource = activeProjectionSources(store, b.context).find(s => s.key === key);
-            if (currentSource?.revision === revision) stamps.set(key, next);
+            if (currentSource?.revision === revision) { stamps.set(key, next); recoveredProjections.delete(key); }
           } catch (error) {
             if (error.projectionDisposition === 'rejected') {
               storage.removeItem(pendingKey); projectionFailures.set(pendingKey, revision);
@@ -377,9 +379,8 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
   async function verifyReminder(token) {
     const choice = selectedChoice(token, 'reminder'), b = binding, epoch = generation;
     if (!choice || !usable() || verifying) return { status: 'rejected' };
-    if (currentResult(verification)?.token === token && verification.status === 'unknown') return { status: 'unknown' };
-    const event = choice.value.event;
-    const valid = () => epoch === generation && binding === b && usable() && selectedChoice(token, 'reminder')?.signature === choice.signature;
+    const event = choice.value.event, initialFence=outcomeFence(),initialPreferences=JSON.stringify(preferences());
+    const valid = () => sameOutcomeFence(initialFence,outcomeFence()) && initialPreferences===JSON.stringify(preferences()) && epoch === generation && binding === b && usable() && selectedChoice(token, 'reminder')?.signature === choice.signature;
     const finish = (status, receipt = {}) => {
       if (!valid()) return { status: 'rejected' };
       verification = { ...receipt, token, signature: choice.signature, status, eventId: event.id, sourceId: event.targetId,
@@ -392,10 +393,44 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
       if (!valid()) return { status: 'rejected' };
       if (!confirmed.some(s => s.kind === event.kind && s.id === event.targetId)) return finish('pending');
       const key = JSON.stringify([event.kind, event.targetId]);
-      await projectConfirmed({ workspace: b.workspace, session: b.session, sourceKey: key });
-      if (!valid()) return { status: 'rejected' };
       const pendingKey = 'rakeezx-n44-projection-pending:' + JSON.stringify([b.context.ownerId, b.context.workspaceId, key]);
-      if (storage.getItem(pendingKey)) return finish('unknown');
+      // UNKNOWN is present-state only. Explicit reads never replay its write.
+      if (storage.getItem(pendingKey) || existingClickOnly || recoveredProjections.has(key) || !stamps.has(key)) {
+        const g=gateway,fence=outcomeFence(),prefs=JSON.stringify(preferences());
+        const mounted=()=>JSON.stringify([activeProjectionSources(store,b.context).find(s=>s.key===key)?.revision,store.state.calendars,store.state.calendarDays]);
+        const revision=mounted(),same=()=>valid()&&sameOutcomeFence(fence,outcomeFence())&&prefs===JSON.stringify(preferences())&&mounted()===revision;
+        if(!same())return {status:'rejected'};
+        const beforeOutbox=await projectionOutbox('outbox');
+        if(!same())return {status:'rejected'};
+        if(beforeOutbox.some(r=>r.state!=='superseded'&&['calendars','calendarDays'].includes(r.store)))return finish('pending');
+        const syncCheckpoint=JSON.stringify(beforeOutbox);
+        const result=await g.readProjection(event.kind,event.targetId);
+        if(!same())return {status:'rejected'};
+        const stillConfirmed=await store.confirmedNotificationSources();
+        if(!same())return {status:'rejected'};
+        if(!stillConfirmed.some(s=>s.kind===event.kind&&s.id===event.targetId))return finish('pending');
+        const afterOutbox=await projectionOutbox('outbox');
+        if(!same())return {status:'rejected'};
+        if(JSON.stringify(afterOutbox)!==syncCheckpoint)return finish('pending');
+        const localRevisionDigest=await mountedProjectionRevisionDigest(store,b.context,event.kind,event.targetId,win.crypto);
+        if(!same())return {status:'rejected'};
+        const expected=mountedProjectionEvents(store,b.context,event.kind,event.targetId,preferences(),result.observedAt);
+        if(result.status!=='verified'||!localRevisionDigest||localRevisionDigest!==result.sourceRevisionDigest||!expected||JSON.stringify(expected)!==JSON.stringify([...result.events].sort((a,b)=>a.id.localeCompare(b.id))))return finish(result.status==='changed'||result.status==='verified'?'changed':'unknown');
+        const [subscription,consent]=await Promise.all([browser.existing(),browser.consent()]);
+        if(!same())return {status:'rejected'};
+        const registration=g.registration();
+        if(!subscription||consent?.binding!==registration?.registrationId||consent.expiresAt<registration.expiresAt||b.serverConsent!==true)return finish('unknown');
+        // No await between the final mounted/Sync fence and marker removal.
+        const finalConfirmed=await store.confirmedNotificationSources();
+        if(!same())return {status:'rejected'};
+        if(!finalConfirmed.some(s=>s.kind===event.kind&&s.id===event.targetId))return finish('pending');
+        const finalOutbox=await projectionOutbox('outbox');
+        if(!same())return {status:'rejected'};
+        if(JSON.stringify(finalOutbox)!==syncCheckpoint)return finish('pending');
+        storage.removeItem(pendingKey);stamps.set(key,result.sourceStamp);recoveredProjections.add(key);
+        return finish('current_verified',{projection:'current',sourceStamp:result.sourceStamp,observedAt:result.observedAt});
+      }
+      if (!valid()) return { status: 'rejected' };
       if (projectionFailures.get(pendingKey) === choice.value.source) return finish('rejected');
       if (!stamps.has(key)) return finish('unknown');
       const registration = gateway.registration();
@@ -523,7 +558,7 @@ export function createPushRuntime({ store, cloud, navigate, window: win = global
     normalUiSnapshot() {
       const options = normalChoices();
       return { ...options, verification: usable() ? currentResult(verification) : null, sourceStatus: currentResult(sourceStatus), verifying,
-        canVerify: !existingClickOnly && usable() };
+        canVerify: usable() };
     },
     async deviceOutcome() {
       const before=outcomeBinding();if(!before?.registration)return null;
@@ -615,3 +650,37 @@ export function writePushQuiet(context, quiet, storage = globalThis.localStorage
 let runtime = null;
 export const setPushRuntime = value => { runtime = value; };
 export const getPushRuntime = () => runtime;
+
+// AI: local complete identities, independently re-derived from the mounted source.
+// This does not accept/adopt any server payload into store data.
+export function mountedProjectionEvents(store,context,kind,id,prefs,now) {
+ const source=activeProjectionSources(store,context).find(s=>s.kind===kind&&s.id===id);if(!source)return null;
+ const row=(kind==='lesson'?store.state.sessions:store.state.scoreSubitems).find(s=>s.id===id);
+ const item=kind==='due'?store.state.items.find(i=>i.id===row.itemId):null;
+ const teaching=store.getTeaching(item?.teachingId??row.teachingId),term=store.getTerm(teaching.termId);
+ const inTerm=d=>d>=term.startDate&&d<=term.endDate;
+ const wall=(d,t)=>new Date(d+'T'+t+':00').getTime(),events=[];
+ const add=(eventId,dueAt,expiresAt,actionPath)=>{if(Number.isSafeInteger(dueAt)&&Number.isSafeInteger(expiresAt)&&expiresAt>now&&expiresAt>dueAt)events.push({id:eventId,kind,dueAt,expiresAt,actionPath});};
+ if(kind==='lesson') {
+  const start=row.startTime?.slice(0,5),end=row.endTime?.slice(0,5);
+  if(!inTerm(row.date)||!store.isSessionEligibleDate(row.date,{teaching,term,year:store.getYear(term.yearId)}))return [];
+  add(`lesson:${encodeURIComponent(id)}:${row.date}:${start}:${end}`,wall(row.date,start)-prefs.lessonMinutes*60000,wall(row.date,end),`/teaching/${encodeURIComponent(teaching.id)}/attendance?session=${encodeURIComponent(id)}`);
+ }else if(row.dueDate&&inTerm(row.dueDate))for(const stage of prefs.dueDays){
+  const date=shiftDate(row.dueDate,-stage);if(!inTerm(date)||row.startDate&&row.startDate>date)continue;
+  add(`due:${encodeURIComponent(id)}:${row.dueDate}:${date}`,wall(date,'00:00'),wall(shiftDate(date,1),'00:00'),`/teaching/${encodeURIComponent(teaching.id)}/items`);
+ }
+ return events.sort((a,b)=>a.id.localeCompare(b.id));
+}
+
+export async function mountedProjectionRevisionDigest(store,context,kind,id,cryptoPort=globalThis.crypto) {
+ const row=(kind==='lesson'?store.state.sessions:store.state.scoreSubitems).find(r=>r.id===id);if(!row)return null;
+ const item=kind==='due'?store.state.items.find(r=>r.id===row.itemId):null;
+ const teaching=store.getTeaching(item?.teachingId??row.teachingId),term=store.getTerm(teaching?.termId),year=store.getYear(term?.yearId);if(!year)return null;
+ const calendars=(store.state.calendars??[]).filter(r=>r.yearId===year.id),calIds=new Set(calendars.map(r=>r.id));
+ const entries=[['years',year],['teachings',teaching],['sections',store.getSection(teaching.sectionId)],['subjects',store.getSubject(teaching.subjectId)],
+  ...store.state.terms.filter(r=>r.yearId===year.id).map(r=>['terms',r]),...calendars.map(r=>['calendars',r]),...(store.state.calendarDays??[]).filter(r=>calIds.has(r.calendarId)).map(r=>['calendarDays',r]),
+  [kind==='lesson'?'sessions':'scoreSubitems',row],...(item?[['items',item]]:[])];
+ if(entries.length>816||entries.some(([,r])=>!r||(r.ownerId!=null&&r.ownerId!==context.ownerId)||!Number.isSafeInteger(r.serverRevision)||r.serverRevision<=0||r.syncCreatePending))return null;
+ const vector=entries.map(([name,r])=>[name,r.id,String(r.serverRevision),r.deleted===true]).sort((a,b)=>JSON.stringify(a)<JSON.stringify(b)?-1:1);
+ return Array.from(new Uint8Array(await cryptoPort.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(vector)))),b=>b.toString(16).padStart(2,'0')).join('');
+}

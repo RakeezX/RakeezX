@@ -1,0 +1,26 @@
+// AI: narrowly compose on the exact installed Native181; never rebuild older main over it.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const dir='drafts/n44-push/activation/current-projection-recovery-20261031/';
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const before=await readFile(dir+'bundle/before/n44-notifications/index.mjs','utf8');
+assert.equal(hash(before),'09d902f57abbb43ac459121072c3a1c28c3c83310aa790a5e8e43d5b744475d2');
+assert.equal(hash(await readFile(dir+'bundle/before/n44-notifications/import_map.json')),'50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421');
+let edge=before;
+const backend=(await readFile('drafts/n44-push/backend.mjs','utf8')).replaceAll('\r\n','\n'),canonical=(await readFile('drafts/n44-push/canonical-source.mjs','utf8')).replaceAll('\r\n','\n');
+let branch=backend.slice(backend.indexOf("   // AI: explicit present-state"),backend.indexOf("   if(path==='/events/authorize')"));
+assert(branch.includes("if(path==='/events/read')"));
+branch=branch.replaceAll('exact(body,','exact2(body,').replaceAll('fail();','fail8();');
+const needle='        if (path === "/events/authorize") {';assert.equal(before.split(needle).length,2);
+edge=edge.replace(needle,branch+'\n'+needle);
+const mobileBefore='path.startsWith("/events/")',mobileAfter='(path.startsWith("/events/") && path!=="/events/read")';assert.equal(edge.split(mobileBefore).length,2);edge=edge.replace(mobileBefore,mobileAfter);
+const comparison=canonical.slice(canonical.indexOf('// Complete finite equality')).replaceAll('export function','function').replaceAll("createHash('sha256')","createHash3('sha256')");
+edge=comparison+'\n'+edge;
+const oldSourceReturn='  return { stamp, events };',newSourceReturn='  return { stamp, events, sourceRevisionDigest:sourceRevisionDigest(s,kind) };';assert.equal(edge.split(oldSourceReturn).length,2);edge=edge.replace(oldSourceReturn,newSourceReturn);
+const old='events\\/(?:update|authorize)',next='events\\/(?:read|update|authorize)';assert.equal(edge.split(old).length,2);edge=edge.replace(old,next);
+assert.equal(edge.replace(comparison+'\n','').replace(branch+'\n','').replace(next,old).replace(newSourceReturn,oldSourceReturn).replace(mobileAfter,mobileBefore),before,'unrelated native bytes changed');
+await mkdir(dir+'bundle/qualified',{recursive:true});await writeFile(dir+'bundle/qualified/edge.mjs',edge);
+await writeFile(dir+'bundle/qualified/import_map.json',await readFile(dir+'bundle/before/n44-notifications/import_map.json'));
+const m={aiAuthored:true,taskId:'continuous-n44-current-projection-recovery-20261031',runId:'a28ecd62-83bf-4c8f-8aa7-b511048e76ec',nativeBaselineVersion:181,nativeBaselineArchive:'41c540288561db1e1d0ce32e2cd26660da128251270ee9f686d8846fec2254fc',baselineEntrySha256:hash(before),qualifiedEntrySha256:hash(edge),composition:['canonical version digest and complete comparison','one authenticated teacher read branch','read exemption from enrollment-only scope gate','events/read route allowlist'],allOtherNativeBytesPreserved:true,deliveryEnabled:false,schedulerEnabled:false,cron:[],deployment:'NOT_RUN',actualServicePrerequisite:'BLOCKED',readback:'service-readback.json',serviceMaintenanceUpdatesConsumed:0,ingress:'CURRENT SOURCE REQUIRED',sourceHashEncoding:'UTF-8 LF Git canonical text; bundle hashes exact bytes',sourceHashes:Object.fromEntries(await Promise.all(['drafts/n44-push/backend.mjs','drafts/n44-push/canonical-source.mjs','drafts/n44-push/web-protocol.mjs','src/lib/notification-push-runtime.js','src/lib/notification-push-gateway.js','src/views/notification-settings.js','sw.js'].map(async f=>[f,hash((await readFile(f,'utf8')).replaceAll('\r\n','\n'))])))};
+await writeFile(dir+'manifest.json',JSON.stringify(m,null,2)+'\n');console.log(JSON.stringify(m));

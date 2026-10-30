@@ -1,0 +1,71 @@
+{
+  "taskId": "continuous-n44-current-projection-recovery-20261031",
+  "runId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "recordedAt": "2026-10-30T22:31:59.456Z",
+  "status": "BLOCKED",
+  "stage": "current-ingress-source-authentication",
+  "nativeBaseline": {
+    "version": 181,
+    "archiveSha256": "41c540288561db1e1d0ce32e2cd26660da128251270ee9f686d8846fec2254fc",
+    "entrySha256": "09d902f57abbb43ac459121072c3a1c28c3c83310aa790a5e8e43d5b744475d2",
+    "importMapSha256": "50c148558c120b2a7bc3bb65d0b6fe4568d05ce9e681720502a94a716cc51421",
+    "source": "9d5becbc13e131249bac0d2e73babce6dd841f31",
+    "readback": "Connected official get_edge_function, exact source saved under bundle/before; original preserved native-installed.json agrees."
+  },
+  "originalAdmission": {
+    "cardAndAuthorityHash": true,
+    "originalCustodyOwner": true,
+    "originalCurrentUserPolicyDigestAndSourcePinAssertionsReached": true,
+    "flagsOffDescriptorNullPinAbsentAssertionsReached": true,
+    "evidence": "inspect reached creation of fresh bundle/current-ingress only after these assertions; CLI metadata was kept in memory and not exported.",
+    "oldTrialEntryInvocations": 0
+  },
+  "failedOperation": {
+    "tool": "Existing official Wrangler4.148 init --from-dash",
+    "deadlineMs": 45000,
+    "status": null,
+    "error": "ETIMEDOUT",
+    "signal": "SIGTERM",
+    "observedOwnedChildCommand": "wrangler login",
+    "generatedWrapperDependency": "wrangler ^4.156.0",
+    "currentIngressSourceObtained": false,
+    "interactiveLoginCompletedByWorker": false,
+    "noRepeat": true
+  },
+  "providerOperations": {
+    "qualifiedFunctionUpdates": 0,
+    "ingressUpdates": 0,
+    "sourcePolicyWrites": 0,
+    "registrations": 0,
+    "projectionWrites": 0,
+    "sends": 0,
+    "sqlAuthSchemaRoleChanges": 0,
+    "phoneTrialActions": 0
+  },
+  "actualDeployedRecovery": "NOT_RUN",
+  "authenticatedHostedFixture": "NOT_RUN; none provisioned or used",
+  "privateBoundary": "PASS: exact three actual pg_catalog/ACL reads; bundle/private-boundary-readback.json",
+  "cleanup": {
+    "serviceDisarm": "No new live activation/configuration/temporary function; original OFF assertions reached. No disarm write was made.",
+    "priorTemporaryFunctionCleanup": "NOT_VERIFIED; no prior temporary-function deployment is used as evidence.",
+    "browserAndLoopbackServers": "Closed in test finally; browser lease released.",
+    "integrationAndLiveMutationLeases": "Released",
+    "ownedLoginProcesses": [
+      14768,
+      29452,
+      7016,
+      16728
+    ],
+    "ownedLoginProcessesAfterObservation": "All absent in fresh Get-CimInstance observation at evidence preparation; no forced termination ran.",
+    "generatedLocalDirectory": "bundle/current-ingress retained, excluded from candidate commit; no running login or server",
+    "cleanupDenial": {
+      "action": "Combined ownership-checked Stop-Process and recursive Remove-Item of generated directory",
+      "tool": "exec_command",
+      "reason": "blocked by policy",
+      "executed": false,
+      "alternativeDeletionAttempted": false
+    }
+  },
+  "retryCondition": "A connected authenticated official Cloudflare operator supplies the three exact GET responses in bundle/provider-read-requests.json. Qualify only the route delta against that current source/settings and empty cron; original maintenance admission then performs at most one exact Edge update and one ingress update, preserves policy approval identity/timestamps and reads back both identities/config/authenticated behavior. No trial/reset/re-enrollment/send grant is created."
+}

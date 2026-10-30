@@ -1,0 +1,25 @@
+{
+  "taskId": "continuous-n44-current-projection-recovery-20261031",
+  "runId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+  "projectId": "xlrubcwjqktzzunrvuns",
+  "authority": "PO-20261031-N44-CURRENT-PROJECTION-RECOVERY",
+  "providerWrites": 0,
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/accounts/1c9ae85e766968a4269a7ac505f9a693/workers/scripts/n44-notifications-ingress",
+      "responsePath": "bundle/provider-responses/ingress-source.multipart"
+    },
+    {
+      "method": "GET",
+      "path": "/accounts/1c9ae85e766968a4269a7ac505f9a693/workers/scripts/n44-notifications-ingress/settings",
+      "responsePath": "bundle/provider-responses/ingress-settings.json"
+    },
+    {
+      "method": "GET",
+      "path": "/accounts/1c9ae85e766968a4269a7ac505f9a693/workers/scripts/n44-notifications-ingress/schedules",
+      "responsePath": "bundle/provider-responses/ingress-schedules.json"
+    }
+  ],
+  "scope": "Current ingress source/settings/empty cron only; no routes, peers, new credential or trial action."
+}

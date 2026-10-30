@@ -38,9 +38,31 @@ export async function readSource(query,owner,kind,id,preferences) {
     for(const stage of preferences.dueDays){const date=shift(source.dueDate,-stage);if(source.startDate && source.startDate>date || !inTerm(date))continue;
       add({id:`due:${encodeURIComponent(id)}:${source.dueDate}:${date}`,kind,expiresAt:await wall(shift(date,1),'00:00'),actionPath:`/teaching/${encodeURIComponent(teaching.id)}/items`},await wall(date,'00:00'));}
   }
-  return {stamp,events};
+  return {stamp,events,sourceRevisionDigest:sourceRevisionDigest(s,kind)};
 }
 export function sourcePayload(event,now) {
   if(!event || event.dueAt>now)return null;
   const {dueAt,...payload}=event;return normalizePushPayload(payload,now);
+}
+
+// Complete finite equality includes future events, ignores only expired identities.
+// An empty/deleted canonical source is intentionally ABSENT, never verified.
+export function compareCurrentProjection(source, rows, scope, now) {
+ const expected=(source?.events??[]).filter(e=>e.expiresAt>now);
+ const stored=rows.filter(r=>r.workspace_id===scope.workspaceId&&r.device_id===scope.deviceId&&r.source_kind===scope.sourceKind&&r.source_id===scope.sourceId&&Number(r.expires_at_ms)>now);
+ const finite=expected.length<=100&&new Set(expected.map(e=>e.id)).size===expected.length;
+ const same=finite&&expected.length===stored.length&&expected.every(e=>stored.filter(r=>r.event_id===e.id&&r.source_stamp===source.stamp&&Number(r.due_at_ms)===e.dueAt&&Number(r.expires_at_ms)===e.expiresAt&&r.payload&&Object.keys(r.payload).sort().join(',')==='actionPath,expiresAt,id,kind'&&r.payload.id===e.id&&r.payload.kind===e.kind&&r.payload.expiresAt===e.expiresAt&&r.payload.actionPath===e.actionPath).length===1);
+ const status=!finite?'unknown':!expected.length&&!stored.length?'absent':same&&expected.length?'verified':stored.length?'changed':'absent';
+ return {status:status==='verified'&&!source?.sourceRevisionDigest?'unknown':status,sourceStamp:source?.stamp??null,sourceRevisionDigest:source?.sourceRevisionDigest??null,events:finite?expected.map(e=>({id:e.id,kind:e.kind,dueAt:e.dueAt,expiresAt:e.expiresAt,actionPath:e.actionPath})).sort((a,b)=>a.id.localeCompare(b.id)):[]};
+}
+
+// Version-only digest: binds the complete canonical dependency graph without
+// exposing source data or an unbounded revision list to the browser.
+export function sourceRevisionDigest(s,kind) {
+ const entries=[['years',s.year],['teachings',s.teaching],['sections',s.section],['subjects',s.subject],
+  ...s.terms.map(r=>['terms',r]),...s.calendars.map(r=>['calendars',r]),...s.days.map(r=>['calendarDays',r]),
+  [kind==='lesson'?'sessions':'scoreSubitems',s.source],...(kind==='due'?[['items',{id:s.source.itemId,revision:s.source.itemRevision,deleted:s.source.itemDeleted}]]:[])];
+ if(entries.length>816||entries.some(([,r])=>!r||typeof r.id!=='string'||!/^([1-9][0-9]{0,14})$/.test(String(r.revision))))return null;
+ const vector=entries.map(([name,r])=>[name,r.id,String(r.revision),r.deleted===true]).sort((a,b)=>JSON.stringify(a)<JSON.stringify(b)?-1:1);
+ return createHash('sha256').update(JSON.stringify(vector)).digest('hex');
 }
