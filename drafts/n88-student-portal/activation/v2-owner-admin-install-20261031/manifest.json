@@ -1,17 +1,17 @@
 {
   "version": 1,
   "taskId": "continuous-n88-owner-admin-storage-install-20261031",
-  "runId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+  "runId": "884fde26-bbeb-4f09-bac7-d2bd60a47ca5",
   "baseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
   "projectRef": "xlrubcwjqktzzunrvuns",
   "serviceEnabled": false,
-  "authorityRef": "PO-20261031-N88-EXISTING-ADMIN-ATOMIC-INSTALL",
-  "authorityPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/authority.json",
-  "authoritySha256": "9d4df6d361c6c0aa90fa90f312d1236a28f3afc8f2560f204ac389298e8ed3d5",
+  "authorityRef": "PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION",
+  "authorityPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/window-continuation-authority.json",
+  "authoritySha256": "e659fc0b19c97df3825638073400e0441120545ee7684a9a5eb5985c13e3f452",
   "providerPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-provider-config/observation.json",
   "providerSha256": "199c9ca4360dfc894866647e99775a2a7989f4b7b482c398a704d6b92c5439fc",
   "providerObservedAt": "2026-10-28T22:26:13.288Z",
-  "installerSha256": "da5913c38f426e55bbc79e92cfcc8c9e1a01f4035a200c4d1f4b6df6b472b57c",
+  "installerSha256": "fb4201b1afacf7a5a9bfe56bcd57f6aaaecb472770e48e95056fd18b6e863ff0",
   "deltaSha256": "6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026",
   "historicalRelay": {
     "commit": "421f0a96173cb3ae35c70bb85337206f73cff171",
@@ -41,10 +41,25 @@
       "sha256": "9bd90648a06ab030f910d7e7e2eeb2d306a184254ed19093ff2bb849c3751731"
     }
   ],
-  "admissionSha256": "e305d5aeb6845042e8c0f2cef54f6ebbd81b7a0d0937f1f3bbf4c63830b29a40",
-  "testSha256": "5218ac433b4a0c6d1ee95bb3727f50c9fe0672d304b0d686fed4bd261db15abb",
-  "relaySha256": "73a97e9012e18801e64e287234b676eee40b28f1de7770f15a47c46b4bfcad0e",
-  "actualAttempt": {
+  "admissionSha256": "a72c45b04a3517aab9904b8fb80c3c9283c276be8ae3cf7c4fed641cbc0dc9ce",
+  "testSha256": "35ee787a448b896787cea5fce6ee17a0b6f3e8e9d4adfbac1979861ce3c3f55f",
+  "relaySha256": "237f0af8e31ed3c8ba35e09a8f54ff83fb684520ec07fb3723c3e28843930bae",
+  "previousCandidate": "34fc3b995badbbc01c8b73815c9a01429ec06dad",
+  "previousRunId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+  "lateProviderOutcome": {
+    "path": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/late-provider-outcome.json",
+    "sha256": "3856056fa30065517fd1d6c065e35d44a69191d2bd8f3f7989a584a3bf5e36cd"
+  },
+  "originalArchive": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-original-reconcile.tmp/archive-manifest.json",
+    "sha256": "7c8c40ed4b947b88f9fa464d9bb27f92abb9dc18d35f2e12f4be39519c7731f4"
+  },
+  "originalReconciliation": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-original-reconcile.tmp/report.json",
+    "sha256": "8fce86e5d152f914b5e8785be82336f6dacb20259d3cb2abe66389e8a9cf9e12",
+    "state": "VERIFIED_NO_CHANGE"
+  },
+  "expiredAttempt": {
     "state": "UNKNOWN",
     "boundInstallerSha256": "05851eac5f25c24d99f8d8dafefd479c8b2e812695f2399dcd1f409cc5b4d97e",
     "phaseReportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-qualified-v1.tmp/report.json",
@@ -68,5 +83,27 @@
       "reportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-reconcile.tmp/report.json",
       "reportSha256": "6956f88956726c5ed2a247000325501afcc254c4d6578ac35a326acda277fd72"
     }
+  },
+  "maxToolWindowMs": 2700000,
+  "currentPreflight": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-current-preflight.tmp/response.json",
+    "sha256": "ac4a6fc3fa5ce4113664a7082df2c4b762350571912590fe86364d4b26a66841",
+    "sqlSha256": "9f470b703db8e4a827ddd908786a24535397c335b256261563cd0fd02d97642d"
+  },
+  "timingQualification": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-a75edf91-c8a3-47c3-9e88-efedfb3dd7c8.tmp/report.json",
+    "sha256": "ebedb611c0f857c34c8af485391229eeaee6df72f94c8f32b7b9b3f99b9c8cc7",
+    "storageCampaignRerun": false
+  },
+  "currentAttempt": {
+    "state": "TOOL_PENDING",
+    "phasePath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp",
+    "requestSha256": "e82e0f7da666fc57c43204e2bbb407be4482656c02ffed7ccd8dac226ecc3de6",
+    "boundInstallerSha256": "161bc8f7db21ffff7ba4532df78f5e654bef43fce7cee0924f7b6a7fc96e3b2d",
+    "claimPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-884fde26-bbeb-4f09-bac7-d2bd60a47ca5-window-v1.tmp/custodian-dispatch-claim.json",
+    "claimSha256": "70cc794bc02d838b1e8e1e445e062221496e0ed0d29afe462e5ba559a9a1ed3f",
+    "deadline": "2026-10-30T23:39:24.406Z",
+    "installationReplay": false,
+    "serviceEnabled": false
   }
 }

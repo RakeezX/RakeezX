@@ -14,12 +14,12 @@ import { CANONICAL_PROJECTION_REQUIREMENTS } from '../drafts/n88-student-portal/
 
 
 import { evaluateActorCapabilities, requiredHelpers } from '../drafts/n88-student-portal/activation/v2-actor-qualified-20261030/actor-capabilities.mjs';
-import {preSql,postSql,bind,admit,validatePost} from '../drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs';
+import {preSql,postSql,bind,admit,validatePost,toolLifecycle,TOOL_WINDOW_MS} from '../drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/admission.mjs';
 import { identitySql, baselineInventorySql } from '../drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs';
 import { publicationV2FunctionReadback } from '../drafts/n88-student-portal/publication-v2-host.inactive.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 assert.equal(path.resolve(process.cwd()), root);
-const taskId = 'continuous-n88-owner-admin-storage-install-20261031', runId = 'f63d1781-5921-4fe4-9d60-5eeb7c27e823';
+const taskId = 'continuous-n88-owner-admin-storage-install-20261031', runId = '884fde26-bbeb-4f09-bac7-d2bd60a47ca5';
 const canonicalRoot = 'C:/Users/Abody/Projects/RakeezX';
 const toolRoot = path.join(canonicalRoot, 'artifacts/n77-native-pg17');
 const bin = path.join(toolRoot, 'package/native/bin');
@@ -141,6 +141,7 @@ async function qualify({root,admin,connect,report}) {
  const sourceHash=b=>hash(b.toString('utf8').replaceAll('\r\n','\n'));
  const candidateDir='drafts/n88-student-portal/activation/v2-owner-admin-install-20261031';
  const candidateManifest=JSON.parse(await source(candidateDir+'/manifest.json'));
+ if(process.argv.includes('--timing-only'))return qualifyTiming({source,admin,report,candidateDir,candidateManifest});
  for(const [file,expected] of Object.entries(candidateManifest.pinnedSources)) assert.equal(sourceHash(await readFile(path.join(root,file))),expected,file);
   // Exact core table definitions, keys, foreign keys and checks, not JSON snapshots.
   await admin.query(`create schema auth;
@@ -308,4 +309,43 @@ async function qualify({root,admin,connect,report}) {
   let lost=0;const f3=admit({query:async()=>{lost++;throw Error('lost acknowledgement');}},admittedRecord,{taskId,runId});await assert.rejects(f3.query(preSql),/lost acknowledgement/);await assert.rejects(f3.query(preSql),/statement_denied/);assert.equal(lost,1);
   report.checks.push({name:'n88_exact_original_target_authority_and_finite_admission',status:'PASS',evidence:'Pinned authority/source bytes; real native pre/post catalog SQL and post-validator qualified. Foreign run, cloned/tampered record, SQL tamper, second install and lost-result replay denied before further dispatch.'});
   report.checks.push({name:'n88_native_actual_actor_atomic_admin_qualification',status:'PASS',evidence:'PG17 actual nonsuperuser postgres creates BOTH V2 roles. Old route fails42501; six injections (3 stages, standalone/outer) roll back original metadata and all V2; busy outer transaction refuses25001. Full standalone final assertions with fixture ROLLBACK; exact candidate COMMIT in selected standalone/empty-outer mode. 14 actual restricted-runtime calls roundtrip scope/item/highwater/receipt CAS with foreign-owner denial and rollback; 14 original identities/ACLs match; both mandatory ADMIN-only creator edges; old roles/body/config/ACL except 3 exact helper grants unchanged; runtime denied all raw private/Auth/canonical reads and canonical deletes.'});
+}
+
+/** Narrow continuation: actual guard SQL only, no storage fixture or DDL campaign. */
+async function qualifyTiming({source,admin,report,candidateDir,candidateManifest}){
+ const archived=JSON.parse(await source(candidateManifest.originalArchive.path));
+ const priorFile=archived.files.find(f=>f.file===candidateDir+'/installer.inactive.sql');
+ const old=await source(priorFile.path),sql=await source(candidateDir+'/installer.inactive.sql');assert.equal(hash(old),priorFile.sha256);assert.equal(hash(sql),candidateManifest.installerSha256);
+ assert.equal(sql.slice(sql.indexOf('DO $original_snapshot$')),old.slice(old.indexOf('DO $original_snapshot$')));
+ const qualifiedDelta=sql.slice(sql.indexOf('DO $original_snapshot$'),sql.indexOf('DO $external_readback$'))+sql.slice(sql.indexOf('DO $admin_readback$'),sql.lastIndexOf('COMMIT;'));assert.equal(hash(qualifiedDelta),candidateManifest.deltaSha256);assert.equal((sql.match(/create function n88_private\.v2_/g)??[]).length,14);
+ assert.equal(sql.slice(0,sql.indexOf('DO $external_gate$')),old.slice(0,old.indexOf('DO $external_gate$')));
+ const priorRecord=JSON.parse(await source(archived.files.find(f=>f.file===candidateDir+'/install-authority.json').path));
+ const row={target:priorRecord.target,target_sha256:priorRecord.authority.targetSha256,snapshot:priorRecord.originalSnapshot};
+ const start=Date.now(),deadline=new Date(start+TOOL_WINDOW_MS).toISOString();
+ const rec=await bind(row,deadline,{persist:false});
+ const gate=sql.slice(sql.indexOf('DO $external_gate$'),sql.indexOf(' SELECT * INTO STRICT observed'))+'END\n$external_gate$;';
+ const literal=v=>JSON.stringify(v).replaceAll("'","''");
+ const bound=(t,a)=>gate.replace("expected_target jsonb := 'null'::jsonb;",`expected_target jsonb := '${literal(t)}'::jsonb;`).replace("expected_authority jsonb := 'null'::jsonb;",`expected_authority jsonb := '${literal(a)}'::jsonb;`);
+ await admin.query(bound(rec.target,rec.authority));
+ let rejected=0;
+ for(const [key,value]of [['expiresAt',new Date(start-1000).toISOString()],['expiresAt',null]]){
+  await assert.rejects(admin.query(bound(rec.target,{...rec.authority,[key]:value})),e=>{assert.equal(e.code,'P0001');assert.equal(e.message,'n88_external_authority_expired');rejected++;return true;});
+ }
+ for(const key of ['productId','taskId','runId','action','targetSha256','deltaSha256','ref']){
+  await assert.rejects(admin.query(bound(rec.target,{...rec.authority,[key]:'tampered'})),e=>{assert.equal(e.message,'n88_external_target_delta_action_authority_mismatch');rejected++;return true;});
+ }
+ for(const key of ['projectRef','nonExposureReadbackSha256'])await assert.rejects(admin.query(bound({...rec.target,[key]:'tampered'},rec.authority)),e=>{assert.equal(e.message,'n88_external_target_delta_action_authority_mismatch');rejected++;return true;});
+ let clock=start+9*60000,dispatches=0;
+ const fake={query:async statement=>{dispatches++;if(statement===rec.operations[1].sql)clock=start+46*60000;return {rows:statement===preSql?[row]:statement===postSql?[{snapshot:priorRecord.originalSnapshot}]:[],receipt:{terminal:true}};}};
+ const admitted=admit(fake,rec,{taskId,runId},{now:()=>clock});await admitted.query(preSql);await admitted.query(rec.operations[1].sql);
+ await admitted.query(postSql);
+ await assert.rejects(admitted.query(rec.operations[1].sql),/statement_denied/);assert.equal(dispatches,3);
+ const restart=admit({query:async statement=>{assert.equal(statement,postSql);return {rows:[{snapshot:priorRecord.originalSnapshot}]};}},rec,{taskId,runId},{reconcile:true,now:()=>clock});await restart.query(postSql);await assert.rejects(restart.query(rec.operations[1].sql),/statement_denied/);
+ const tampered=structuredClone(rec);tampered.operations[1].sql+='-- tamper';tampered.boundInstallerSha256=hash(tampered.operations[1].sql);assert.throws(()=>admit({},tampered,{taskId,runId}),/admission_denied/);
+ assert.throws(()=>admit({},rec,{taskId,runId:'foreign'}),/admission_denied/);
+ const tooLong=await bind(row,new Date(Date.now()+TOOL_WINDOW_MS+60000).toISOString(),{persist:false});assert.throws(()=>admit({},tooLong,{taskId,runId}),/plan_mismatch/);
+ clock=start;const lifecycle=toolLifecycle(start+TOOL_WINDOW_MS,{now:()=>clock});clock+=1000;lifecycle.claim();clock=start+46*60000;assert.equal(lifecycle.tick(),'PENDING_AFTER_WINDOW');assert.equal(lifecycle.canRelease,false);lifecycle.terminal();assert.equal(lifecycle.canRelease,true);assert.throws(()=>lifecycle.claim(),/expired_or_spent/);
+ clock=start;const unclaimed=toolLifecycle(start+TOOL_WINDOW_MS,{now:()=>clock});clock=start+TOOL_WINDOW_MS;assert.equal(unclaimed.tick(),'EXPIRED_UNCLAIMED');assert.equal(unclaimed.canRelease,true);assert.throws(()=>unclaimed.claim(),/expired_or_spent/);
+ report.checks.push({name:'n88_timing_guard_and_tool_lifecycle',status:'PASS',evidence:'Actual native first-guard SQL: valid45min authority accepted; expired/null expiry classified separately; all 9 identity/binding tamper cases rejected. Same qualified DDL/privilege tail, delta hash and14 identities; 15s/3s settings byte-identical. Fake-clock admission accepts after old8min, retains late terminal ACK, preserves post-ACK/restart readonly, rejects foreign/tampered/repeated mutation and >45min authority. Claimed pending cannot release; unclaimed expiry can.'});
+ report.reusedNativeQualification=candidateManifest.nativeQualification;report.authorityGuardRejections=rejected;report.storageCampaignRerun=false;
 }

@@ -1,4 +1,20 @@
-# N88 owner-admin storage prerequisite — AI-authored
+# N88 bounded tool-window continuation — AI-authored
+
+Current run `884fde26-bbeb-4f09-bac7-d2bd60a47ca5`, continuing exact candidate `34fc3b995badbbc01c8b73815c9a01429ec06dad` under `PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION`. Original source/binding/manifest were archived before replacement; hashes and paths are in the manifest. Original result, consumed request, UNKNOWN timeout and late provider failure are immutable. The late P0001 response is consistent with expiry; actual database execution time was not independently measured.
+
+The original fixed postSql read returned exact full original snapshot equality (VERIFIED_NO_CHANGE) at 2026-10-30T22:48:43.749Z. Only then was one fresh phase prepared. A fresh supported preflight matched the same physical target and baseline digest. Original ownership/rollback/14-operation proofs are reused: the entire qualified SQL tail, delta hash, all14 identities and database timeout prefix are unchanged.
+
+Current focused check: `node tests/n88-v2-owner-admin-install-20261031.test.mjs --timing-only`. Do not rerun the historical storage campaign merely for this continuation. This native check executes the actual first-guard predicates only, plus fake-clock finite admission/lifecycle tests. Expired authority has its own reason; every original binding predicate remains, with the new exact run/reference. Actual SQL database limits remain statement15s, idle15s and lock3s.
+
+Tool admission/queue lifetime is45minutes. Root is the sole migration operator; the worker never imports or calls a migration tool. A valid exclusive root claim moves the relay to TOOL_PENDING. Missing ACK cannot dispose the relay/leases while that original call remains explicitly pending, including an overdue call. The terminal outcome is checkpointed before readback. No second mutation is admitted. After ACK, the fixed read receives a separate finite read window; `--readback-only` supports restart after ACK without reinstalling. Responses and claims are retained for reconciliation.
+
+Current handoff: `node drafts/n88-student-portal/activation/v2-owner-admin-install-20261031/install-original-custodian.mjs --window-original-custodian-files`. It creates one immutable named phase directory, validates the archived VERIFIED_NO_CHANGE prerequisite and current preflight, binds the new run and source hashes, acquires existing leases and emits exact operation descriptors. A second launch cannot reuse the phase. A pending original call is drained to its bound terminal file even after a local protocol error; there is no automatic DDL replay.
+
+Actual current result is recorded in [the evidence](../../../../docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md). LOCAL_READY requires genuine installed-storage readback. serviceEnabled:false; runtime login/transport and transactional Sync/Delete writer attachment remain separate.
+
+---
+
+# Preserved original qualification description — AI-authored
 
 New finite candidate for `continuous-n88-owner-admin-storage-install-20261031`, run `f63d1781-5921-4fe4-9d60-5eeb7c27e823`, base `df23c78126281b8625e2009df7cf3195abd7a482`. Authority and historical source identities are pinned in `manifest.json`. Historical packets, sessions, receipts and admissions are unchanged. No shared error-boundary route was modified.
 
@@ -8,7 +24,7 @@ The final SQL assertions verify four FORCE-RLS relations, fourteen exact fixed f
 
 `admission.mjs` reconstructs bound SQL from the verified template and exact target/authority substitutions. It checks the finite operation plan and current task/run, freezes the record, consumes positions before dispatch, bounds outputs/deadline and denies SQL/hash tampering, foreign runs, second installation and lost-result replay. The explicit relay creates owned phase files and uses the existing integration/live-mutation leases. The original local-review phase is preserved; the corrected phase has a distinct `qualified-v1` identity and reuses the actual unchanged supported preflight observation. Reconciliation emits only the fixed post-catalog read, with a fresh lease; it never installs again.
 
-Affected native checks:
+Historical native qualification commands (completed evidence reused; not current continuation commands):
 
 ```powershell
 node tests/n88-v2-owner-admin-install-20261031.test.mjs

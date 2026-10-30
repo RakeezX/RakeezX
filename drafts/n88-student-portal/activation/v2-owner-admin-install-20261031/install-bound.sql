@@ -8,7 +8,7 @@ SET LOCAL search_path=pg_catalog;
 DO $external_gate$
 DECLARE
  expected_target jsonb := '{"projectRef":"xlrubcwjqktzzunrvuns","serverPort":"5432","databaseOid":"5","databaseName":"postgres","serverAddress":"2406:da1a:314:7102:b56b:ec54:38ab:5060","serverVersionNum":"170006","systemIdentifier":"7678071634733212629","installerCurrentRole":"postgres","installerSessionRole":"postgres","baselineInventorySha256":"d5f9f0451c70076e67fc9adee68d672c2a42dc852a440b1995889a20db7b0b7f","nonExposureReadbackSha256":"199c9ca4360dfc894866647e99775a2a7989f4b7b482c398a704d6b92c5439fc"}'::jsonb;
- expected_authority jsonb := '{"productId":"N88","action":"install-owner-admin-storage-20261031","ref":"PO-20261031-N88-EXISTING-ADMIN-ATOMIC-INSTALL","taskId":"continuous-n88-owner-admin-storage-install-20261031","runId":"f63d1781-5921-4fe4-9d60-5eeb7c27e823","targetSha256":"d379c08fb8cc1cf50d07ef7315e74dfaf4a1402109da29d7724de35a16e40fd1","deltaSha256":"6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026","expiresAt":"2026-10-30T22:27:39.152Z"}'::jsonb;
+ expected_authority jsonb := '{"productId":"N88","action":"install-owner-admin-storage-20261031","ref":"PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION","taskId":"continuous-n88-owner-admin-storage-install-20261031","runId":"884fde26-bbeb-4f09-bac7-d2bd60a47ca5","targetSha256":"d379c08fb8cc1cf50d07ef7315e74dfaf4a1402109da29d7724de35a16e40fd1","deltaSha256":"6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026","expiresAt":"2026-10-30T23:39:24.406Z"}'::jsonb;
  observed record; baseline text; target_digest text;
 BEGIN
  IF jsonb_typeof(expected_target) IS DISTINCT FROM 'object' OR jsonb_typeof(expected_authority) IS DISTINCT FROM 'object' THEN
@@ -18,20 +18,23 @@ BEGIN
  PERFORM set_config('n88.external_authority_sha256',encode(sha256(convert_to(expected_authority::text,'UTF8')),'hex'),true);
  PERFORM set_config('n88.external_nonexposure_sha256',expected_target->>'nonExposureReadbackSha256',true);
  target_digest := encode(sha256(convert_to(expected_target::text,'UTF8')),'hex');
+ IF coalesce((expected_authority->>'expiresAt')::timestamptz,'-infinity'::timestamptz)<=clock_timestamp() THEN
+  RAISE EXCEPTION 'n88_external_authority_expired';
+ END IF;
  IF expected_target->>'projectRef' IS DISTINCT FROM 'xlrubcwjqktzzunrvuns' OR
     expected_authority->>'productId' IS DISTINCT FROM 'N88' OR
     expected_authority->>'taskId' IS DISTINCT FROM 'continuous-n88-owner-admin-storage-install-20261031' OR
-    expected_authority->>'runId' IS DISTINCT FROM 'f63d1781-5921-4fe4-9d60-5eeb7c27e823' OR
+    expected_authority->>'runId' IS DISTINCT FROM '884fde26-bbeb-4f09-bac7-d2bd60a47ca5' OR
     expected_authority->>'action' IS DISTINCT FROM 'install-owner-admin-storage-20261031' OR
     expected_authority->>'targetSha256' IS DISTINCT FROM target_digest OR
     expected_authority->>'deltaSha256' IS DISTINCT FROM '6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026' OR
     coalesce(expected_authority->>'ref','')='' OR
-    coalesce((expected_authority->>'expiresAt')::timestamptz,'-infinity'::timestamptz)<=clock_timestamp() OR
+    expected_authority->>'ref' IS DISTINCT FROM 'PO-20261031-N88-BOUNDED-TOOL-WINDOW-CONTINUATION' OR
     current_setting('n88.external_authority_ref',true) IS DISTINCT FROM expected_authority->>'ref' OR
     current_setting('n88.external_authority_sha256',true) IS DISTINCT FROM encode(sha256(convert_to(expected_authority::text,'UTF8')),'hex') OR
     coalesce(expected_target->>'nonExposureReadbackSha256','') !~ '^[a-f0-9]{64}$' OR
     current_setting('n88.external_nonexposure_sha256',true) IS DISTINCT FROM expected_target->>'nonExposureReadbackSha256' THEN
-  RAISE EXCEPTION 'n88_external_exact_authority_mismatch';
+  RAISE EXCEPTION 'n88_external_target_delta_action_authority_mismatch';
  END IF;
  SELECT * INTO STRICT observed FROM (select current_database() as database_name,(select oid::text from pg_database where datname=current_database()) as database_oid,current_user::text as current_role,session_user::text as session_role,host(inet_server_addr()) as server_address,inet_server_port() as server_port,current_setting('server_version_num') as server_version_num,(pg_control_system()).system_identifier::text as system_identifier) identity;
  IF observed.database_name IS DISTINCT FROM expected_target->>'databaseName' OR

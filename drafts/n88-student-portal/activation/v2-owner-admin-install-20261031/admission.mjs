@@ -5,6 +5,7 @@ import manifest from './manifest.json' with {type:'json'};
 import originalRead from '../v2-external-plan-1028/read-authority.json' with {type:'json'};
 import {identitySql,baselineInventorySql,readOnlyQueryPlan} from '../v2-external-plan-1028/preflight.mjs';
 export const sha=s=>createHash('sha256').update(s).digest('hex');
+export const TOOL_WINDOW_MS=45*60000;
 export const taskId=manifest.taskId,runId=manifest.runId,projectRef=manifest.projectRef;
 export const snapshotSql=`select jsonb_build_object(${readOnlyQueryPlan.slice(1,8).map(o=>`'${o.id}',(select coalesce(jsonb_agg(to_jsonb(q) order by to_jsonb(q)::text),'[]'::jsonb) from (${o.sql}) q)`).join(',')},'memberships',(select coalesce(jsonb_agg(jsonb_build_object('role',roleid::regrole::text,'member',member::regrole::text,'grantor',grantor::regrole::text,'admin',admin_option,'inherit',inherit_option,'set',set_option) order by roleid::regrole::text,member::regrole::text,grantor::regrole::text),'[]'::jsonb) from pg_auth_members where roleid in ('n88_guard'::regrole,'n88_backend'::regrole) or roleid in (coalesce(to_regrole('n88_v2_guard')::oid,0),coalesce(to_regrole('n88_v2_runtime')::oid,0))),'settings',(select coalesce(jsonb_agg(to_jsonb(q)),'[]'::jsonb) from (select d.datname,r.rolname,array(select v from unnest(s.setconfig) v where v like 'pgrst.db_schemas=%') as setconfig from pg_db_role_setting s left join pg_database d on d.oid=s.setdatabase left join pg_roles r on r.oid=s.setrole where (s.setdatabase=0 or d.datname=current_database()) and (s.setrole=0 or r.rolname in ('authenticator','postgres')) limit 16) q)) as snapshot`;
 const targetExpression=`jsonb_build_object('projectRef','${projectRef}','databaseName',i.database_name,'databaseOid',i.database_oid,'systemIdentifier',i.system_identifier,'serverAddress',i.server_address,'serverPort',i.server_port::text,'serverVersionNum',i.server_version_num,'installerSessionRole',i.session_role,'installerCurrentRole',i.current_role,'baselineInventorySha256',b.sha256,'nonExposureReadbackSha256','${manifest.providerSha256}')`;
@@ -52,24 +53,24 @@ export async function bind(row,deadline,{persist=true}={}){
  const authority={productId:'N88',action:'install-owner-admin-storage-20261031',ref:manifest.authorityRef,taskId,runId,targetSha256:row.target_sha256,deltaSha256:manifest.deltaSha256,expiresAt:deadline};
  const literal=v=>JSON.stringify(v).replaceAll("'","''");
  const sql=template.replace("expected_target jsonb := 'null'::jsonb;",`expected_target jsonb := '${literal(row.target)}'::jsonb;`).replace("expected_authority jsonb := 'null'::jsonb;",`expected_authority jsonb := '${literal(authority)}'::jsonb;`);
- const record={taskId,runId,projectRef,authorityRef:manifest.authorityRef,authorityEvidenceSha256:manifest.authoritySha256,installerSha256:manifest.installerSha256,boundInstallerSha256:sha(sql),target:row.target,authority,deadline,originalSnapshot:row.snapshot,serviceEnabled:false,operations:[{id:'fresh-target-baseline',kind:'read',sql:preSql,maxRows:1,maxBytes:1048576},{id:'owner-admin-atomic-install',kind:'migration',name:'n88_owner_admin_storage_20261031',sql,maxRows:0,maxBytes:4096},{id:'postinstall-exact-readback',kind:'read',sql:postSql,maxRows:1,maxBytes:1048576}]};
+ const record={taskId,runId,projectRef,authorityRef:manifest.authorityRef,authorityEvidenceSha256:manifest.authoritySha256,installerSha256:manifest.installerSha256,boundInstallerSha256:sha(sql),target:row.target,authority,deadline,originalSnapshot:row.snapshot,serviceEnabled:false,operations:[{id:'fresh-target-baseline',kind:'read',sql:preSql,maxRows:1,maxBytes:1048576},{id:'owner-admin-atomic-install',kind:'migration',name:'n88_owner_admin_storage_window_20261031',sql,maxRows:0,maxBytes:4096},{id:'postinstall-exact-readback',kind:'read',sql:postSql,maxRows:1,maxBytes:1048576}]};
  freeze(record);sealedRecords.add(record);
  if(persist){await writeFile(new URL('./install-bound.sql',import.meta.url),sql);await writeFile(new URL('./install-authority.json',import.meta.url),JSON.stringify(record,null,2)+'\n');}return record;
 }
 const used=new WeakSet();
 export function admit(client,record,context,{reconcile=false,now=Date.now}={}){
  if(!client||!sealedRecords.has(record)||used.has(client)||context?.taskId!==taskId||context?.runId!==runId||record.taskId!==taskId||record.runId!==runId||record.projectRef!==projectRef||record.authorityEvidenceSha256!==manifest.authoritySha256||record.installerSha256!==manifest.installerSha256||sha(record.operations[1].sql)!==record.boundInstallerSha256||record.operations[0].sql!==preSql||record.operations[2].sql!==postSql||!reconcile&&now()>=Date.parse(record.deadline))throw Error('n88_finite_admission_denied');
- if(record.authority?.taskId!==taskId||record.authority?.runId!==runId||record.authority?.ref!==manifest.authorityRef||record.authority?.deltaSha256!==manifest.deltaSha256||record.operations[1].kind!=='migration'||record.operations[1].name!=='n88_owner_admin_storage_20261031')throw Error('n88_record_mismatch');
+ if(record.authority?.taskId!==taskId||record.authority?.runId!==runId||record.authority?.ref!==manifest.authorityRef||record.authority?.deltaSha256!==manifest.deltaSha256||record.operations[1].kind!=='migration'||record.operations[1].name!=='n88_owner_admin_storage_window_20261031')throw Error('n88_record_mismatch');
  const derived=deriveSql(pinnedTemplate,record.target,record.authority);
- const expectedOps=[{id:'fresh-target-baseline',kind:'read',sql:preSql,maxRows:1,maxBytes:1048576},{id:'owner-admin-atomic-install',kind:'migration',name:'n88_owner_admin_storage_20261031',sql:derived,maxRows:0,maxBytes:4096},{id:'postinstall-exact-readback',kind:'read',sql:postSql,maxRows:1,maxBytes:1048576}];
- if(!pinnedTemplate||sha(derived)!==record.boundInstallerSha256||!exact(record.operations,expectedOps)||!exact(Object.keys(record.authority).sort(),['productId','action','ref','taskId','runId','targetSha256','deltaSha256','expiresAt'].sort())||record.authority.productId!=='N88'||record.authority.action!=='install-owner-admin-storage-20261031'||record.authority.expiresAt!==record.deadline||!Number.isFinite(Date.parse(record.deadline))||!reconcile&&Date.parse(record.deadline)-now()>8*60000)throw Error('n88_derived_sql_or_plan_mismatch');
+ const expectedOps=[{id:'fresh-target-baseline',kind:'read',sql:preSql,maxRows:1,maxBytes:1048576},{id:'owner-admin-atomic-install',kind:'migration',name:'n88_owner_admin_storage_window_20261031',sql:derived,maxRows:0,maxBytes:4096},{id:'postinstall-exact-readback',kind:'read',sql:postSql,maxRows:1,maxBytes:1048576}];
+ if(!pinnedTemplate||sha(derived)!==record.boundInstallerSha256||!exact(record.operations,expectedOps)||!exact(Object.keys(record.authority).sort(),['productId','action','ref','taskId','runId','targetSha256','deltaSha256','expiresAt'].sort())||record.authority.productId!=='N88'||record.authority.action!=='install-owner-admin-storage-20261031'||record.authority.expiresAt!==record.deadline||!Number.isFinite(Date.parse(record.deadline))||!reconcile&&Date.parse(record.deadline)-now()>TOOL_WINDOW_MS)throw Error('n88_derived_sql_or_plan_mismatch');
  validatePre({target:record.target,snapshot:record.originalSnapshot});
- used.add(client);const expires=reconcile?now()+120000:Date.parse(record.deadline);let position=reconcile?2:0,closed=false;
+ used.add(client);let expires=reconcile?now()+TOOL_WINDOW_MS:Date.parse(record.deadline);let position=reconcile?2:0,closed=false;
  return {close(){closed=true;},async query(sql,values=[]){
  const op=record.operations[position];
  if(closed||!op||values.length||sql!==op.sql||now()>=expires){closed=true;throw Error('n88_finite_statement_denied');}
  position++; // consume before dispatch, including loss of acknowledgement
- try{const r=await client.query(sql,[]);if(closed||now()>=expires||!Array.isArray(r.rows)||r.rows.length>op.maxRows||Buffer.byteLength(JSON.stringify(r.rows))>op.maxBytes)throw Error('n88_result_bounds');if(op.kind==='read'&&r.rows.length!==1)throw Error('n88_result_shape');return r;}catch(e){closed=true;throw e;}
+ try{const r=await client.query(sql,[]);if(closed||!Array.isArray(r.rows)||r.rows.length>op.maxRows||Buffer.byteLength(JSON.stringify(r.rows))>op.maxBytes)throw Error('n88_result_bounds');if(op.kind==='read'&&r.rows.length!==1)throw Error('n88_result_shape');if(op.kind==='migration')expires=now()+TOOL_WINDOW_MS;return r;}catch(e){closed=true;throw e;}
  }};
 }
 export async function loadSavedRecord(){
@@ -95,4 +96,11 @@ export async function validatePost(record,row){
  const support=funcs.filter(f=>f.proname.startsWith('publication_v2_'));if(support.length!==6||support.some(f=>f.owner!=='postgres'||f.definer||/(?:\{|,)=X|EXECUTE\*/.test(f.acl??'')))throw Error('n88_support_functions');
  const schema=s['exposure-and-effective-privileges'].find(r=>r.nspname==='n88_private');if(schema.anon_usage||schema.authenticated_usage)throw Error('n88_schema_exposed');
  return {relations:4,fixedOperations:14,helpers:6,helperExecuteDelta:3,oldMembershipRestored:true,runtimeRawPrivileges:false,serviceEnabled:false};
+}
+
+/** Pure queue-lifecycle state: expiry never releases an explicitly pending tool. */
+export function toolLifecycle(deadlineMs,{now=Date.now}={}){
+ if(!Number.isFinite(deadlineMs)||deadlineMs<=now()||deadlineMs-now()>TOOL_WINDOW_MS)throw Error('n88_tool_window_invalid');
+ let state='AWAITING_CLAIM',pending=false;
+ return {get state(){return state;},get canRelease(){return !pending;},claim(){if(state!=='AWAITING_CLAIM'||now()>=deadlineMs)throw Error('n88_tool_claim_expired_or_spent');pending=true;state='PENDING';},tick(){if(now()>=deadlineMs){if(pending)state='PENDING_AFTER_WINDOW';else if(state==='AWAITING_CLAIM')state='EXPIRED_UNCLAIMED';}return state;},terminal(){if(!pending)throw Error('n88_tool_terminal_without_claim');pending=false;state='TERMINAL';}};
 }
