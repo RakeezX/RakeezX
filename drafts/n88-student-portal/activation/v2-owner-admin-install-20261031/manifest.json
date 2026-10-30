@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "taskId": "continuous-n88-owner-admin-storage-install-20261031",
+  "runId": "f63d1781-5921-4fe4-9d60-5eeb7c27e823",
+  "baseSha": "df23c78126281b8625e2009df7cf3195abd7a482",
+  "projectRef": "xlrubcwjqktzzunrvuns",
+  "serviceEnabled": false,
+  "authorityRef": "PO-20261031-N88-EXISTING-ADMIN-ATOMIC-INSTALL",
+  "authorityPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261031-n88-admin-install/authority.json",
+  "authoritySha256": "9d4df6d361c6c0aa90fa90f312d1236a28f3afc8f2560f204ac389298e8ed3d5",
+  "providerPath": "C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/intake-evidence/po-20261029-n88-provider-config/observation.json",
+  "providerSha256": "199c9ca4360dfc894866647e99775a2a7989f4b7b482c398a704d6b92c5439fc",
+  "providerObservedAt": "2026-10-28T22:26:13.288Z",
+  "installerSha256": "da5913c38f426e55bbc79e92cfcc8c9e1a01f4035a200c4d1f4b6df6b472b57c",
+  "deltaSha256": "6f0c21236d3a465f399b4b865a562247519c928d6d2a42575a81f6ac3f754026",
+  "historicalRelay": {
+    "commit": "421f0a96173cb3ae35c70bb85337206f73cff171",
+    "path": "drafts/n88-student-portal/activation/v2-external-plan-1028/install-original-custodian.mjs",
+    "sha256": "f622add0fb3b25a7d831dd2f3595c2fe0366a8f2dbacba08cf52f95d76187544"
+  },
+  "pinnedSources": {
+    "drafts/n88-student-portal/activation/v2-actor-qualified-20261030/installer.inactive.sql": "0bca177df3827b414f8d1a6f48093644437dfdf88564ce140f39e11443841552",
+    "drafts/n88-student-portal/activation/v2-external-plan-1028/preflight.mjs": "0f16d5eb1e569e0657643fca03569a9aed77428c102c7a9dff9d82f3490a6178",
+    "drafts/n88-student-portal/activation/v2-package-1028/manifest.json": "8138a716764d4767ec34d40a295fcf31cf1d39ae7ca69db00328732d85f42dd0",
+    "tests/n88-backend-package-1028/results.json": "0c69a2ebaa353cc0b1e9b12181f910d573c95ac29f1bfa2afe4f1c518a1f5f22"
+  },
+  "supportedPreflight": {
+    "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823.tmp/supported-preflight.json",
+    "sha256": "c1a64fe7a4fbe489d34b02d8fbcdb0c2bb4a13a76b686b9df26432303c52da2d",
+    "sqlSha256": "9f470b703db8e4a827ddd908786a24535397c335b256261563cd0fd02d97642d"
+  },
+  "nativeQualification": [
+    {
+      "mode": "empty-outer",
+      "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-317b14df-f54b-40a0-b385-7c6cc4da1299.tmp/report.json",
+      "sha256": "26895a2f7e43166e62e69c62e27e369daf8f38d7c1d90c4cf9dbb2e44b4268e4"
+    },
+    {
+      "mode": "standalone",
+      "path": "artifacts/continuous-n88-owner-admin-storage-install-20261031-250f6614-1657-4d00-8a98-149a7742adbb.tmp/report.json",
+      "sha256": "9bd90648a06ab030f910d7e7e2eeb2d306a184254ed19093ff2bb849c3751731"
+    }
+  ],
+  "admissionSha256": "e305d5aeb6845042e8c0f2cef54f6ebbd81b7a0d0937f1f3bbf4c63830b29a40",
+  "testSha256": "5218ac433b4a0c6d1ee95bb3727f50c9fe0672d304b0d686fed4bd261db15abb",
+  "relaySha256": "73a97e9012e18801e64e287234b676eee40b28f1de7770f15a47c46b4bfcad0e",
+  "actualAttempt": {
+    "state": "UNKNOWN",
+    "boundInstallerSha256": "05851eac5f25c24d99f8d8dafefd479c8b2e812695f2399dcd1f409cc5b4d97e",
+    "phaseReportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-qualified-v1.tmp/report.json",
+    "phaseReportSha256": "ce8c7d6292e4f6a7dd66e5f33b898fe8e05b71850a6e3ca676fd1b309b26a029",
+    "custodianClaimPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-qualified-v1.tmp/custodian-dispatch-claim.json",
+    "custodianClaimSha256": "53d0606a83a4e49a8fb7840ca11c0b25a95e47e20a9818cd7ddb1aeea1537938",
+    "migrationAcknowledged": false,
+    "providerReceipt": null,
+    "installationReplay": false,
+    "serviceEnabled": false,
+    "cleanup": {
+      "relayClosed": true,
+      "integrationReleased": true,
+      "liveMutationReleased": true
+    },
+    "reconciliation": {
+      "state": "NOT_RUN",
+      "reason": "integration lease occupied by another active worker",
+      "holderTaskId": "continuous-n44-current-projection-recovery-20261031",
+      "holderRunId": "a28ecd62-83bf-4c8f-8aa7-b511048e76ec",
+      "reportPath": "artifacts/continuous-n88-owner-admin-storage-install-20261031-f63d1781-5921-4fe4-9d60-5eeb7c27e823-reconcile.tmp/report.json",
+      "reportSha256": "6956f88956726c5ed2a247000325501afcc254c4d6578ac35a326acda277fd72"
+    }
+  }
+}
