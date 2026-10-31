@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-manual-phone-handoff-source-20261031",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100025,
+      "scopeKey": "n44-manual-phone-readiness-source",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/mobile-trial.inactive.mjs",
+        "drafts/n44-push/activation/core-v1-packet/build.mjs",
+        "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+        "drafts/n44-push/activation/manual-phone-handoff-1031/**",
+        "tests/n44-manual-phone-handoff-1031/**",
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+        "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.inactive.mjs",
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+      ],
+      "requiredChecks": [
+        "n44_existing_endpoint_server_attestation_and_legacy_compatibility",
+        "n44_manual_phone_export_without_auth_token_or_remote_context_handle",
+        "n44_pair_currentness_replay_and_browser_evidence_separation",
+        "n44_exact_inactive_composition_and_unspent_grant_preserved"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only manual-phone authenticated readiness adapter; no live service or device activation",
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019",
+        "privateSourceOnlyPaths": [
+          "drafts/n44-push/activation/core-v1-host-handoff.mjs",
+          "drafts/n44-push/activation/core-v1-live.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs"
+        ],
+        "privateRuntimeReads": 0,
+        "credentialReads": 0,
+        "providerOperations": 0,
+        "liveGrantOperations": 0
+      },
+      "releaseAuthority": "Latest direct PO31October expressly directs correcting concrete errors/blockers, clean stable development and studied parallel work. This separate source-only task addresses a confirmed manual-phone handoff capability gap under current ChatGPT tools. It authorizes narrowly necessary original-custodian private SOURCE glue edits and inactive public protocol/backend/prepared-frontend code, not private runtime/credential reads or an actual trial. Original finite grant/history, all spent markers and physical/live acceptance remain unchanged; no extra installation/send/window is granted.",
+      "objective": "Implement the missing usable MANUAL-PHONE authenticated readiness path, not another repeated availability request. Resume same originalN44session01a14fcd-032c-7ec0-8b0c-0e0395862c61 in assigned source worktree; read current main and original latest public result for n44-core-live-1028/run1b99e765-460c-44a5-992c-a25ccadedddf, candidate4644abc2c38e368cfdf32bec98a0e31ee7d0c27b. No old failed/spent operation is replayed.\n\nConcrete evidence from tracked browser-wire-1030.test.mjs: contexts contain authorization()/isCurrent() closures; collectPhoneContextReads requires them for four authenticated reads to existing /api/n44/context/read; assembly rejects structuredClone batch through protected in-memory identity. Report final paragraph explicitly requires originalContexts. Root is ChatGPTweb on desktop and has NO connected phone browser runtime or supported way to create those original Android/iPhone closures. Owner can use each authenticated Home-Screen PWA and transfer an encrypted file; asking owner to supply executable handles or tokens is not actionable. Encrypted reports alone do not satisfy present server proof. Preserve synthetic15PASS, current producer571fc483 binding and all historical actualNOT_RUN; don't claim user caused this technical gap.\n\nInspect actual original context/read handler/authentication/signing and immediate private collector/batch validator SOURCE. Original private glue source files listed in preparationAuthority may be edited ONLY by original custodian for this new prepared path; keep that raw private code outside public Git, record nonsecret source hashes separately. No protected runtime state, DPAPI credential material, provider secret, actual user/phone report or token is read. Old dispatchers, expiry/owner/consent/UNKNOWN guards and consumed markers stay intact.\n\nBuild the narrowest verifiable route where each phone performs its OWN existing authenticated context/read locally using its normal PWA session. Carry server-verifiable challenge-bound context/registration evidence inside the existing encrypted export, so the trusted host need not possess or serialize phone authorization closures. First determine whether current response already has adequate independently verifiable server authentication. If yes reuse it. If unsigned, this source scope explicitly permits a backwards-compatible optional attestation on the EXISTING context/read operation using an appropriate EXISTING server-only signing mechanism with strict domain separation; no newendpoint, schema, database role, broad SQL, admin bypass, tokenexport or credentialcreation. The signed payload must come from actual authenticated canonical server fields, never echo user-provided owner/session/registration authority. Bind exact issued challenge/run/grant/slot/nonce, owner/workspace/device, current session/revision/expiry, observed time and read phase/checkpoint. Return no extra identity fields to old clients. Old context/read and old signed gateway behavior unchanged when new optional request is absent.\n\nMaintain the actual paired-currentness guarantee. Preserve four-read ordering/unchanged-pair check OR implement and explicitly justify an equivalent using the existing legitimate server capability that revalidates the exact authorized pair at the critical preactivation boundary. Independently signed stale or nonoverlapping single-phone snapshots do not automatically prove an unchanged pair; don't silently weaken that condition, accept a copied in-memory batch, manufacture serverProof/peerProof or treat encryption as server authentication. Preserve strict owner/session/revision/expiry and device consent/logout/change fences. If source inspection shows a missing server capability, implement the narrow existing-operation extension in allowed backend/host paths rather than invent a data grant or fabricate proof. If this genuinely needs a new secret/endpoint/schema not in scope, complete all compatible adapter code and state the exact concrete required capability; no generic 'phone readiness unavailable' result.\n\nBrowser-local ServiceWorker outcome/quiet/preferences remain separately verified client evidence. No server receive-receipt repository; missing/UNKNOWN never becomes empty. Reuse actual existing producer helpers for export/decryption and fresh nonce/source/hash/exact-byte admission. Choose a practical normal support gesture sequence for owner on each phone without console/credentials/remote browser injection. Stage precise minimal frontend integration as frontend.patch plus producer module in this new draft directory; canonical src/SW/teacherUI are READ-ONLY in this phase so this work can run in parallel with N88. Do not publish a new active UI route dependent on an undeployed server. Document exact later frontend/SW and read-only service deployment prerequisites so no circular dependency requires the new signed report before its own supporting read-only service is installed. Original one-install/20min finite live trial stays untouched and unused; no budget expansion or attempted workaround here.\n\nQualify only the changed compiled server->phone producer->encrypted export->host verification path using fabricated identities/keys and the ACTUAL functions. Cover tampering, wrongowner/workspace/device/slot, replay/order/mixedsessions, expiration/logout/revisionchange, copiedbatch, browserUNKNOWN and legacy response compatibility. No real network, actualbrowsercapture, nativeSQLcluster, full historical29/14/11/15 suite or repeated hardware trial. Reuse unchanged proof by source identity. Build an exact inactive service/package/frontend-delta composition and manifest with all behavior OFF, recording original known source/unusedgrant identities. Current actual service/config/physical proof remains NOT_RUN. Do not issue an expiring challenge while no legitimate operator path exists.\n\nFinish executable adapter code, focused evidence, exact inactive packet and a clean AI-labelled SOURCE-ONLY candidate for sole publisher. This milestone does not closeN44 or mark old live checksPASS. The result must explain the actual technical correction and minimal remaining normal phone gestures, not ask the user again for settings already supplied or for inaccessible in-memory handles. No user/account/studentmutation, service/install/cron/registration/sourcecreation/send, realoperatoraction, old-grantchange, privateexport, personalbrowser/OSinteraction or N88sharedasset changes.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "5b77024e36f254a6568a0224abb9ea25d78698af",
+        "requiredSourcePaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/mobile-trial.inactive.mjs",
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "src/lib/notification-push-gateway.js",
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-push-browser.js"
+        ],
+        "editPaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/mobile-trial.inactive.mjs",
+          "drafts/n44-push/activation/core-v1-packet/build.mjs",
+          "drafts/n44-push/activation/core-v1-packet/manifest.public.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/producer.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host-verifier.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/prepare.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/frontend.patch",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/ACTIVATION.md",
+          "tests/n44-manual-phone-handoff-1031/contracts.test.mjs",
+          "tests/n44-manual-phone-handoff-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/producer.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host-verifier.inactive.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/prepare.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/frontend.patch",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/ACTIVATION.md",
+          "tests/n44-manual-phone-handoff-1031/contracts.test.mjs",
+          "tests/n44-manual-phone-handoff-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+        ],
+        "workerChecks": [
+          "n44_existing_endpoint_server_attestation_and_legacy_compatibility",
+          "n44_manual_phone_export_without_auth_token_or_remote_context_handle",
+          "n44_pair_currentness_replay_and_browser_evidence_separation",
+          "n44_exact_inactive_composition_and_unspent_grant_preserved"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
