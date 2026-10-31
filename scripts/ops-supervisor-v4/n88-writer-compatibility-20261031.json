@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-writer-compatibility-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100032,
+      "scopeKey": "n88-durable-publication-runtime-writer",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-owner-admin-storage-install-20261031",
+        "continuous-n88-publication-ui-integration-20261031"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/runtime.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/**",
+        "tests/n88-runtime-writer-1031/**",
+        "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md",
+        "tests/n88-writer-compatibility-1031/**",
+        "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql"
+      ],
+      "requiredChecks": [
+        "n88_original_canonical_protocol_differential_compatibility",
+        "n88_actual_source_writers_delete_restore_permanent_retirement",
+        "n88_same_transaction_receipt_rollback_and_genuine_writer_lock_order",
+        "n88_corrected_owner_admin_packet_native_qualification_default_off"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only corrected runtime and compatible canonical-writer attachment, with exact native proof"
+      },
+      "releaseAuthority": "Latest explicit PO requests fixing actual defects and delivering stable RakeezX. This bounded successor reuses exact original candidate/session and corrects established canonical-writer regressions plus invalid verification selectors. Inactive source-only publication through original sole publisher is authorized. It does not execute hosted schema/Auth/data/service changes, replay prior storage grant, enable V2 or change frontend readiness.",
+      "objective": "Complete the CURRENT N88 canonical-writer compatibility correction and deliver the corrected inactive runtime in one pass through the original controller/publisher. Reuse original session and exact preserved candidate0b17ef977446304f8236daf406575a717ce8471c from continuous-n88-runtime-writer-integration-20261031; that candidate is LOCAL_READY but unpushed due solely to card verification path names hosted-runtime.mjs/sync-delete-attachment.sql differing from actual host.mjs/writer-helpers.sql. Do not fabricate aliases, relaunch original work, reset its worktree, edit its queue, or repeat unchanged runtime/Auth/LOGIN campaigns. In YOUR new owned worktree based on current main, inspect and cherry-pick this exact existing candidate if its changes are absent, preserving concurrent UI publication97e39d269d0a19686a9e7e9764a017cec7232780. This new substantive correction supersedes its incomplete attachment; the original failed attempt/result remains history.\n\nRead the bounded independent review at artifacts/ops-supervisor-v4/n88-runtime-writer-compatibility-review-20261031.json and the latest actual source. ROOT CLARIFICATION: previous wording 'accepted parent delete must not leave live children' means no still-PUBLISHED N88 child links; it never authorized new canonical child cascades, parent deletion admission rules or stricter generic Sync CAS. Preserve actual current canonical commands and receipts, including their existing protections. Root owns the ambiguous wording. The first native PASS tested the new altered behavior and is not compatibility proof.\n\nEstablished fixes: REMOVE extra live-delete baseRevision equality conflict (original generic core rejects only ahead bases); REMOVE N88 canonical cascade/recomputation and n88_parent_has_live_children policy; REMOVE N88 score_domain_write override (original generic subitem writes must still fail42501). Keep all genuine current wrappers, original full envelope equality, replay, Auth/owner, field CAS, immutable receipts and grade4. Do NOT replace the actual assembled public/core RPC by an old0012 body. N88 should observe accepted canonical mutation and write ONLY its publication/high-water/scope storage atomically inside the original writer transaction. Parent publication retirement must retire child publication identities without demanding canonical child deletion; restore must never revive retired identities.\n\nGeneric Sync is not the only actual client path. Bounded source/installed metadata inventory must include current N94 score command, score configuration removal, distribution copy/plan, N77 lifecycle/delete, N71 and original restore chains and actual parent/admission lock participants. src/lib/cloud.js exposes the actual choices. Read only required current function definitions/ACL/owners plus relevant trigger definitions; no user row inventory. Prior metadata observation confirms postgres owns current apply_* and finalize*restore* entries, so do not invent a missing installer-owner blocker. Source pinning must use actual assembled CURRENT functions, including later N77/N58/N71/N94/N100, not0012/0029 alone.\n\nPreferred bounded correction: N88-only accepted-mutation AFTER hooks plus outer early-entry wrappers that acquire the existing N88 global advisory lock(1312307256,88) BEFORE original canonical/lifecycle/row locks, preserve each original function body/signature/defaults/security/config/owner/ACL, and prevent direct new backing-entry exposure. Include supported direct DML ordering before existing statement hooks when needed. A table BEFORE STATEMENT alone is too late for a genuine score function's SELECT FOR UPDATE. AFTER-only creates row/global inversion. A V2-only optimistic reader is not a shortcut: original V1 adapter/lock_projection_sources also holds locks, and current membership/parent admission needs a commit fence. Choose the smallest design that actually satisfies these contracts; avoid broad rewriting, dynamic public SQL capabilities or weakened existing reads. Inventory bounded actual lock participants and explain inclusion; do not blindly wrap unrelated commands.\n\nNative verification must compare original CURRENT baseline and corrected genuine RPC on older-base live delete, ahead-base rejection, parent then separately queued child outcome, generic subitem42501, replay/full-envelope mismatch. Exercise actual score-configuration removal, current parent/lifecycle deletion and genuine N71/score restore with delete+restore between V2 reads, no old identity revival. Inject meaningful canonical/N88/receipt failure and prove rollback together. Both controlled contention schedules must use a genuine original writer entry, not just handcrafted DML. Reuse unchanged passed restricted LOGIN, Auth, numeric admission, finite bridge, signed gateway, ACK/UNKNOWN and UI evidence. Preserve old result/failure files as historical evidence; add focused new evidence, correcting wrong assertions explicitly instead of claiming old PASS covers new semantics.\n\nRegenerate one exact corrected install/disable/readback/manifest packet under existing v2-runtime-writer-1031; reuse the already-installed four tables/fourteen finite operations. Do not edit applied migrations or pinned installed storage packet. Qualify NEW delta under actual non-superuser postgres owner/admin capability, preserving exact original role/ACL edges. Keep runtime/gateway flags OFF. No hosted schema/data/Auth/service mutation or live fixture in this card. The new UI is already source-published OFF; do not edit frontend files. Its later actual private student bundle+stylesheet allowance update remains activation work. Deliver code+focused evidence through sole publisher, using actual EXISTING verification paths on this card. Declare hosted activation NOT_RUN honestly. If a real new blocker occurs, save concrete candidate/proof and smallest next action; do not stop for generic approval or more planning.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "0b17ef977446304f8236daf406575a717ce8471c",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/runtime.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-role.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-replacement.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-baseline.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/observed-writer.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/expected-identities.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gate.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/post.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/disable.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/readback.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/install.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/INSTALL.md",
+          "src/lib/cloud.js",
+          "supabase/migrations/0012_sync_v2_server_protocol.sql",
+          "supabase/migrations/0029_student_lifecycle_safety.sql",
+          "supabase/migrations/0033_score_subitem_foundation.sql",
+          "supabase/migrations/20261007230123_n77_server_validated_delete.sql",
+          "supabase/migrations/20261012163000_n71_unified_restore.sql",
+          "supabase/migrations/20261012234116_n94_subitem_dates_late_scoring.sql",
+          "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/runtime.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-role.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-replacement.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-baseline.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/observed-writer.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/expected-identities.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gate.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/post.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/disable.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/readback.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/install.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-entrypoints.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-hooks.sql",
+          "tests/n88-writer-compatibility-1031/native.mjs",
+          "tests/n88-writer-compatibility-1031/results.json",
+          "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-entrypoints.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-hooks.sql",
+          "tests/n88-writer-compatibility-1031/native.mjs",
+          "tests/n88-writer-compatibility-1031/results.json",
+          "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md"
+        ],
+        "workerChecks": [
+          "n88_original_canonical_protocol_differential_compatibility",
+          "n88_actual_source_writers_delete_restore_permanent_retirement",
+          "n88_same_transaction_receipt_rollback_and_genuine_writer_lock_order",
+          "n88_corrected_owner_admin_packet_native_qualification_default_off"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
