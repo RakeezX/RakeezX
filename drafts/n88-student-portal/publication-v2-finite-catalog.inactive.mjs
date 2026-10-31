@@ -1,4 +1,5 @@
-/** AI-authored INACTIVE finite V2 catalogue. Synthetic construction only.
+import {publicationRuntimeAllowed} from './activation/v2-runtime-writer-1031/capability.mjs';
+/** AI-authored INACTIVE finite V2 catalogue. Synthetic or verified server capability.
  * No driver/DSN/environment/route/hosted-boundary import or installation.
  * Trusted same-transaction admission and local execution ports are mandatory.
  * Statement success is NOT a receipt/COMMIT ACK. Never retries or reissues.
@@ -211,9 +212,9 @@ const matchesLocated = (c, v) => c.ownerId === v.ownerId && c.sessionId === v.id
  * Timeout poisons the request, aborts its signal and never retries. The parent
  * transaction must roll back/destroy its owned client on ANY rejection/unknown.
  */
-export function createInactivePublicationV2FiniteCatalog({ executionMode, verifyAdmission, executeFixed, now = Date.now,
+export function createInactivePublicationV2FiniteCatalog({ executionMode, runtimeCapability, verifyAdmission, executeFixed, now = Date.now,
   budgetMs = 5000, maxOperations = 20000 }) {
-  must(executionMode === 'synthetic' && typeof verifyAdmission === 'function' && typeof executeFixed === 'function' && typeof now === 'function' &&
+  must(publicationRuntimeAllowed(executionMode,runtimeCapability) && typeof verifyAdmission === 'function' && typeof executeFixed === 'function' && typeof now === 'function' &&
     Number.isSafeInteger(budgetMs) && budgetMs >= 10 && budgetMs <= 10000 && Number.isSafeInteger(maxOperations) && maxOperations >= 1 && maxOperations <= 20000);
   const requests = new WeakMap(), tickets = new WeakMap();
   const state = request => {

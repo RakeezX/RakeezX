@@ -1,0 +1,75 @@
+{
+  "taskId": "continuous-n88-runtime-writer-integration-20261031",
+  "runId": "fac941dc-b3df-4d7a-bf59-57918a1bb9d7",
+  "checkedAt": "2026-10-31T11:14:08.946Z",
+  "scope": "PASS",
+  "syntax": {
+    "status": "PASS",
+    "files": [
+      "drafts/n88-student-portal/existing-host.mjs",
+      "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+      "drafts/n88-student-portal/web-entry.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gateway.inactive.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+      "tests/n88-runtime-writer-1031/cases.mjs",
+      "tests/n88-runtime-writer-1031/native.mjs",
+      "tests/n88-runtime-writer-1031/package.test.mjs"
+    ]
+  },
+  "unchangedSafeguards": [
+    "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+    "drafts/n88-student-portal/activation/database-transport.mjs",
+    "drafts/n88-student-portal/activation/v2-package-1028",
+    "drafts/n88-student-portal/activation/v2-owner-admin-install-20261031",
+    "drafts/n88-student-portal/auth-verifier.mjs",
+    "drafts/n88-student-portal/numeric-credentials.mjs",
+    "drafts/n88-student-portal/student-projection.mjs",
+    "supabase/migrations",
+    "public/sw.js"
+  ],
+  "proofs": {
+    "results.json": {
+      "sha256": "f9afcec6a70c7dc190d062c3a50a06a147b495d5c11b754c6f3dfa8fb9469140",
+      "checks": 13,
+      "status": "PASS",
+      "finishedAt": "2026-10-31T11:02:36.193Z"
+    },
+    "ack-results.json": {
+      "sha256": "67719313d5da1e7c1597160973b161b5dfe7fa3670cbfb72f4bf3623d55190f9",
+      "checks": 3,
+      "status": "PASS",
+      "finishedAt": "2026-10-31T11:05:57.900Z"
+    },
+    "disable-results.json": {
+      "sha256": "e225576ba9de394d2b376a87dd07df6a2bce9b03df32bd4312d8ca944d46346f",
+      "checks": 2,
+      "status": "PASS",
+      "finishedAt": "2026-10-31T11:04:43.401Z"
+    },
+    "install-results.json": {
+      "sha256": "913fd9b3b5b582ea7ae713fce81667e2097b4daa52a727c6297a2b4a64557bc5",
+      "checks": 2,
+      "status": "PASS",
+      "finishedAt": "2026-10-31T11:10:51.082Z"
+    }
+  },
+  "unit": {
+    "command": "node --test tests/n88-runtime-writer-1031/package.test.mjs",
+    "status": "PASS",
+    "checks": 4
+  },
+  "hostedAcceptance": "NOT_RUN",
+  "renderedUi": "NOT_RUN",
+  "packet": {
+    "bundleSha256": "da0629bee4a8e8ffc19d1d35ef01fbef7157987f4e4588ecb0485c58ed31f3f0",
+    "installerSha256": "cad07b99ef3f064479c18a242261d7a9abe1c59a5a5dcd73be0f18648ef69ac2",
+    "qualifiedDelta": "PASS; current bundle binding and one blank separator outside function only"
+  }
+}

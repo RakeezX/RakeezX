@@ -1,0 +1,27 @@
+{
+  "source": "supabase/migrations/0012_sync_v2_server_protocol.sql",
+  "sourceSha256": "03b9abd0c904364ad6b9acdbf9315ab699782f3c8daa5a416a4828c7a67a2078",
+  "originalFunctionSha256": "76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11",
+  "sourceFunctionSha256": "6032dc0de7f591a4c660fc17d17892f4a5fc509bfabcc0098bc7d6b23bb07af1",
+  "signature": "rakeezx.apply_sync_v2_mutation(text,text,text,text,bigint,jsonb,text,bigint)",
+  "preservedHostedRawObservation": "76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11",
+  "wrapperSource": "supabase/migrations/0029_student_lifecycle_safety.sql",
+  "attachmentSignature": "rakeezx.apply_sync_v2_mutation_before_student_0029(text,text,text,text,bigint,jsonb,text,bigint)",
+  "observed": [
+    {
+      "name": "apply_sync_v2_mutation",
+      "sha256": "76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11",
+      "normalizedSha256": "1e4e8b1c7e3ff622c5390efa2a77ac62e8543c4028aacce39fc5d0ab6e55e636",
+      "owner": "postgres",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "apply_sync_v2_mutation_before_student_0029",
+      "sha256": "a04e5c89f75523a46f0f16de44ecacd4f25687db8a8fa5f481f91c4aacab3a64",
+      "normalizedSha256": "a04e5c89f75523a46f0f16de44ecacd4f25687db8a8fa5f481f91c4aacab3a64",
+      "owner": "postgres",
+      "acl": "{postgres=X/postgres}"
+    }
+  ],
+  "observationSha256": "d91639cd1e2804071aa2066e9f9f3cfb025a30d8c8d32c02e7558c7f46d6bd64"
+}

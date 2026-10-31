@@ -1,3 +1,4 @@
+import {publicationRuntimeAllowed} from './activation/v2-runtime-writer-1031/capability.mjs';
 /** AI: executable, INACTIVE PostgreSQL storage port. No driver, DSN, acquisition,
  * route, migration or live default. Reuses the existing repository's transaction
  * signature/global lock and canonical reader, not its hosted finite SQL allowance.
@@ -32,13 +33,13 @@ const tables = {
 const reads = Object.fromEntries(Object.entries(tables).map(([name, [table, cols, order]]) => [name,
   `select case when octet_length(body)<=$3 and sum(octet_length(body)) over (rows unbounded preceding)<=$4 then body else null end as body from (select row_to_json(r)::text as body from (select ${cols} from n88_private.${table} where owner_id=$1::uuid order by ${order} limit $2) r) bounded`]));
 
-/** Explicit local/synthetic acquisition only; never wired to hosted native ports.
+/** Explicit synthetic acquisition or capability-verified server assembly only.
  * Exclusive pg-compatible client, typed query result and release(error) contract.
- * A future hosted finite boundary needs separately approved operation identities;
- * passing new statements to the current privateQuery must continue to fail.
+ * Hosted assembly supplies the exact installed finite operation identities;
+ * passing new statements to the old privateQuery must continue to fail.
  */
-export function createPublicationV2PostgresRepository({ executionMode, acquire, transactionMs = 5000, cleanupMs = 500 }) {
-  must(executionMode === 'synthetic' && typeof acquire === 'function' && Number.isInteger(transactionMs) && transactionMs >= 50 && transactionMs <= 10000 &&
+export function createPublicationV2PostgresRepository({ executionMode, runtimeCapability, acquire, transactionMs = 5000, cleanupMs = 500 }) {
+  must(publicationRuntimeAllowed(executionMode,runtimeCapability) && typeof acquire === 'function' && Number.isInteger(transactionMs) && transactionMs >= 50 && transactionMs <= 10000 &&
     Number.isInteger(cleanupMs) && cleanupMs >= 1 && cleanupMs <= 1000);
   return Object.freeze({ async transaction(action) {
     let client, live = true, committed = false, begun = false, timer, released = false;
@@ -140,12 +141,12 @@ function transitions(before, after) {
 
 /** Returns ports accepted by the existing OFF service, using the existing typed
  * transaction signature. Hosted privateQuery does NOT yet allow these statements.
- * This task permits synthetic execution only, not installing or enabling it.
+ * New server assembly requires a verified capability; publication enables nothing.
  */
-export function createPublicationV2PostgresPorts({ executionMode, repository, authenticate,
+export function createPublicationV2PostgresPorts({ executionMode, runtimeCapability, repository, authenticate,
   readCurrent = async (tx, auth) => ({ canonical: await readCanonical(tx, auth.ownerId),
     now: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()) }) }) {
-  must(executionMode === 'synthetic' && typeof repository?.transaction === 'function' && typeof authenticate === 'function' && typeof readCurrent === 'function');
+  must(publicationRuntimeAllowed(executionMode,runtimeCapability) && typeof repository?.transaction === 'function' && typeof authenticate === 'function' && typeof readCurrent === 'function');
   const owned = new WeakSet();
   return Object.freeze({
     authenticate: (request, tx, role) => { must(owned.has(tx)); return authenticate(request, tx, role); },

@@ -1,0 +1,51 @@
+[
+  {
+    "proname": "apply_sync_v2_mutation",
+    "definition": "76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11",
+    "owner": "postgres",
+    "prosecdef": true,
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+  },
+  {
+    "proname": "apply_sync_v2_mutation_before_student_0029",
+    "definition": "8a9b27b3d46fef576847108631a175b57787fc794e7fb868e9d300761a6d26d4",
+    "owner": "postgres",
+    "prosecdef": true,
+    "acl": "{postgres=X/postgres}"
+  },
+  {
+    "proname": "v2_runtime_identity_1031",
+    "definition": "46de8509b3b0bed8f33b36e28da8a4b74f05a5c6e017f744a273d49c8b519693",
+    "owner": "postgres",
+    "prosecdef": true,
+    "acl": "{postgres=X/postgres,n88_backend=X/postgres}"
+  },
+  {
+    "proname": "v2_writer_capture_1031",
+    "definition": "c569b47066ede69b9997d60277a593105b31c815e166a21b6aed6f986d6b866e",
+    "owner": "postgres",
+    "prosecdef": false,
+    "acl": "{postgres=X/postgres}"
+  },
+  {
+    "proname": "v2_writer_complete_1031",
+    "definition": "4aaf92591fc4ba4815c7ca1543c65b92b6aaba5fb858483278d28e1f6212d1cf",
+    "owner": "postgres",
+    "prosecdef": false,
+    "acl": "{postgres=X/postgres}"
+  },
+  {
+    "proname": "v2_writer_delete_children_1031",
+    "definition": "77254694dcd9b1a286cb0a18ab2051e07605d7dc1cb6f452b0748874014bcdde",
+    "owner": "postgres",
+    "prosecdef": false,
+    "acl": "{postgres=X/postgres}"
+  },
+  {
+    "proname": "v2_writer_finalize_domain_1031",
+    "definition": "a8800df791c9ce9c5833f9588092745e6ea5f55500e977f68966fb574e2763da",
+    "owner": "postgres",
+    "prosecdef": false,
+    "acl": "{postgres=X/postgres}"
+  }
+]

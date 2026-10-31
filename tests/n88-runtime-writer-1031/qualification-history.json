@@ -1,0 +1,926 @@
+{
+  "taskId": "continuous-n88-runtime-writer-integration-20261031",
+  "runId": "fac941dc-b3df-4d7a-bf59-57918a1bb9d7",
+  "note": "Original reports retained unchanged; no failed attempt is relabelled PASS. Integration BUSY attempt started no server; observed lease belonged to continuous-n88-publication-ui-integration-20261031. Later source-only binding/comments reused successful unchanged delta proofs.",
+  "reports": [
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-41a94c08-fee7-4fb0-9cf0-c69bb8e2d6d3.tmp/report.json",
+      "sha256": "cf577c615489da6203f236b03f97cecee4083ebb56b0ae3bab395ebff2fa19c1",
+      "startedAt": "2026-10-31T10:24:46.263Z",
+      "finishedAt": "2026-10-31T10:25:01.798Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "Error",
+        "code": null,
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at bootstrapPublicSchema (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/fixtures/n122-1019/native-cases.mjs:100:320)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 3100,
+        "birth": "2026-10-31T10:24:57.0148100Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-9566bdee-5ef8-426e-b4fa-5402f7e1821e.tmp/report.json",
+      "sha256": "545a3f2f35ad3e73761201399460aa90af588c2851ac118d58d90f6d51631be9",
+      "startedAt": "2026-10-31T10:25:13.819Z",
+      "finishedAt": "2026-10-31T10:25:28.358Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "Error",
+        "code": null,
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at bootstrapPublicSchema (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/fixtures/n122-1019/native-cases.mjs:100:320)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 12488,
+        "birth": "2026-10-31T10:25:23.3070680Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-93b1e46c-5907-4719-a630-7e759088f9b6.tmp/report.json",
+      "sha256": "68fb4fef8c9dae08dd70d5a091b202e548cc9945a84e850ad8b2ed589d7e272c",
+      "startedAt": "2026-10-31T10:26:00.193Z",
+      "finishedAt": "2026-10-31T10:26:13.446Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "error",
+        "code": "42P01",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:21:280)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 27388,
+        "birth": "2026-10-31T10:26:08.9557560Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-7ab2fa84-5fee-4637-9fbc-478c09247688.tmp/report.json",
+      "sha256": "e0edcb9304e067fcf08aa523bf995efcf17d7cbb9251f92fca7117afd71ce4fe",
+      "startedAt": "2026-10-31T10:26:50.051Z",
+      "finishedAt": "2026-10-31T10:27:03.731Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "error",
+        "code": "42P01",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:21:280)"
+      },
+      "nativeError": {
+        "code": "42P01",
+        "message": "relation \"n88_private.ingress_receipts\" does not exist",
+        "statementSha256": "04f3ead1c8c5f8fb2a9680b49c2e103e0db20301da78fd5dac8ade6a00e74c41"
+      },
+      "cleanup": {
+        "stopped": true,
+        "pid": 8748,
+        "birth": "2026-10-31T10:26:58.8299460Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-96c0d546-fff0-4db3-9faa-89d2a169935a.tmp/report.json",
+      "sha256": "fa2d182810c83bb418c85d6e259e0e0fddfd7e8e747ca1536740c9589e78b119",
+      "startedAt": "2026-10-31T10:27:13.959Z",
+      "finishedAt": "2026-10-31T10:27:29.783Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ '1e4e8b1c7e3ff622c5390efa2a77ac62e8543c4028aacce39fc5d0ab6e55e636'\n- '76084d0bb32cad6751c2f02a7ed03269cba7be374c2f7248aef305f2b66bda11'\n",
+        "location": "at qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:38:9)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 7412,
+        "birth": "2026-10-31T10:27:24.2417880Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-683e3da1-4fee-4be3-8e4e-988abdd9a751.tmp/report.json",
+      "sha256": "7469f5160376ca9a3b396c70718ddaee72fda411a500b9f0ef2b5f0bf4804b30",
+      "startedAt": "2026-10-31T10:30:47.075Z",
+      "finishedAt": "2026-10-31T10:31:02.621Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "{\"state\":\"unknown\",\"retry\":false}\n\n503 !== 200\n",
+        "location": "at list (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:72:83)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 17788,
+        "birth": "2026-10-31T10:30:56.5078540Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-dca1791f-0492-47e3-8119-9265cc8a0913.tmp/report.json",
+      "sha256": "5faaf145d6914f13884bb9a4108e73150429f5d747339d0be98277213570ca72",
+      "startedAt": "2026-10-31T10:31:49.998Z",
+      "finishedAt": "2026-10-31T10:32:04.570Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "{\"state\":\"unknown\",\"retry\":false}\n\n503 !== 200\n",
+        "location": "at list (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:72:83)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 20720,
+        "birth": "2026-10-31T10:31:58.5553430Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-1ac0cbf0-0feb-40e0-9f04-8fd82cceea17.tmp/report.json",
+      "sha256": "81c06efb6054fae8e928f9360c169b248246a329d48e40aca1b44b1ca58b24b4",
+      "startedAt": "2026-10-31T10:32:52.835Z",
+      "finishedAt": "2026-10-31T10:33:07.134Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "{\"state\":\"unknown\",\"retry\":false}\n\n503 !== 200\n",
+        "location": "at list (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:72:119)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 25920,
+        "birth": "2026-10-31T10:33:01.7954490Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-5dbb2b52-5e42-48ca-bf98-4e51bf83836b.tmp/report.json",
+      "sha256": "6048f611f748f21da555643754e1670dc096b96694d3c0a6c0eba629e031f737",
+      "startedAt": "2026-10-31T10:33:45.377Z",
+      "finishedAt": "2026-10-31T10:34:02.378Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "error",
+        "code": "42501",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:95:3"
+      },
+      "nativeError": {
+        "code": "42501",
+        "message": "Owner mismatch",
+        "statementSha256": "69e11158eda67a172e2d690865c922260cb2588686d5782d12d94380c977a02d"
+      },
+      "cleanup": {
+        "stopped": true,
+        "pid": 7448,
+        "birth": "2026-10-31T10:33:54.7930100Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-de9d5617-b7ad-4ad2-9e3c-37919806fa49.tmp/report.json",
+      "sha256": "d1e3ab64e37228fcf4dae591e236fa2cdb87107afef6bf63994ba6b8a51cb98b",
+      "startedAt": "2026-10-31T10:34:55.740Z",
+      "finishedAt": "2026-10-31T10:35:11.631Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "The validation function is expected to return \"true\". Received false\n\nCaught error:\n\nerror: Invalid restore envelope",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:96:3"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 28000,
+        "birth": "2026-10-31T10:35:03.9375060Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-4c478f78-8e7a-429e-b791-61a22f6261db.tmp/report.json",
+      "sha256": "7bde73feb68f1e9a86af302e9ba5b385eeb9a43e2ea02a35361bc79af33e4c29",
+      "startedAt": "2026-10-31T10:37:07.650Z",
+      "finishedAt": "2026-10-31T10:37:28.826Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown_commit_ack_preserves_original_publication_outcome_no_blind_replay",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_persists_original_receipts_and_tombstones",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 17688,
+        "birth": "2026-10-31T10:37:25.8360650Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-cd4ce677-875b-444a-8725-d92cfb03ece1.tmp/report.json",
+      "sha256": "22622fa91a498a43eb6b47e0c9abb129189a3529e01451ec89c33d5de67e5d8c",
+      "startedAt": "2026-10-31T10:40:02.620Z",
+      "finishedAt": "2026-10-31T10:40:18.727Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_signed_web_entry_original_ingress_owner_guard_and_default_off",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "Error",
+        "code": null,
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at unavailable (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/drafts/n88-student-portal/postgres-repository.mjs:10:27)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 30620,
+        "birth": "2026-10-31T10:40:11.3377670Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-1738a03b-8225-4d3c-9bb7-1d8af6f9077a.tmp/report.json",
+      "sha256": "6447af0ae7347a9f6e275d25db349c2f5b739e88b9070abf7475d9cf2efcccce",
+      "startedAt": "2026-10-31T10:42:19.230Z",
+      "finishedAt": "2026-10-31T10:42:34.266Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "error",
+        "code": "42501",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:50:33)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 11408,
+        "birth": "2026-10-31T10:42:28.8331390Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-b17e3893-e28f-4ad2-a578-3a33969d3a13.tmp/report.json",
+      "sha256": "d6add4218164f68f788559468e3c02760af56cf4a41ad22c32b01f7702d16066",
+      "startedAt": "2026-10-31T10:44:41.260Z",
+      "finishedAt": "2026-10-31T10:44:57.273Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "error",
+        "code": "42501",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:50:37)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 25960,
+        "birth": "2026-10-31T10:44:51.2092600Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-bfb05a49-03a2-4a90-a351-566b7c3ee8d2.tmp/report.json",
+      "sha256": "09599ed407c4f23cf9ffe2c2f2863efb780521968e38ae09f49f14dec561b520",
+      "startedAt": "2026-10-31T10:45:43.539Z",
+      "finishedAt": "2026-10-31T10:46:08.414Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_signed_web_entry_original_ingress_owner_guard_and_default_off",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_rpc_grade4_guard_child_delete_recomputes_original_algorithm",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_parent_children_v2_and_original_receipt_rollback_fault_points",
+          "status": "PASS"
+        },
+        {
+          "name": "independent_service_writer_connections_contend_in_both_orders",
+          "status": "PASS"
+        },
+        {
+          "name": "accepted_parent_delete_leaves_no_live_dependencies_and_receipt_replays_once",
+          "status": "PASS"
+        },
+        {
+          "name": "cross_owner_conflict_and_current_session_negatives_do_not_retire",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown_commit_ack_preserves_original_publication_outcome_no_blind_replay",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_persists_original_receipts_and_tombstones",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 17880,
+        "birth": "2026-10-31T10:46:04.7785500Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-f5b4ddf0-695c-4260-8f12-e6278c7ff571.tmp/report.json",
+      "sha256": "d27616a2c659aec8ab06871092f9ec10a7104b5e7e6c0f15fee62c0baa733ab4",
+      "startedAt": "2026-10-31T10:48:59.308Z",
+      "finishedAt": "2026-10-31T10:49:14.785Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "error",
+        "code": "42601",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async qualify (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:38:2)"
+      },
+      "nativeError": {
+        "code": "42601",
+        "message": "syntax error at or near \"$\"",
+        "statementSha256": "f0c0ec3319df160aa68aca4263b2bb2546b60a642b1843c5fbe0a23f97c5a42b"
+      },
+      "cleanup": {
+        "stopped": true,
+        "pid": 28892,
+        "birth": "2026-10-31T10:49:09.2947120Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-7ed9dfaf-b36a-40ad-91fa-51ee030103c9.tmp/report.json",
+      "sha256": "f3aa9690574c339364787095ae61ae7d89bc18597bfb9ef6f09fad7f7bf9950b",
+      "startedAt": "2026-10-31T10:51:02.377Z",
+      "finishedAt": "2026-10-31T10:51:24.558Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_signed_web_entry_original_ingress_owner_guard_and_default_off",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_rpc_grade4_guard_child_delete_recomputes_original_algorithm",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_parent_children_v2_and_original_receipt_rollback_fault_points",
+          "status": "PASS"
+        },
+        {
+          "name": "independent_service_writer_connections_contend_in_both_orders",
+          "status": "PASS"
+        },
+        {
+          "name": "accepted_parent_delete_leaves_no_live_dependencies_and_receipt_replays_once",
+          "status": "PASS"
+        },
+        {
+          "name": "cross_owner_conflict_and_current_session_negatives_do_not_retire",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown_commit_ack_preserves_original_publication_outcome_no_blind_replay",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_persists_original_receipts_and_tombstones",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 4072,
+        "birth": "2026-10-31T10:51:21.1213360Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-7f81d19b-f2f3-46d6-9512-2142c145d7e2.tmp/report.json",
+      "sha256": "f4ff4bade45240befd70f114b983b6302d040656ee25bd1e59141d0e55d67aff",
+      "startedAt": "2026-10-31T11:00:13.824Z",
+      "finishedAt": "2026-10-31T11:00:15.067Z",
+      "status": "FAIL",
+      "checks": [],
+      "failure": {
+        "name": "Error",
+        "code": null,
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at command (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/native.mjs:37:57)"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": false
+      },
+      "leaseRelease": null
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-e308c3ec-9bcf-4c88-bc41-7d25e01703b6.tmp/report.json",
+      "sha256": "6b44e544d14463b243dde687138460f1ffda31c553acf06d259dbc4f07467a10",
+      "startedAt": "2026-10-31T11:00:59.161Z",
+      "finishedAt": "2026-10-31T11:01:19.961Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_signed_web_entry_original_ingress_owner_guard_and_default_off",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_rpc_grade4_guard_child_delete_recomputes_original_algorithm",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_parent_children_v2_and_original_receipt_rollback_fault_points",
+          "status": "PASS"
+        },
+        {
+          "name": "independent_service_writer_connections_contend_in_both_orders",
+          "status": "PASS"
+        },
+        {
+          "name": "accepted_parent_delete_leaves_no_live_dependencies_and_receipt_replays_once",
+          "status": "PASS"
+        },
+        {
+          "name": "cross_owner_conflict_and_current_session_negatives_do_not_retire",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown_commit_ack_preserves_original_publication_outcome_no_blind_replay",
+          "status": "PASS"
+        },
+        {
+          "name": "exact_unbound_installer_refuses_and_postconditions_read_back",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "The input did not match the regular expression /n88_exact_runtime_writer_authority_required/. Input:\n\n'error: syntax error at or near \"DO\"'\n",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:212:3"
+      },
+      "nativeError": {
+        "code": "42601",
+        "message": "syntax error at or near \"DO\"",
+        "statementSha256": "e05eb8f71d1fea89f29d5becf958248fc10a5d3cb2eee9c86bbdf70e13f1781b"
+      },
+      "cleanup": {
+        "stopped": true,
+        "pid": 24924,
+        "birth": "2026-10-31T11:01:09.0505750Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-5958dbaa-7488-4562-b45d-b84f1c2a6907.tmp/report.json",
+      "sha256": "06ddff2fdc2dffdd06644f60c7a8475ae7e1f2fe53006f297eb5a2e4f8b2d2c4",
+      "startedAt": "2026-10-31T11:02:09.645Z",
+      "finishedAt": "2026-10-31T11:02:36.193Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_numeric_entry_current_pupil_privacy_and_independent_grades",
+          "status": "PASS"
+        },
+        {
+          "name": "assembled_service_original_auth_and_full_rpc_edit_conflict_receipt",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_delete_retirement_receipt_and_restore_no_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_signed_web_entry_original_ingress_owner_guard_and_default_off",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_rpc_grade4_guard_child_delete_recomputes_original_algorithm",
+          "status": "PASS"
+        },
+        {
+          "name": "full_rpc_parent_children_v2_and_original_receipt_rollback_fault_points",
+          "status": "PASS"
+        },
+        {
+          "name": "independent_service_writer_connections_contend_in_both_orders",
+          "status": "PASS"
+        },
+        {
+          "name": "accepted_parent_delete_leaves_no_live_dependencies_and_receipt_replays_once",
+          "status": "PASS"
+        },
+        {
+          "name": "cross_owner_conflict_and_current_session_negatives_do_not_retire",
+          "status": "PASS"
+        },
+        {
+          "name": "unknown_commit_ack_preserves_original_publication_outcome_no_blind_replay",
+          "status": "PASS"
+        },
+        {
+          "name": "exact_unbound_installer_refuses_and_postconditions_read_back",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_persists_original_receipts_and_tombstones",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": {
+        "code": "P0001",
+        "message": "n88_exact_runtime_writer_authority_required",
+        "statementSha256": "9c8f72e43e08a14cdf739dc5af54b774543d9dd3ad9253f3f85f82530d17e537"
+      },
+      "cleanup": {
+        "stopped": true,
+        "pid": 31220,
+        "birth": "2026-10-31T11:02:32.3598870Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-6472ea45-a6bf-4352-a3a1-b60b4ff4d364.tmp/report.json",
+      "sha256": "bd504b244f381e378b4ec30b6b281df6aa02e3ea36d2f7dea96631f56b9da843",
+      "startedAt": "2026-10-31T11:03:52.044Z",
+      "finishedAt": "2026-10-31T11:04:09.510Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "exact_disable_existing_owner_transaction_and_rollback",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\ntrue !== false\n",
+        "location": "at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-runtime-writer-integration-20261031/tests/n88-runtime-writer-1031/cases.mjs:59:11"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 9668,
+        "birth": "2026-10-31T11:04:03.5238720Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-a432de35-c81c-4a6e-a197-b54d09131e79.tmp/report.json",
+      "sha256": "30798d46322efc40f04b751fc17c46750a33b53fff47d815f57f0dc3abf8b7ed",
+      "startedAt": "2026-10-31T11:04:22.634Z",
+      "finishedAt": "2026-10-31T11:04:43.401Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "exact_disable_existing_owner_transaction_and_rollback",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_preserves_qualified_disable_rollback",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 16780,
+        "birth": "2026-10-31T11:04:39.5044810Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-462f57b2-4c43-483c-8aa3-cad2e7dc19b4.tmp/report.json",
+      "sha256": "47913ae1a86fcf433c9546aad73101d407eda65b8fa8d27234da75321ceed9eb",
+      "startedAt": "2026-10-31T11:05:39.274Z",
+      "finishedAt": "2026-10-31T11:05:57.900Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_restricted_login_reset_set_and_raw_privilege_denials",
+          "status": "PASS"
+        },
+        {
+          "name": "lost_actual_publication_write_ack_read_only_reconciliation",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_preserves_committed_unknown_write_receipt",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 31224,
+        "birth": "2026-10-31T11:05:54.6538480Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-095688bb-ad41-4ddc-9f8b-6eedfcfb42d7.tmp/report.json",
+      "sha256": "85f7600b354cbe6be6e827d8acc4ee1f92014883e1a87ac1eb1ae32093608938",
+      "startedAt": "2026-10-31T11:07:04.802Z",
+      "finishedAt": "2026-10-31T11:07:23.075Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "full_exact_install_delta_single_native_transaction",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_preserves_exact_install",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 24456,
+        "birth": "2026-10-31T11:07:19.9170220Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-runtime-writer-integration-20261031-164b0d13-57d0-4461-9871-9632db4591d3.tmp/report.json",
+      "sha256": "7cb55600a0a08d84c887644312ba6a08f6199780815971ea8f335ce799b315b3",
+      "startedAt": "2026-10-31T11:10:35.101Z",
+      "finishedAt": "2026-10-31T11:10:51.082Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "full_exact_install_delta_single_native_transaction",
+          "status": "PASS"
+        },
+        {
+          "name": "native_clean_restart_preserves_exact_install",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 20192,
+        "birth": "2026-10-31T11:10:48.0876060Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    }
+  ]
+}
