@@ -48,6 +48,20 @@ export function projectPublicationStudentData(data) {
   if (!exact(data,['version','work','grades']) || data.version !== 'n88-publication-v2') deny();
   return parsePublicationStudentData({ work:data.work, grades:data.grades });
 }
+/** Exact discriminated V2 read: a chooser can never smuggle a projection. */
+export function parseStudentScopeData(value,normalized=false){
+  if(!value||value.version!=='n88-student-scope-v2'||!['choice','empty','selected'].includes(value.state)
+      ||!exact(value,value.state==='selected'?['version','state','teachingId','choices','projection']:['version','state','choices'])
+      ||!Array.isArray(value.choices)||value.choices.length>2000)deny();
+  const choices=value.choices.map(c=>{if(!exact(c,['teachingId','label'])||!id(c.teachingId)||!text(c.label,4003)||!c.label.trim())deny();return {...c};});
+  if(new Set(choices.map(c=>c.teachingId)).size!==choices.length||value.state==='choice'&&choices.length<2||value.state==='empty'&&choices.length!==0)deny();
+  const out={version:value.version,state:value.state,choices};
+  if(value.state==='selected'){
+    if(!id(value.teachingId)||!choices.some(c=>c.teachingId===value.teachingId))deny();
+    out.teachingId=value.teachingId;out.projection=normalized?projectPublicationStudentData(value.projection):parsePublicationStudentData(value.projection);
+  }
+  return out;
+}
 
 /** getIdentity and dispatch are trusted composition ports; neither is supplied by URLs/globals/storage. */
 export function createPublicationClient({ getIdentity, dispatch, timeoutMs = 10000, storage = () => globalThis.sessionStorage,

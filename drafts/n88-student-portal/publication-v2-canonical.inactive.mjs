@@ -12,6 +12,8 @@ import { readCanonical } from './integrated-service.mjs';
 import { studentPortalPublicationBindings } from './student-projection.mjs';
 import { createPublicationV2PostgresPorts } from './publication-v2-postgres.inactive.mjs';
 import { proposePublicationRows, samePublicationScope } from '../../src/lib/n88-item-publication-proposal.js';
+import {parseStudentScopePath} from './web-protocol.mjs';
+import {readStudentLabels} from './activation/v2-student-scope-1031/labels.mjs';
 
 const fail = () => { throw Error('n88_v2_canonical_unavailable'); };
 const id = v => typeof v === 'string' && v.length > 0 && v.length <= 200;
@@ -25,8 +27,8 @@ const receiptScope = (c, owner, teachingId) => {
 };
 
 export function createCanonicalPublicationV2Ports({ executionMode, runtimeCapability, repository, teacher, numeric, rollout,
-  verifyIngress, origin, studentTeachingId, now = Date.now, onVerifiedIdentity }) {
-  if (!publicationRuntimeAllowed(executionMode,runtimeCapability) || typeof verifyIngress !== 'function' || !id(studentTeachingId) ||
+  verifyIngress, origin, now = Date.now, onVerifiedIdentity }) {
+  if (!publicationRuntimeAllowed(executionMode,runtimeCapability) || typeof verifyIngress !== 'function' ||
       typeof now !== 'function' || !rollout?.configured || !numeric) fail();
   const verifyTeacher = createTeacherVerifier({ ...teacher, now });
   const numbers = createNumericCredentialOperations({ ...numeric, rollout, now });
@@ -86,12 +88,30 @@ export function createCanonicalPublicationV2Ports({ executionMode, runtimeCapabi
           synchronizeOwner: owner => synchronize(db, tx, owner) }) },
         verifyIngress: () => admitted(request, tx),
         project: async (_db, member) => {
-          const c = await read(tx, member.ownerId), scope = receiptScope(c, member.ownerId, studentTeachingId);
-          if (scope.sectionId !== member.classId) fail();
-          studentPortalPublicationBindings({ canonical: c, ownerId: member.ownerId, studentId: member.studentId,
-            enrollmentId: member.enrollmentId, classId: member.classId, termId: scope.termId, now: clockDate(now) });
+          const c = await read(tx, member.ownerId), today=clockDate(now),selector=parseStudentScopePath(request.path,'');
+          if(!selector)fail();
           current = { ownerId: member.ownerId, sessionId: s.id, studentId: member.studentId,
-            enrollmentId: member.enrollmentId, scope, current: true };
+            enrollmentId: member.enrollmentId, scope:null, current: true };
+          // Numeric READ has already verified this exact current member/session.
+          await onVerifiedIdentity?.({role,auth:current,numeric:{tokenHash:s.tokenHash,credentialId:s.credentialId,studentId:s.studentId,version:String(s.version)},expiresAt:s.expiresAt},request,tx);
+          const labels=await readStudentLabels(tx,member.ownerId,member.classId,s.id,today),eligible=[];
+          for(const t of c.teachings){
+            if(t.ownerId!==member.ownerId||t.sectionId!==member.classId||!active(t))continue;
+            const term=c.terms.find(r=>r.id===t.termId&&r.ownerId===member.ownerId),section=c.sections.find(r=>r.id===member.classId&&r.ownerId===member.ownerId),year=c.years.find(r=>r.id===section?.yearId&&r.ownerId===member.ownerId);
+            if(![term,section,year].every(r=>active(r)&&r.status==='active')||term.yearId!==section.yearId||term.startDate&&term.startDate>today||term.endDate&&term.endDate<today)continue;
+            if(!rollout.admitsTeacher({ownerId:member.ownerId,current:true},{ownerId:member.ownerId,current:true,classId:member.classId,teachingId:t.id}))continue;
+            const label=labels.find(r=>r.teaching_id===t.id&&r.subject_id===t.subjectId&&r.term_id===t.termId);if(!label)fail();
+            studentPortalPublicationBindings({canonical:c,ownerId:member.ownerId,studentId:member.studentId,enrollmentId:member.enrollmentId,classId:member.classId,termId:t.termId,now:today});
+            eligible.push({scope:receiptScope(c,member.ownerId,t.id),subject:label.subject_name,term:label.term_name});
+          }
+          if(eligible.length>2000)fail();
+          const choices=eligible.map(e=>({teachingId:e.scope.teachingId,label:e.subject+(eligible.filter(v=>v.subject===e.subject).length>1?' — '+e.term:'')}));
+          let selected=selector.teachingId;
+          if(selected&&!eligible.some(e=>e.scope.teachingId===selected))fail();
+          if(!selected&&eligible.length===1)selected=eligible[0].scope.teachingId;
+          current={...current,scope:selected?eligible.find(e=>e.scope.teachingId===selected).scope:null,choices,
+            selectionState:selected?'selected':choices.length?'choice':'empty',
+            eligibilityRevision:createHash('sha256').update(JSON.stringify([c,labels,choices])).digest('hex')};
           return {}; // Internal admission only: no source/score payload escapes.
         },
       });

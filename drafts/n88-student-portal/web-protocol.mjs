@@ -2,6 +2,16 @@
 export const PREFIX='/api/n88';
 export const ROUTE=/^\/api\/n88\/(?:teacher\/class\/(?:list|issue-missing|rotate|revoke|visibility|guidance-list|guidance-save)|student\/(?:claim|read|end))$/;
 export const FORWARDED=Object.freeze(['authorization','cookie','origin','content-type','x-n88-csrf','sec-fetch-site']);
+// V2 ONLY: the canonical selector-bearing path is signed in full by the unchanged MAC.
+export function parseStudentScopePath(path,prefix='/api/n88') {
+  const base=prefix+'/student/publication-v2/read';
+  if(path===base)return {path:base,teachingId:null};
+  if(typeof path!=='string'||!path.startsWith(base+'?teaching='))return null;
+  const encoded=path.slice((base+'?teaching=').length);let value;
+  try{value=decodeURIComponent(encoded);}catch{return null;}
+  if(!value||value.length>200||/[\u0000-\u001f\u007f-\u009f]/u.test(value)||encodeURIComponent(value)!==encoded)return null;
+  return {path:base,teachingId:value};
+}
 export const encodeBytes=bytes=>btoa(String.fromCharCode(...bytes));
 export const decodeBytes=value=>{
   if(typeof value!=='string' || value.length>5464 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value))throw Error('n88_envelope');

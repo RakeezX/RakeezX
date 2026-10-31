@@ -168,6 +168,15 @@ export function projectStudentPortal(input) {
  * publications/draft are constructed by publication-v2-service, never HTTP data.
  */
 export function projectStudentPublicationV2(input, draft, publications) {
+  // V2 is exactly one Teaching, including overlapping terms. V1 readScope stays unchanged.
+  const selected=input.selectedTeachingId??draft.scope.teachingId,c=input.canonical;
+  if(selected!==draft.scope.teachingId)deny();
+  const items=c.items.filter(r=>r.teachingId===selected),ids=new Set(items.map(r=>r.id));
+  const definitions=c.scoreSubitems.filter(r=>ids.has(r.itemId)),subids=new Set(definitions.map(r=>r.id));
+  input={...input,canonical:{...c,teachings:c.teachings.filter(r=>r.id===selected),items,
+    scores:c.scores.filter(r=>ids.has(r.itemId)),scoreSubitems:definitions,
+    scoreSubitemCompletions:c.scoreSubitemCompletions.filter(r=>subids.has(r.subitemId)),
+    sessions:c.sessions.filter(r=>r.teachingId===selected),attendance:c.attendance.filter(r=>r.teachingId===selected),logs:c.logs.filter(r=>r.teachingId===selected)}};
   const s = readScope(input);
   if (draft.scope.ownerId !== input.ownerId || draft.scope.sectionId !== input.classId ||
       draft.scope.termId !== input.termId || !s.teachings.some(t => t.id === draft.scope.teachingId && t.subjectId === draft.scope.subjectId)) deny();

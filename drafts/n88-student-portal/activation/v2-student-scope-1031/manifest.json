@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "enabled": false,
+  "hostedExecuted": false,
+  "taskId": "continuous-n88-student-scope-source-20261031",
+  "runId": "9f046986-1f78-4ad5-a247-397a19fc7e66",
+  "baseSha": "5b77024e36f254a6568a0224abb9ea25d78698af",
+  "parentBundleSha256": "b76a030cc443ad89c1772d18572a7e54a2d277ec8047b01a1554b1e15d8d9208",
+  "parentInstallerSha256": "62e06e5ad1b9eaae7407e6017d8d9905e89ee6450ea66c58dbf45144b0128819",
+  "bundleSha256": "aaaeb23eb4cb5e22c510cda30cc46c9d7f2bcaab798bb6749762aefb7c8eeb62",
+  "files": {
+    "label-delta.sql": "a59d89e86d73a39ed898fb6e99520c3a1a7949ffccb7309e52a9f11080a52d3d",
+    "labels.mjs": "edcdae653c939980ea61d3bc5767fec12344e74b06183e02bcda9467a2e81948",
+    "../../publication-v2-canonical.inactive.mjs": "e9bb637d11cba86cf0e6f9dc0214509467a2f56e8ca0ee85c2fddb8d76111a4e",
+    "../../publication-v2-service.inactive.mjs": "6e75c80ecdd52526d1d0e0705648d59aefb652a0c3b085c5e3daeaf1c65c03b5",
+    "../../web-protocol.mjs": "1aa5abc3d62e4b241bc3917942fb761d5d2544cb0d06169f86b49b1c203acf60",
+    "../v2-runtime-writer-1031/host.mjs": "8685b3497fbdcb208edfb5050d88b9f261e5a9fee250bc36511b3d35177c4a61"
+  },
+  "labelRead": {
+    "id": "student-scope-labels-1031",
+    "name": "safe_student_scope_labels_1031",
+    "bodySha256": "c404e514185e2d2f84300cf7945d6eb3225ad2eddffc6d58d592bf1771562ff1",
+    "parameters": [
+      "owner:uuid",
+      "class:text200",
+      "verifiedNumericSession:uuid",
+      "currentDate:ISO"
+    ],
+    "maxRows": 2000,
+    "maxBytes": 2097152
+  },
+  "storage14Unchanged": true,
+  "additionalPrivateReaders": 1,
+  "newPublicFunctions": 0,
+  "installerSha256": "3cb168cd95a260cd16b89d5f2ad17d9418e79ed2ea0020b2aee45be4e5c4f959",
+  "disableSha256": "f1328e7eb4464d68dfb707a967ac7b5de11e090620d919729de1cd9950deb77c",
+  "readbackSha256": "d83fc9c595d76604f3f2c517238732ef0d9ce3adb8ef391d2f66f8b7901ba819"
+}

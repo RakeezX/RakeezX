@@ -36,12 +36,14 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     }
     const field=root.querySelector('[data-claim] input');if(field)field.value=codeDraft;
     clearTimeout(timer);
+    if(client.publicationReadMode?.()&&client.selectedTeaching?.())root.querySelector('section').insertAdjacentHTML('beforeend','<button type="button" data-reset-teaching>التحقق من المواد المتاحة</button>');
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
   }
   function recovery(message, end = false) {
     screen = end ? 'end-uncertain' : 'recovery';
     clearTimeout(timer);const cooling=Date.now()<cooldownUntil;
     paint(`<section class="n88-unified-entry"><h1 tabindex="-1">${end ? 'التحقق من الجلسة' : 'مساحة الطالب'}</h1><p role="status" aria-live="polite">${escape(message)}${cooling?' يرجى الانتظار قليلًا قبل المحاولة مجددًا.':''}</p><button class="btn btn--primary" data-session-retry ${cooling?'disabled':''}>${end ? 'التحقق مجددًا' : 'حاول مجددًا'}</button></section>`);
+    if(!end&&client.publicationReadMode?.()&&client.selectedTeaching?.())root.querySelector('section').insertAdjacentHTML('beforeend','<button type="button" data-reset-teaching>التحقق من المواد المتاحة</button>');
     if(cooling)timer=setTimeout(()=>recovery(message,end),Math.max(1,cooldownUntil-Date.now()));
   }
   function publicationReview() {
@@ -49,14 +51,20 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     paint('<section class="n88-unified-entry" data-publication-review><h1 tabindex="-1">مساحة الطالب</h1><p role="status">يلزم أن يراجع معلّمك النشر الحالي قبل عرض بياناتك. جلستك ما زالت متاحة.</p><button type="button" data-read>التحقق من النشر</button><button type="button" data-end>تسجيل الخروج من مساحة الطالب</button></section>');
   }
   function show(raw, preserve = false) {
-    const data = projectUnifiedStudentData(raw);
+    const envelope = projectUnifiedStudentData(raw),scoped=envelope.version==='n88-student-scope-v2'?envelope:null;
+    if(scoped&&scoped.state!=='selected'){
+      screen='scope';settledProjection=null;settledContext=undefined;clearTimeout(freshnessTimer);
+      paint(`<section class="n88-unified-entry"><h1 tabindex="-1">${scoped.state==='empty'?'لا توجد مواد متاحة حاليًا':'اختر المادة'}</h1>${scoped.state==='empty'?'<p>راجع معلمك إذا كنت تتوقع مادة في فصلك الحالي.</p>':scopeChooser(scoped)}<button type="button" data-read>تحديث المواد</button><button type="button" data-end>تسجيل الخروج</button></section>`);return;
+    }
+    const data=scoped?scoped.projection:envelope;
     const completedOpen = preserve && root.querySelector('.n88-completed-group')?.open;
     const scroll=preserve ? {x:win.scrollX,y:win.scrollY} : null;
     const focus=preserve && root.contains(doc.activeElement) ? ['data-read','data-end'].find(key=>doc.activeElement.hasAttribute(key)) : null;
-    settledProjection = JSON.stringify(data); settledAt = Date.now(); settledTick = win.performance.now(); settledContext = client.captureContext?.();
+    settledProjection = JSON.stringify(envelope); settledAt = Date.now(); settledTick = win.performance.now(); settledContext = client.captureContext?.();
     screen = 'private';
     const profile = data.profile;
     let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end aria-label="تسجيل الخروج من مساحة الطالب">تسجيل الخروج</button></div></div><div class="n88-unified-sections">`;
+    if(scoped)content+=scopeChooser(scoped);
     if(data.version==='n88-publication-v2')content+=renderStudentPublications(data);
     else {
     const workSection = (key, label) => {
@@ -78,6 +86,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     paint(content + '</div><p role="status" data-refresh-status>يُحدّث العرض تلقائيًا كل خمس دقائق أثناء فتحه. يمكنك تحديثه الآن.</p>',!preserve);
     if(preserve){const completed = root.querySelector('.n88-completed-group');if(completed)completed.open=!!completedOpen;if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
     scheduleFreshness();
+  }
+  function scopeChooser(data){
+    return `<label class="n88-scope-chooser">المادة<select data-student-teaching aria-label="المادة"><option value="" disabled ${data.teachingId?'':'selected'}>اختر المادة</option>${data.choices.map(c=>`<option value="${escape(c.teachingId)}" ${data.teachingId===c.teachingId?'selected':''}>${escape(c.label)}</option>`).join('')}</select></label>`;
   }
   const displayAge = () => Math.max(Date.now()-settledAt,win.performance.now()-settledTick);
   function scheduleFreshness() {
@@ -250,6 +261,11 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (event.target.closest('[data-session-retry]')) void run(() => client.read({phase:'manual'}),false,false,true);
     if (event.target.closest('[data-read]')) void refresh();
     if (event.target.closest('[data-end]')) void run(() => client.end(), true);
+    if(event.target.closest('[data-reset-teaching]')){client.selectTeaching(null);void run(()=>client.read(),false,false,true);}
+  };
+  const selectScope=event=>{
+    if(!event.target.matches('[data-student-teaching]')||!event.target.value)return;
+    client.selectTeaching(event.target.value);void run(()=>client.read(),false,false,true);
   };
   function clear(preserveDraft=false, reason='context', invalidateClient=true) {
     if(clearing)return;clearing=true;
@@ -298,7 +314,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   const pageshow = () => visible();
   const blur = () => {if(screen!=='private')return;const retain=client.canRetainView?.()!==false;if(screen!=='private')return;if(!retain){clear(false,'hidden');retiredPage=true;}};
   const unsubscribeContext=client?.subscribeContext?.(()=>{if(!clearing&&!disposed){const wasEntry=screen==='entry';retiredPage=false;clear(false,'context',false);if(wasEntry)entry('تغيّرت الجلسة في صفحة أخرى. أدخل الرمز للمتابعة.');}});
-  root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
+  root.addEventListener('change',selectScope);root.addEventListener('beforeinput', beforeInput); root.addEventListener('paste', paste); root.addEventListener('submit', submit); root.addEventListener('input', input); root.addEventListener('click', click);
   win.addEventListener('focus', visible);win.addEventListener('blur', blur);win.addEventListener('pagehide', hide); win.addEventListener('pageshow', pageshow); doc.addEventListener('visibilitychange', visible);
   // Never inspect the HttpOnly cookie or persist private state. One current read
   // decides initial entry; pageshow/focus do not duplicate this bootstrap.
@@ -310,7 +326,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     if (disposed) return;
     unsubscribeContext?.();clear(false,'disposed'); disposed = true; clearTimeout(timer);clearTimeout(freshnessTimer); client?.dispose?.(); root.replaceChildren(); style.remove();publicationStyle?.remove();
     root.classList.remove('n88-unified'); if (previousDir === null) root.removeAttribute('dir'); else root.setAttribute('dir', previousDir);
-    root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
+    root.removeEventListener('change',selectScope);root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
     win.removeEventListener('focus', visible);win.removeEventListener('blur', blur);win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);
   } };
 }

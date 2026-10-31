@@ -4,7 +4,7 @@ import { timingSafeEqual } from 'node:crypto';
 import {composeService} from './runtime.mjs';
 import {createTeacherVerifier} from './auth-verifier.mjs';
 import {createHostedPublicationV2Runtime} from './activation/v2-runtime-writer-1031/host.mjs';
-import {PUBLICATION_V2_PATHS} from './publication-v2-service.inactive.mjs';
+import {isPublicationV2Path} from './publication-v2-service.inactive.mjs';
 import {ROUTE,FORWARDED,decodeBytes,readBytes,sha,mac,signingText,privateResponse,PRIVATE_WEB_HEADERS,validateReadPhases} from './web-protocol.mjs';
 export function createWebEntry(options) {
   if(!Buffer.isBuffer(options.ingressKey) || options.ingressKey.length!==32)throw Error('n88_ingress_configuration');
@@ -21,9 +21,9 @@ export function createWebEntry(options) {
   const legacy=composeService(options,adapter);let publication;
   const publicationEnabled=options.publicationRuntime?.enabled===true;
   const service=async r=>{
-    if(!publicationEnabled||!PUBLICATION_V2_PATHS.includes(r.path))return legacy(r);
+    if(!publicationEnabled||!isPublicationV2Path(r.path))return legacy(r);
     publication??=createHostedPublicationV2Runtime({...options.publicationRuntime,acquire:options.acquire,origin:options.origin,
-      canonical:{rollout:options.rollout,studentTeachingId:options.publicationRuntime.studentTeachingId,
+      canonical:{rollout:options.rollout,
        teacher:{authUrl:options.authUrl,apiKey:options.apiKey,fetch:options.fetch},
        numeric:{keys:new Map([['v1',options.numericKey]]),activeKeyVersion:'v1',reservationKey:options.reservationKey},verifyIngress:adapter.verifyIngress}});
     return (await publication).handle(r);
@@ -40,7 +40,7 @@ export function createWebEntry(options) {
           !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(nonce||'') ||
           !/^[a-f0-9]{64}$/.test(source||'') || !/^[a-f0-9]{64}$/.test(signature||''))return privateResponse(401);
         const envelope=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(await readBytes(request.body,24576,abort.signal)));
-        if(!envelope || Object.keys(envelope).sort().join(',')!=='body,headers,method,path' || (!ROUTE.test(envelope.path)&&!(publicationEnabled&&PUBLICATION_V2_PATHS.some(p=>envelope.path==='/api/n88'+p))) ||
+        if(!envelope || Object.keys(envelope).sort().join(',')!=='body,headers,method,path' || (!ROUTE.test(envelope.path)&&!(publicationEnabled&&typeof envelope.path==='string'&&envelope.path.startsWith('/api/n88/')&&isPublicationV2Path(envelope.path.slice('/api/n88'.length)))) ||
           !['GET','POST'].includes(envelope.method) || !Array.isArray(envelope.headers) || envelope.headers.length!==FORWARDED.length ||
           !envelope.headers.every(v=>typeof v==='string' && v.length<=8200))return privateResponse(400);
         const {path,method}=envelope,h=new Headers(FORWARDED.map((n,i)=>[n,envelope.headers[i]]));
@@ -54,9 +54,9 @@ export function createWebEntry(options) {
         let body={};if(bytes.length)body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
         if(!body || Array.isArray(body) || typeof body!=='object' || method==='GET' && bytes.length)return privateResponse(400);
         const r={path:path.slice('/api/n88'.length),method,body,headers:Object.fromEntries(['cookie','origin','content-type','x-n88-csrf','sec-fetch-site'].map(n=>[n,h.get(n)||'']))};
-        if(publicationEnabled&&PUBLICATION_V2_PATHS.includes(r.path)){
+        if(publicationEnabled&&isPublicationV2Path(r.path)){
           r.headers.authorization=h.get('authorization')||'';r.signal=abort.signal;
-          if(r.path==='/student/publication-v2/read')r.body=null;
+          if(r.path.startsWith('/student/publication-v2/read'))r.body=null;
         }
         envelopes.set(r,{authorization:h.get('authorization'),signal:abort.signal,time,nonce,source});
         // Cookie/private entry stays in the upstream BODY as well; only the

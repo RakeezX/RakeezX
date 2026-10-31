@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v104';
+const VERSION = 'rakeezx-v105';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -284,6 +284,7 @@ self.addEventListener('install', (event) => {
         './src/views/student-portal-login.js',
         './src/styles/student-portal-class.css',
         './src/styles/student-portal.css',
+        './src/styles/student-portal-login.css',
       ].map(url => cache.add(new Request(url, { cache: 'reload' }))));
       // ملف واحد مفقود يجب ألا يفشل التثبيت كله
       await Promise.all(

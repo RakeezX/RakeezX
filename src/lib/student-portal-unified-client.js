@@ -1,6 +1,6 @@
 /** AI: universal student transport; no identity lookup or private projection storage. Finite opt-in diagnostics only. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
-import { PUBLICATION_V2_READINESS, publicationV2Ready, parsePublicationStudentData, projectPublicationStudentData } from './student-portal-publication-client.js';
+import { PUBLICATION_V2_READINESS, publicationV2Ready, parseStudentScopeData, projectPublicationStudentData } from './student-portal-publication-client.js';
 export function parseStudentFailure(value){try{if(typeof value!=='string'||value.length>768)return null;const d=JSON.parse(value),keys=['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'];if(!d||typeof d!=='object'||Array.isArray(d)||Object.keys(d).filter(k=>!['site','requirement','exception'].includes(k)).sort().join(',')!==keys.sort().join(','))return null;if(!["acquire","guard","begin","snapshot","operation","synchronize-lock","synchronize-memberships","synchronize-sessions","synchronize-sources","synchronize-publications","synchronize-validate","projection-finalize","projection-membership-flush","projection-commitguards","projection-commit","unknown"].includes(d.phase)||!["acquire","guard","transaction","projection","commit","unknown","admission_denied","session_required","denied"].includes(d.category)||!["none","55P03","57014","42501","23503","23505","40001","40P01","08000","08001","08003","08004","08006","08007","08P01","28P01","28000","53300","53400","57P01","57P02","57P03","25P02","22001","22P02","42703","42883","42P01"].includes(d.sqlstate)||!['none','reset','timeout','refused','dns'].includes(d.connection)||typeof d.cancelled!=='boolean'||typeof d.deadline!=='boolean'||!['not_needed','acknowledged','unknown'].includes(d.rollback)||!['not_started','unknown','acknowledged'].includes(d.commit))return null;const tagged=['site','requirement','exception'].some(k=>Object.hasOwn(d,k));if(tagged&&(!["canonical-fetch","canonical-decode","term-selection","visibility-fetch","visibility-selection","guidance-fetch","guidance-decode","student-scope","visibility-validation","visibility-scope","grade-context","grade-score","work-projection","guidance-projection"].includes(d.site)||!["unknown","current-membership-and-policy","canonical-revision","canonical-row-identity","unique-current-enrollment","unique-student-item-score","unique-student-subitem-completion","canonical-atomic-subitem-score","bounded-years","bounded-terms","bounded-sections","bounded-students","bounded-enrollments","bounded-teachings","bounded-items","bounded-scores","bounded-scoreSubitems","bounded-scoreSubitemCompletions","bounded-sessions","bounded-attendance","bounded-logs","portable-grade-context","unique-current-term","canonical-source-bound","canonical-read-mode","guidance-contract","visibility-policy","score-decimals","canonical-date","subitem-date-order","subitem-late-score","subitem-count","score-student-identity"].includes(d.requirement)||!["rejected","type","range","syntax","other"].includes(d.exception)))return null;return Object.freeze({...Object.fromEntries(['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'].map(k=>[k,d[k]])),...(tagged?{site:d.site,requirement:d.requirement,exception:d.exception}:{})});}catch{return null;}}
 
 export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
@@ -38,6 +38,7 @@ function list(value, rules, required = []) {
 }
 /** Fresh allowlisted projection: omitted sections stay omitted; null is never coerced. */
 export function projectUnifiedStudentData(data) {
+  if(data?.version==='n88-student-scope-v2')return parseStudentScopeData(data,true);
   if(data?.version==='n88-publication-v2')return projectPublicationStudentData(data);
   if (!object(data) || data.version !== 'n88-student-v3') throw fail();
   const result = { version: data.version };
@@ -90,6 +91,7 @@ function createRetirementObserver(onPeerChange) {
 export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000, bindingProof=null, publicationReadiness=PUBLICATION_V2_READINESS } = {}) {
   if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
   let generation = 0, retirement = 0, controller, disposed = false, lastDiagnostic = null, retireDiagnostic;
+  let teachingSelection=null,teachingChoices=[];
   const contextListeners = new Set();
   const peer=createRetirementObserver(()=>invalidate('context'));
   const reasons = ['visible','hidden','pagehide','disposed','context','superseded','deadline'];
@@ -98,11 +100,12 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     retireDiagnostic?.(reason); retireDiagnostic = null;
     generation++; controller?.abort(); controller = null;
   }
-  function invalidate(reason = 'context') { if(reason==='pagehide'||reason==='disposed')peer.abandon();retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; for(const listener of contextListeners)listener(); }
+  function invalidate(reason = 'context') { if(!['selection','pagehide','hidden','deadline'].includes(reason)){teachingSelection=null;teachingChoices=[];}if(reason==='pagehide'||reason==='disposed')peer.abandon();retirement++; bindingProof?.retire?.(); cancelRequest(reasons.includes(reason) ? reason : 'context'); if(lastDiagnostic?.readPhases)lastDiagnostic=null; for(const listener of contextListeners)listener(); }
   async function call(action, body, phase = 'manual') {
     if (disposed) throw fail();
     peer.sync();
     let mutation=null,acknowledged=false;if(action==='claim'||action==='end')mutation=peer.begin();
+    if(action==='claim'||action==='end'){teachingSelection=null;teachingChoices=[];}
     cancelRequest(); lastDiagnostic=null; const checkpoint = generation;
     const owned = controller = new AbortController(), started = performance.now();
     let timedOut = false, statusClass = 'none', recorded = false, readPhases=null;
@@ -127,7 +130,8 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       const proof=action==='read'?bindingProof?.reserve():null;
       clientStage='request';
       const v2Read=action==='read'&&publicationV2Ready(publicationReadiness);
-      const responsePending = send('/api/n88/student/' + (v2Read?'publication-v2/read':action), {
+      const selected=teachingSelection;
+      const responsePending = send('/api/n88/student/' + (v2Read?'publication-v2/read'+(selected?'?teaching='+encodeURIComponent(selected):''):action), {
         method: action === 'read' ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
         redirect: 'error', referrerPolicy: 'no-referrer', signal: owned.signal,
         headers: action === 'read' ? { Accept: 'application/json',...(v2Read?{'X-N88-CSRF':'1'}:{}),...proof?.headers } : { Accept: 'application/json', 'Content-Type': 'application/json', 'X-N88-CSRF': '1' },
@@ -163,9 +167,14 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       clientStage='decode';const data = await response.json();
       peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline();
-      clientStage='projection';const projected = v2Read?parsePublicationStudentData(data):projectUnifiedStudentData(data);
+      if(!v2Read&&data?.version==='n88-student-scope-v2')throw fail();
+      clientStage='projection';const projected = v2Read?parseStudentScopeData(data):projectUnifiedStudentData(data);
+      if(v2Read){
+        if(selected&&(projected.state!=='selected'||projected.teachingId!==selected))throw fail();
+      }
       await proof?.accept(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
       if(checkpoint!==generation)throw fail('stale');withinDeadline();
+      if(v2Read){teachingChoices=projected.choices.map(c=>c.teachingId);teachingSelection=projected.state==='selected'?projected.teachingId:null;}
       readPhases=parseStudentReadPhases(response.headers?.get('x-n88-student-read-phases'));
       record('success'); return projected;
       })(), new Promise((_, reject) => { owned.signal.addEventListener('abort', () => reject(fail()), { once: true }); }) ]);
@@ -178,6 +187,11 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
   }
   return Object.freeze({
     publicationReadMode:()=>publicationV2Ready(publicationReadiness),
+    selectedTeaching:()=>teachingSelection,
+    selectTeaching(value){
+      if(!publicationV2Ready(publicationReadiness)||value!==null&&(typeof value!=='string'||!teachingChoices.includes(value)))throw fail();
+      teachingSelection=value;invalidate('selection');
+    },
     async claim(value) {
       let code = normalizeStudentCode(value);
       if (!validStudentCode(code)) throw fail('format');
