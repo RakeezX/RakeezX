@@ -1,0 +1,50 @@
+// AI: fabricated private-file IO, keys and reports; immutable actual validators.
+import {registerHooks} from 'node:module';
+import {execFileSync} from 'node:child_process';
+import {createHash,randomUUID} from 'node:crypto';
+import path from 'node:path';
+const blob=p=>execFileSync('git',['show','36a3e2e98097038bbb33002b3f8e6967ba86426d:'+p]);
+export const attestationBytes=blob('drafts/n44-push/activation/manual-phone-handoff-1031/attestation.mjs');
+const attestationUrl='data:text/javascript;base64,'+attestationBytes.toString('base64');
+registerHooks({resolve(s,c,next){if(s==='./attestation.mjs'&&c.parentURL?.endsWith('/manual-phone-handoff-1031/host.mjs'))return {url:attestationUrl,shortCircuit:true};return next(s,c);}});
+export const protocol=await import(attestationUrl);
+const gateway=execFileSync('git',['show','571fc483d711780af666be4926c80ab00eeaba91:src/lib/notification-push-gateway.js']);
+export const gatewayHash=createHash('sha256').update(gateway).digest('hex');
+if(gatewayHash!=='992b2b36a63602767bf9eb4ba085a426afd7edad28c693044afc7b832a052099')throw Error('immutable_producer_mismatch');
+export const producer=await import('data:text/javascript;base64,'+gateway.toString('base64'));
+export const sealer=await import('data:text/javascript;base64,'+blob('drafts/n44-push/activation/manual-phone-handoff-1031/producer.mjs').toString('base64'));
+export const {createManualHost}=await import('../../drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs');
+export const {createManualFileCustodyComposition}=await import('../../drafts/n44-push/activation/manual-file-admission-1031/composition.mjs');
+export const {createOwnedFileOpener,createManualFileIntake}=await import('../../drafts/n44-push/activation/manual-file-admission-1031/ingestion.mjs');
+const rawHash=b=>createHash('sha256').update(b).digest('hex');
+export const RUN='267696b5-a7e2-412a-8289-fd3769b3da9b',UI='d'.repeat(40),SOURCE='a'.repeat(40);
+export async function fixture(){
+ const f={now:Date.now(),owned:true,opens:0,closes:0,claims:new Set(),sealed:[],files:new Map(),root:path.resolve('synthetic-original-private-intake')};
+ f.sessionExpiry=f.now+3600000;
+ const {hash,GRANT,TASK,DOMAIN}=protocol,scope={ownerId:'synthetic-owner',workspaceId:'synthetic-workspace',devices:['android','iphone']};
+ const ingressKey=Buffer.alloc(32,29),authority=protocol.createManualAuthority(ingressKey);
+ const pair=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']),jwk=await crypto.subtle.exportKey('jwk',pair.publicKey);
+ f.guard=async root=>{if(!f.owned||path.resolve(root)!==f.root)throw Error('synthetic_ownership_denial');};
+ let ino=1;
+ const stat=e=>({dev:1,ino:e.ino,size:e.bytes.length,mtimeMs:e.time,ctimeMs:e.time,isFile:()=>!e.directory,isSymbolicLink:()=>Boolean(e.symlink)});
+ f.io={realpath:async p=>path.resolve(p),lstat:async p=>{const e=f.files.get(p);if(!e)throw Error('synthetic_missing');return stat(e);},open:async p=>{const e=f.files.get(p);if(!e||e.unreadable)throw Error('synthetic_unreadable');f.opens++;return {stat:async()=>stat(e),read:async(b,offset,length,position)=>{const n=Math.max(0,Math.min(length,e.bytes.length-position));e.bytes.copy(b,offset,position,position+n);if(f.duringRead){const x=f.duringRead;f.duringRead=null;x(e);}return {bytesRead:n};},close:async()=>{f.closes++;}};}};
+ f.receive=(ref,bytes,extra={})=>{const name=path.join(f.root,'manual-'+ref+'.encrypted.json');f.files.set(name,{bytes:Buffer.from(bytes),ino:ino++,time:f.now,...extra});return name;};
+ f.options={ingressKey,serviceSourceSha:SOURCE,uiSourceSha:UI,producer,clock:()=>f.now,claimOnce:async c=>{if(f.claims.has(c.nonce))throw Error('synthetic_nonce_consumed');f.claims.add(c.nonce);}};
+ f.intake=createManualFileIntake({assertOwned:()=>f.guard(f.root),openReceivedFile:createOwnedFileOpener({root:f.root,assertOwnedRoot:f.guard,io:f.io}),clock:()=>f.now});
+ f.host=createManualHost({...f.options,manualIntake:f.intake});f.scope=scope;
+ f.challenges=[0,1].map(slot=>authority.issue({version:2,kind:'n44-phone-readiness',taskId:TASK,grantId:GRANT,runId:RUN,nonce:String(slot+1).repeat(64),issuedAt:f.now,expiresAt:f.now+300000,ownerHash:hash(scope.ownerId),workspaceHash:hash(scope.workspaceId),deviceHash:hash(scope.devices[slot]),dueAt:Math.floor((f.now+10800000)/86400000+1)*86400000-10800000,publicKey:{kty:jwk.kty,n:jwk.n,e:jwk.e}},scope,slot,f.now));
+ f.makeFile=async(slot,change=()=>{})=>{
+  const challenge=f.challenges[slot],checkpoint=randomUUID(),observedAt=f.now;
+  const pairMeta=scope.devices.map((d,i)=>({deviceHash:hash(d),sessionHash:hash('session-'+i),sessionRevisionHash:hash('revision-'+i),consentRevisionHash:hash('consent-'+i),sessionExpiresAt:f.sessionExpiry,pushConsent:false,preferencesHash:hash('preferences'),registration:null}));
+  const payload={version:1,domain:DOMAIN,sourceSha:SOURCE,challengeHash:hash(challenge),runId:RUN,grantId:GRANT,slot,nonce:challenge.nonce,phase:'before',checkpoint,observedAt,expiresAt:observedAt+60000,ownerHash:hash(scope.ownerId),workspaceHash:hash(scope.workspaceId),deviceHash:hash(scope.devices[slot]),pair:pairMeta,pairHash:hash(pairMeta),previousHash:null};
+  const before=authority.sign(payload),after=authority.sign({...payload,phase:'after',previousHash:hash(before)});
+  const context={mode:'account',verified:true,ownerId:scope.ownerId,workspaceId:scope.workspaceId,deviceId:scope.devices[slot]};
+  const value={version:2,kind:'n44-phone-readiness',taskId:TASK,grantId:GRANT,runId:RUN,nonce:challenge.nonce,challengeDigest:rawHash(JSON.stringify(challenge)),observedAt,documentCheckpoint:checkpoint,ownerId:scope.ownerId,workspaceId:scope.workspaceId,captureDevice:{deviceId:context.deviceId},clockStarted:false,provenance:{serverProof:false,peerProof:false},manualContext:{before,after},sync:{state:'synced',queuedCount:0,pendingCount:0,failedCount:0,blockedCount:0,rejectedCount:0},ancestry:{synthetic:true},existingSourceIds:[],proposed:{dueAt:challenge.dueAt,dateAllowed:true},phone:{deviceId:context.deviceId,gesture:'trusted-support-click',timezone:'Asia/Riyadh',preferences:{lessonMinutes:15,dueDays:[0,1,2,3]},runtime:{context,quiet:null,serverProof:false,peerProof:false,deviceOutcome:{source:'browser-service-worker',state:'empty',scopeHash:rawHash(JSON.stringify(context)),nonce:'c'.repeat(64),binding:null,observedAt,stage:null,minute:null,present:false}}}};
+  change(value);const outer=await sealer.sealManualPayload(value,challenge,async()=>{}),bytes=new TextEncoder().encode(JSON.stringify(outer)),transferRef=randomUUID(),file=f.receive(transferRef,bytes);
+  const ownScope={ownerId:scope.ownerId,workspaceId:scope.workspaceId,deviceId:scope.devices[slot]},mint={transferRef,challenge,scope:ownScope,slot};
+  return {value,bytes,file,mint,challenge,scope:ownScope,slot,transferRef,privateKey:pair.privateKey};
+ };
+ f.admit=async file=>f.host.admitManualTransfer({capability:await f.intake.ingest(file.mint),challenge:file.challenge,scope:file.scope,slot:file.slot,privateKey:file.privateKey});
+ f.composition=()=>createManualFileCustodyComposition({root:f.root,io:f.io,assertOwnedRoot:f.guard,hostOptions:f.options,sealPreparedRecord:async r=>{f.sealed.push(structuredClone(r));}});
+ return f;
+}

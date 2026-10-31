@@ -1,0 +1,24 @@
+{
+  "taskId": "n44-manual-file-admission-source-20261031",
+  "runId": "267696b5-a7e2-412a-8289-fd3769b3da9b",
+  "scope": "Source-only manual ingestion through actual host and immutable helper; fabricated files, IO, keys and identities",
+  "newAdmissionCases": 21,
+  "status": "PASS",
+  "evidence": [
+    "admission.test.mjs: initial 19 cases PASS after fixing missing constructor dependency",
+    "Two added issuer-isolation/legacy-observation cases PASS with test-name filter",
+    "Renamed legacy fixture uses its own synthetic trusted-tool digest; affected case PASS",
+    "Private source/runtime/credential reads and edits: none",
+    "No old19 or historical29/14/11/15 campaign repeated"
+  ],
+  "preservedFailure": "Initial new entrypoint omitted the manualIntake constructor binding and raised ReferenceError; fixed dependency binding, no guard removed.",
+  "actualTransferChannelReady": false,
+  "endToEndLatencyVerified": false,
+  "actualServiceDelivery": "NOT_RUN",
+  "actualUiDelivery": "NOT_RUN",
+  "actualPhoneCapture": "NOT_RUN",
+  "actualFileIngestion": "NOT_RUN",
+  "originalFiniteAcceptance": "NOT_RUN",
+  "liveOperations": 0,
+  "originalFiniteGrantOperations": 0
+}
