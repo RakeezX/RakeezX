@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-student-scope-source-20261031",
+  "runId": "9f046986-1f78-4ad5-a247-397a19fc7e66",
+  "command": "node --test tests/n88-student-scope-1031/scope.test.mjs tests/n88-student-scope-1031/sw.test.mjs tests/n88-student-scope-1031/bundle.test.mjs",
+  "exitCode": 0,
+  "status": "PASS",
+  "tests": 8,
+  "pass": 8,
+  "fail": 0,
+  "finalAffectedRecheck": {"command":"node --test tests/n88-student-scope-1031/scope.test.mjs tests/n88-student-scope-1031/bundle.test.mjs","pass":6,"fail":0,"reason":"Default-OFF V1 reads explicitly reject the new V2 scope discriminator; refreshed student/gateway bytes. Reuse the unchanged two SW checks and V2 mounted/native proofs."},
+  "notRun": ["hosted restricted-login/profile acceptance", "hosted install/deploy/positive teacher/student/public acceptance", "live Service Worker/offline certification"],
+  "originalUnitFailure": "One initial test expected the invented n88-web-v1 domain. Actual unchanged signingText uses n88-ingress-v1; only that fixture expectation was corrected.",
+  "reuse": "Final native results.json and existing prior unchanged teacher Auth/UNKNOWN/grade proofs; no hosted retry."
+}

@@ -7,7 +7,7 @@ const validationFamilies=Object.freeze(["contexts.active","contexts.duplicate-ke
  * Provider cf metadata + CF-Connecting-IP at external ingress ONLY. Worker
  * subrequests (CF-Worker header) are denied, including same-zone IP overrides.
  */
-import {ROUTE,FORWARDED,readBytes,sha,mac,signingText,encodeBytes,privateResponse,PRIVATE_WEB_HEADERS,READ_PHASE_HEADER,validateReadPhases} from '../../web-protocol.mjs';
+import {ROUTE,FORWARDED,readBytes,sha,mac,signingText,encodeBytes,privateResponse,PRIVATE_WEB_HEADERS,READ_PHASE_HEADER,validateReadPhases,parseStudentScopePath} from '../../web-protocol.mjs';
 import {privateAssets} from '../private-document.mjs';
 function createV2Carrier({fetch:send=globalThis.fetch,now=Date.now}={}) {
   return async (request,env) => {
@@ -26,7 +26,7 @@ function createV2Carrier({fetch:send=globalThis.fetch,now=Date.now}={}) {
     const unavailable=()=>new Response('{"error":"unavailable"}',{status:503,headers:{...PRIVATE_WEB_HEADERS,'x-n88-transport-stage':stage,...(responseRegion?{'x-n88-service-region':responseRegion}:{})}});
     try {
       const url=new URL(request.url),origin=env.N88_PUBLIC_ORIGIN,upstream=new URL(env.N88_EDGE_URL);
-      if(url.origin!==origin || url.protocol!=='https:' || url.search || !/^\/api\/n88\/(?:teacher\/class\/publication-v2|student\/publication-v2\/read)$/.test(url.pathname) || !['GET','POST'].includes(request.method) ||
+      if(url.origin!==origin || url.protocol!=='https:' || url.hash || (url.pathname==='/api/n88/student/publication-v2/read'?request.method!=='GET'||!parseStudentScopePath(url.pathname+url.search):url.search||url.pathname!=='/api/n88/teacher/class/publication-v2'||request.method!=='POST') ||
         !request.cf || !['TLSv1.2','TLSv1.3'].includes(request.cf.tlsVersion) || request.headers.has('cf-worker') ||
         upstream.protocol!=='https:' || upstream.username || upstream.password || upstream.search || upstream.hash ||
         !/^\/functions\/v1\/n88-student-portal$/.test(upstream.pathname))return privateResponse(401);
@@ -41,7 +41,9 @@ function createV2Carrier({fetch:send=globalThis.fetch,now=Date.now}={}) {
       const headers=new Headers();for(const n of FORWARDED){const v=request.headers.get(n);if(v!==null)headers.set(n,v);}
       const bytes=await readBytes(request.body,4096,abort.signal);
       const time=String(Math.floor(now()/1000)),nonce=crypto.randomUUID(),source=await mac(key,JSON.stringify(['source-v1',ip]));
-      const signature=await mac(key,signingText({origin,path:url.pathname,method:request.method,headers,bodyHash:await sha(bytes),time,nonce,source}));
+      if(request.method==='GET'&&bytes.length)return privateResponse(400);
+      const signedPath=url.pathname+url.search;
+      const signature=await mac(key,signingText({origin,path:signedPath,method:request.method,headers,bodyHash:await sha(bytes),time,nonce,source}));
       // Fixed upstream URL and metadata headers: private route, PIN, bearer and
       // cookie occur ONLY in TLS request body, never managed invocation URL/headers.
       const wire=new Headers({'content-type':'application/json'});
@@ -51,7 +53,7 @@ function createV2Carrier({fetch:send=globalThis.fetch,now=Date.now}={}) {
       // Trusted placement is carrier-owned, outside the unchanged signed envelope.
       if(request.method==='POST'&&url.pathname==='/api/n88/teacher/class/list')wire.set('x-region','ap-south-1');
       for(const [n,v] of Object.entries({'x-n88-time':time,'x-n88-nonce':nonce,'x-n88-source':source,'x-n88-signature':signature}))wire.set(n,v);
-      const payload=JSON.stringify({path:url.pathname,method:request.method,headers:FORWARDED.map(n=>headers.get(n)||''),body:encodeBytes(bytes)});
+      const payload=JSON.stringify({path:signedPath,method:request.method,headers:FORWARDED.map(n=>headers.get(n)||''),body:encodeBytes(bytes)});
       if(new TextEncoder().encode(payload).length>24576)return privateResponse(413);
       stage='upstream';
       const result=await send(upstream.href+'/dispatch',{method:'POST',headers:wire,body:payload,

@@ -81,7 +81,7 @@ export function createExistingHost(readEnv) {
   };
   try {
     const handle=createWebEntry({...manifest,rollout,canonicalBounds:{rollout},origin,authUrl,apiKey:required('N88_AUTH_API_KEY'),secretKey,ingressKey,numericKey,reservationKey,recoveryKeys,recoveryActiveKeyVersion,acquire,
-      publicationRuntime:readEnv('N88_PUBLICATION_V2_ENABLED')==='true'?{enabled:true,studentTeachingId:required('N88_PUBLICATION_V2_TEACHING_ID'),assertTransport:assertRestrictedTransport}:undefined,
+      publicationRuntime:readEnv('N88_PUBLICATION_V2_ENABLED')==='true'?{enabled:true,assertTransport:assertRestrictedTransport}:undefined,
       sourceOnly:false,canonicalReadback:true,privateIngressReadback:true});
     return Object.freeze({handle,close:()=>pool.end()});
   }catch{void pool.end();throw Error('n88_configuration');}

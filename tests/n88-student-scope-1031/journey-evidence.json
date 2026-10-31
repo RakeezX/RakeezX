@@ -1,0 +1,247 @@
+{
+  "checks": [
+    {
+      "name": "actual_signed_single_scope_auto_numeric_auth",
+      "status": "PASS",
+      "evidence": {
+        "singleAutomatic": true,
+        "originalNumericAuth": true,
+        "actualCarrierAndWebEntry": true
+      }
+    },
+    {
+      "name": "overlap_terms_choice_only_explicit_single_projection_and_signed_tamper",
+      "status": "PASS",
+      "evidence": {
+        "explicitChoice": true,
+        "sameSubjectRealTermLabels": true,
+        "noCombinedProjection": true,
+        "manualScopeIsolation": true,
+        "signedSelectorTamperDenied": true,
+        "bodylessGET": true
+      }
+    },
+    {
+      "name": "old_legacy_path_and_pilot_exact_teaching_fence",
+      "status": "PASS",
+      "evidence": {
+        "legacyResponseNotReinterpreted": true,
+        "legacySearchStillDenied": true,
+        "pilotExactTeachingAndTwoPupilsPreserved": true,
+        "legacyStatus": 503
+      }
+    },
+    {
+      "name": "mounted_actual_student_scope_selection_retired_reply_rtl",
+      "status": "PASS",
+      "evidence": {
+        "actualNumericEntry": true,
+        "nativeSignedHTTP": true,
+        "choiceBeforeProjection": true,
+        "maliciousLabelEscaped": true,
+        "retiredSelectionReplyIgnored": true,
+        "crossTabAndReloadClear": true,
+        "mobile390NoOverflow": true
+      }
+    },
+    {
+      "name": "second_owner_exact_scope_rotation_and_transfer_retire_session",
+      "status": "PASS",
+      "evidence": {
+        "sameIdsDifferentOwnersIsolated": true,
+        "noForeignGradesOrManualWork": true,
+        "rotationRetiresOldSession": true,
+        "currentClassTransferRetiresSession": true
+      }
+    },
+    {
+      "name": "scope_removal_transfer_archive_and_numeric_revocation",
+      "status": "PASS",
+      "evidence": {
+        "removedSelectionDenied": true,
+        "zeroEligibleEmpty": true,
+        "archivedClassDenied": true,
+        "restoreCannotReviveOldSession": true,
+        "numericRevocationStillDenies": true
+      }
+    }
+  ],
+  "wires": [
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJhY3Rpb24iOiJsaXN0Iiwic2NvcGUiOnsib3duZXJJZCI6ImFhYWFhYWFhLWFhYWEtNGFhYS04YWFhLWFhYWFhYWFhYWFhYSIsInRlYWNoaW5nSWQiOiJ0ZWFjaGluZyIsInNlY3Rpb25JZCI6ImNsYXNzIiwidGVybUlkIjoidGVybSIsInN1YmplY3RJZCI6ImN1c3RvbSJ9LCJiaW5kaW5nIjp7InNlc3Npb25JZCI6IjExMTExMTExLTExMTEtNDExMS04MTExLTExMTExMTExMTExMSIsImxlYXNlSWQiOiJzY29wZS1vd25lZC1zeW50aGV0aWMiLCJjb250ZXh0UmV2aXNpb24iOiJzY29wZS1zb3VyY2UtMSJ9fQ=="
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJ2ZXJzaW9uIjoyLCJhY3Rpb24iOiJpdGVtLXB1YmxpY2F0aW9uLXNldCIsInJlcXVlc3RJZCI6Ijg3NjhkYzlhLWU1M2MtNGE3Mi1hZmZhLWUzM2NhYTM3Mjc0MSIsInNjb3BlIjp7Im93bmVySWQiOiJhYWFhYWFhYS1hYWFhLTRhYWEtOGFhYS1hYWFhYWFhYWFhYWEiLCJ0ZWFjaGluZ0lkIjoidGVhY2hpbmciLCJzZWN0aW9uSWQiOiJjbGFzcyIsInRlcm1JZCI6InRlcm0iLCJzdWJqZWN0SWQiOiJjdXN0b20ifSwiYmluZGluZyI6eyJzZXNzaW9uSWQiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJsZWFzZUlkIjoic2NvcGUtb3duZWQtc3ludGhldGljIiwiY29udGV4dFJldmlzaW9uIjoic2NvcGUtc291cmNlLTEifSwiZXhwZWN0ZWRNZW1iZXJzaGlwUmV2aXNpb24iOiIwZTdkMGM0MDYyNzI1MjkwZTRlMTIzMTI5MDhlN2Y1N2M4ZjIzNGIwYTViZTZlOGM2OTY2MmEwNDQwNWJiZTA4Iiwic291cmNlSWQiOiJpdGVtLWEiLCJyb3dJZCI6IltcIml0ZW1cIixcIml0ZW0tYVwiLFwiaXRlbS1hXCJdIiwiZXhwZWN0ZWRTb3VyY2VSZXZpc2lvbiI6IjlhZGU3Y2ZhYzI0NjlmZDYwZTk3ODk1MzY5MjZlNjQxZTkzZGZhNTZkYjU4ZjEyYzgzNmY2OTZhODBmZTg2OWIiLCJleHBlY3RlZFB1YmxpY2F0aW9uUmV2aXNpb24iOjAsImRlY2lzaW9ucyI6eyJyZXF1aXJlZCI6ZmFsc2UsInNjaGVkdWxlZCI6ZmFsc2UsImNvbXBsZXRlZCI6ZmFsc2UsImdyYWRlIjp0cnVlfSwibWFudWFsVGFzayI6bnVsbH0="
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "headers": 6,
+      "body": "eyJjb2RlIjoiMTg1NzY2In0="
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJhY3Rpb24iOiJsaXN0Iiwic2NvcGUiOnsib3duZXJJZCI6ImFhYWFhYWFhLWFhYWEtNGFhYS04YWFhLWFhYWFhYWFhYWFhYSIsInRlYWNoaW5nSWQiOiJ0ZWFjaGluZzIiLCJzZWN0aW9uSWQiOiJjbGFzcyIsInRlcm1JZCI6InRlcm0yIiwic3ViamVjdElkIjoiY3VzdG9tIn0sImJpbmRpbmciOnsic2Vzc2lvbklkIjoiMTExMTExMTEtMTExMS00MTExLTgxMTEtMTExMTExMTExMTExIiwibGVhc2VJZCI6InNjb3BlLW93bmVkLXN5bnRoZXRpYyIsImNvbnRleHRSZXZpc2lvbiI6InNjb3BlLXNvdXJjZS0xIn19"
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJ2ZXJzaW9uIjoyLCJhY3Rpb24iOiJpdGVtLXB1YmxpY2F0aW9uLXNldCIsInJlcXVlc3RJZCI6IjVkMWExMjU1LTQ0MmItNDE3NC05YzM4LTk5OTc0ZWRlMmI3OCIsInNjb3BlIjp7Im93bmVySWQiOiJhYWFhYWFhYS1hYWFhLTRhYWEtOGFhYS1hYWFhYWFhYWFhYWEiLCJ0ZWFjaGluZ0lkIjoidGVhY2hpbmcyIiwic2VjdGlvbklkIjoiY2xhc3MiLCJ0ZXJtSWQiOiJ0ZXJtMiIsInN1YmplY3RJZCI6ImN1c3RvbSJ9LCJiaW5kaW5nIjp7InNlc3Npb25JZCI6IjExMTExMTExLTExMTEtNDExMS04MTExLTExMTExMTExMTExMSIsImxlYXNlSWQiOiJzY29wZS1vd25lZC1zeW50aGV0aWMiLCJjb250ZXh0UmV2aXNpb24iOiJzY29wZS1zb3VyY2UtMSJ9LCJleHBlY3RlZE1lbWJlcnNoaXBSZXZpc2lvbiI6IjM0MzEyMGU4NGE4MjMxNWRiMGJhOGZmMWMyNmU0NGQ3YzVjNTI1YWUyOTY4YzZmZjBhOGY3MDgzZDkzM2ZjZDIiLCJzb3VyY2VJZCI6Iml0ZW0tYiIsInJvd0lkIjoiW1wiaXRlbVwiLFwiaXRlbS1iXCIsXCJpdGVtLWJcIl0iLCJleHBlY3RlZFNvdXJjZVJldmlzaW9uIjoiNTVkYzBmOThkMjg4YTgwODE2ZDNkMDY2YmI5MTgyZjNjMjM5MzY3OWYwYTljOTc1ODhjNjZmODJjNzk2NWFhYSIsImV4cGVjdGVkUHVibGljYXRpb25SZXZpc2lvbiI6MCwiZGVjaXNpb25zIjp7InJlcXVpcmVkIjpmYWxzZSwic2NoZWR1bGVkIjpmYWxzZSwiY29tcGxldGVkIjpmYWxzZSwiZ3JhZGUiOnRydWV9LCJtYW51YWxUYXNrIjpudWxsfQ=="
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJhY3Rpb24iOiJsaXN0Iiwic2NvcGUiOnsib3duZXJJZCI6ImFhYWFhYWFhLWFhYWEtNGFhYS04YWFhLWFhYWFhYWFhYWFhYSIsInRlYWNoaW5nSWQiOiJ0ZWFjaGluZyIsInNlY3Rpb25JZCI6ImNsYXNzIiwidGVybUlkIjoidGVybSIsInN1YmplY3RJZCI6ImN1c3RvbSJ9LCJiaW5kaW5nIjp7InNlc3Npb25JZCI6IjExMTExMTExLTExMTEtNDExMS04MTExLTExMTExMTExMTExMSIsImxlYXNlSWQiOiJzY29wZS1vd25lZC1zeW50aGV0aWMiLCJjb250ZXh0UmV2aXNpb24iOiJzY29wZS1zb3VyY2UtMSJ9fQ=="
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJhY3Rpb24iOiJtYW51YWwtcHJldmlldyIsInNjb3BlIjp7Im93bmVySWQiOiJhYWFhYWFhYS1hYWFhLTRhYWEtOGFhYS1hYWFhYWFhYWFhYWEiLCJ0ZWFjaGluZ0lkIjoidGVhY2hpbmciLCJzZWN0aW9uSWQiOiJjbGFzcyIsInRlcm1JZCI6InRlcm0iLCJzdWJqZWN0SWQiOiJjdXN0b20ifSwiYmluZGluZyI6eyJzZXNzaW9uSWQiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJsZWFzZUlkIjoic2NvcGUtb3duZWQtc3ludGhldGljIiwiY29udGV4dFJldmlzaW9uIjoic2NvcGUtc291cmNlLTEifSwibWFudWFsVGFzayI6eyJpZCI6Im1hbnVhbC1hIiwidGl0bGUiOiLYudmF2YQg2KfZhNmG2LfYp9mCINin2YTYo9mI2YQiLCJkZXNjcmlwdGlvbiI6ItmF2YfZhdipINin2YTZhdi52YTZhSIsInN0YXJ0RGF0ZSI6bnVsbCwiZHVlRGF0ZSI6bnVsbCwibGluayI6Imh0dHBzOi8vZXhhbXBsZS50ZXN0L2V4cGxhbmF0aW9uIn19"
+    },
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "headers": 6,
+      "body": "eyJ2ZXJzaW9uIjoyLCJhY3Rpb24iOiJpdGVtLXB1YmxpY2F0aW9uLXNldCIsInJlcXVlc3RJZCI6ImM4NjJkMzI2LTY0YmEtNDJkMC05ZDNlLWRmMGIzYzE3MDFkOCIsInNjb3BlIjp7Im93bmVySWQiOiJhYWFhYWFhYS1hYWFhLTRhYWEtOGFhYS1hYWFhYWFhYWFhYWEiLCJ0ZWFjaGluZ0lkIjoidGVhY2hpbmciLCJzZWN0aW9uSWQiOiJjbGFzcyIsInRlcm1JZCI6InRlcm0iLCJzdWJqZWN0SWQiOiJjdXN0b20ifSwiYmluZGluZyI6eyJzZXNzaW9uSWQiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJsZWFzZUlkIjoic2NvcGUtb3duZWQtc3ludGhldGljIiwiY29udGV4dFJldmlzaW9uIjoic2NvcGUtc291cmNlLTEifSwiZXhwZWN0ZWRNZW1iZXJzaGlwUmV2aXNpb24iOiIwZTdkMGM0MDYyNzI1MjkwZTRlMTIzMTI5MDhlN2Y1N2M4ZjIzNGIwYTViZTZlOGM2OTY2MmEwNDQwNWJiZTA4Iiwic291cmNlSWQiOiJtYW51YWwtYSIsInJvd0lkIjoiW1wibWFudWFsXCIsbnVsbCxcIm1hbnVhbC1hXCJdIiwiZXhwZWN0ZWRTb3VyY2VSZXZpc2lvbiI6ImNkMDM2Y2ExYjliZWIxMDhkZGJiZDdmNDZmZWRlYjY3NDY4NDU3MjBiZjMyMzNlZTVlNTMxNTExMDhmMjMyY2MiLCJleHBlY3RlZFB1YmxpY2F0aW9uUmV2aXNpb24iOjAsImRlY2lzaW9ucyI6eyJyZXF1aXJlZCI6dHJ1ZSwic2NoZWR1bGVkIjpmYWxzZSwiY29tcGxldGVkIjpmYWxzZSwiZ3JhZGUiOmZhbHNlfSwibWFudWFsVGFzayI6eyJpZCI6Im1hbnVhbC1hIiwidGl0bGUiOiLYudmF2YQg2KfZhNmG2LfYp9mCINin2YTYo9mI2YQiLCJkZXNjcmlwdGlvbiI6ItmF2YfZhdipINin2YTZhdi52YTZhSIsInN0YXJ0RGF0ZSI6bnVsbCwiZHVlRGF0ZSI6bnVsbCwibGluayI6Imh0dHBzOi8vZXhhbXBsZS50ZXN0L2V4cGxhbmF0aW9uIn19"
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching2",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=other-teaching",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "headers": 6,
+      "body": "eyJjb2RlIjoiMTg1NzY2In0="
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching2",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "headers": 6,
+      "body": "eyJjb2RlIjoiMTM3NTAwIn0="
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "headers": 6,
+      "body": "eyJjb2RlIjoiMTA0MjExIn0="
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read?teaching=teaching2",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/claim",
+      "headers": 6,
+      "body": "eyJjb2RlIjoiMTg1NzY2In0="
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    },
+    {
+      "path": "/api/n88/student/publication-v2/read",
+      "headers": 6,
+      "body": ""
+    }
+  ],
+  "actualHostedOperations": 0
+}

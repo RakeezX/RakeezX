@@ -1,0 +1,348 @@
+{
+  "aiAuthored": true,
+  "sourceEncoding": "utf8-lf-preserve-bom",
+  "preparedEncoding": "utf8-lf-preserve-bom (normalize CRLF before upload; embedded asset base64 decodes exact bytes)",
+  "sourceBase": "5b77024e36f254a6568a0224abb9ea25d78698af",
+  "publishedUiDependency": "5b77024e36f254a6568a0224abb9ea25d78698af",
+  "publicationControlsDependency": "current-main src/views/student-portal-class.js (exclusive V2/V1 controls preserved)",
+  "enabled": false,
+  "flags": {
+    "N88_PUBLICATION_V2_ENABLED": false,
+    "PUBLICATION_V2_READINESS": false,
+    "V1Readiness": true
+  },
+  "installed": false,
+  "builder": "esbuild@0.28.1",
+  "inputs": {
+    "src/lib/rakeez-datetime-values.js": "a912d3a19c6130c3eb3e8544bcefe4437cdb54e6e4026b5868082814495ba8f7",
+    "src/lib/n88-manual-task-link-safety.js": "09740c1d6c78f6aa40a2967b92e6881ce961043d0695332774dc55e8be5299fb",
+    "src/lib/n88-item-publication-proposal.js": "45f49d3bd38e4720f9675e2b92a706dbd674585da3695ed8542c4b2a4a102cad",
+    "src/lib/student-portal-publication-client.js": "e65af461ae9d12d2a8b1c68eaf74a8af7246ade5feea968de3c72c1e020052ba",
+    "src/lib/student-portal-unified-client.js": "d4b879b93b9a1b6b65355ba47f9ed0e6475bf109eb2429709db7242edb389164",
+    "src/lib/visible-numerals.js": "28187fdd7a8d444be2644cd5d8e14efff51c6f95e87d549905099ea5a2245575",
+    "src/lib/visible-viewport.js": "7fc9444ad7d95b56de3b4493634ec201af720206c57264d661b1d292f9e2898a",
+    "src/lib/dom.js": "a7b0b7173dd8f05738d4d7c7a2be001a7c5ad82e332a04889c93751edab86480",
+    "src/lib/brand.js": "0b46aa8ad014afd3b84163bdb2e002e486b606ee9e1ea370b44ca64894c087d5",
+    "src/vendor/flatpickr/flatpickr.min.js": "1eeab1cb779471a0b0aaa93dd91c2eb1aa537d696f01ab05ea9dabc55e8525a1",
+    "src/vendor/flatpickr/ar.js": "ae0584eb50898ce251667bdcb3eae30f9ea1eb009af6b87773f1a9fb87bae90b",
+    "src/lib/rakeez-datetime.js": "6e2bf54eb828ae47f75f15e64f74d33b3092ae160b213e258af2b07d6ed90a2d",
+    "src/views/student-portal-publications.js": "9038bea7ade7fdf0ed342b060d7f195c655e331316e30d4d241da8ae42392e0e",
+    "src/views/student-portal-login.js": "fd923eea42423d2a532201cd3d7be43030934dac96fdbb8e6dd5929d200ce422",
+    "drafts/n88-student-portal/client/binding-proof.js": "6e9582ff6f24e0d2ed959910bc214b920ea9e1bebf7657c7ee5f60f6cd4bbab6",
+    "drafts/n88-student-portal/client/student-entry.js": "9c7768a245e06d11f8be9abf62d1397f43451cbd4cc9ef6e292572532177b732",
+    "drafts/n88-student-portal/activation/node-globals.mjs": "1e8c9a351d2b1621e31d616852dac13b4734b439c55ad31c0bed177aadb20157",
+    "drafts/n88-student-portal/deployment.inactive.json": "4a6c0e5ae5f565db5f73ad6db2470e6db8dbad917ce5b98cf175192fdd8849fd",
+    "drafts/n88-student-portal/receipt-reconciliation.mjs": "d88f0b94be9aaf187d3cf76271515a4be50fd72436afdf7da8789ac8d6a9e271",
+    "drafts/n88-student-portal/receipt-terminal-review.inactive.mjs": "81ec20608d6fc1d0c4f7a1e18ae2e5e3d04585d49386ba93f4e2d63205edd92f",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/operations.json": "d74c04c75ddd033b3130e7cdccb0d4001959b80c7e9091e8d1be34e2e496b34e",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/boundary.mjs": "641e5a95c728050a9270df1644c1d0cb436c21ca75588ce106da94f5e077d92a",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs": "f40e74d8d1adb5d154d1d8de66133ed560a952a91dac3fa47776288fce896ee9",
+    "drafts/n88-student-portal/task-guidance.mjs": "a3b929b13ce02d05a211cf9eb078cf3f3403a3ec6db04a7271f3c878741de88a",
+    "src/lib/score-foundation.js": "d759fbec5a53638f2e05873df76db734430c8aafdc8b069bcdbbd23708e9af48",
+    "src/models.js": "08d3ff0b07c8e02ee86c62572c1a2332cf079d4642a403a9cc6de14f7aabe7dc",
+    "drafts/n88-student-portal/canonical-grade-context.mjs": "1595f7588c9a683be570986bde907c2b6a3eb22ccdc3e00fa8cd43eb8c51152f",
+    "drafts/n88-student-portal/visibility-policy.mjs": "2ec1640819029af319bf0ccbefdddd29dd7566f43229937224470a2dd13c73e4",
+    "drafts/n88-student-portal/student-projection.mjs": "9191b46959fd04a101304ae9d8fe31c553831a0362ea9bcc8be83f4f9cab57dd",
+    "drafts/n88-student-portal/service.mjs": "a8fc5c8179611e1c0588bbd3d77f1535084455a00285f9d30cd6eaba81c5c6c5",
+    "drafts/n88-student-portal/web-protocol.mjs": "1aa5abc3d62e4b241bc3917942fb761d5d2544cb0d06169f86b49b1c203acf60",
+    "drafts/n88-student-portal/publication-v2-service.inactive.mjs": "6e75c80ecdd52526d1d0e0705648d59aefb652a0c3b085c5e3daeaf1c65c03b5",
+    "drafts/n88-student-portal/rollout-guard.mjs": "8dbba7aff362cb43426d6d4abe72abe0f04e99284c42de399623cb453d0e2604",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+    "drafts/n88-student-portal/class-credentials.mjs": "80c59baeba5ea6b2bc34cf94b1e0e14255e81b347ba7ebced291313b8e889fdb",
+    "drafts/n88-student-portal/code-recovery.mjs": "ecc33c475b5bd05f09fd2baa90002f9f63c0c71dff81464183c86d8020391c55",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/integrated-service.mjs": "54789efede9e52ef3d521a148b51f6abe82bbf8c3a8a433bd2a577ae0ea51719",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-read-operations.json": "ad5445a843afbfe464869fa6789b518d0f80fcb5518cd611c93442da768e9ccf",
+    "drafts/n88-student-portal/activation/read-service-20261023/typed-identities.json": "1c9e9f0419bb2450acfab84996c9a6afc2566f07cb62398d2ae59a704f1dec04",
+    "drafts/n88-student-portal/activation/v2-external-plan-1028/read-authority.json": "2b5e1f0eed50c741ffccaf65d6e1785b791d53d809fc3a47ef3b3f7e41890acf",
+    "drafts/n88-student-portal/activation/error-boundary-contract.json": "19640c963f6696dbacfc68fbcac06ecc75765701686aaa08aed4fb52f1f753cb",
+    "drafts/n88-student-portal/activation/error-boundary-identities.json": "bfa4db631b64e41dce71eecaa37228c865e0851b8f6580d028db1f12ead57cd4",
+    "drafts/n88-student-portal/activation/private-error-boundary.mjs": "d897789737dd6442fe0f51b1efe6deb7c86531bab658366c41453304dd01281f",
+    "drafts/n88-student-portal/postgres-repository.mjs": "ee11051db7af7412cc76dd747c69921c525bfdd4f6bc058d04ff3629f3aa63fe",
+    "drafts/n88-student-portal/http-adapter.mjs": "e8c2e7017e0ce518a01a2f0bbcde5422015a8c3501b9d88597aeb35544b1bea0",
+    "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+    "drafts/n88-student-portal/runtime.mjs": "0c2abe8d798b302656c4a13d46c2ada6035b1e1afa2401c7c1a1c5a553e8b2c2",
+    "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs": "70a260cb41aac726decf504b6904cbcfefa0c785ba78ae72cfb86128ea150526",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "eb317b16a492375db58871ce2b5326aa178f4cba86ba997f8434e5a530cd8860",
+    "drafts/n88-student-portal/activation/v2-student-scope-1031/labels.mjs": "edcdae653c939980ea61d3bc5767fec12344e74b06183e02bcda9467a2e81948",
+    "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs": "e9bb637d11cba86cf0e6f9dc0214509467a2f56e8ca0ee85c2fddb8d76111a4e",
+    "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs": "d0700274f6d4ba4d958830fb4ca737d43c82df9730cc188389ecce5a167920a6",
+    "drafts/n88-student-portal/activation/v2-package-1028/manifest.json": "8138a716764d4767ec34d40a295fcf31cf1d39ae7ca69db00328732d85f42dd0",
+    "drafts/n88-student-portal/activation/v2-student-scope-1031/manifest.json": "ff13ad5308dbd7571ae5b5b8951ac8e2ceb1643c868b995045109b03ee60e930",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs": "8685b3497fbdcb208edfb5050d88b9f261e5a9fee250bc36511b3d35177c4a61",
+    "drafts/n88-student-portal/web-entry.mjs": "f84f59a29b892681c501aa0a282a231337514a698bb45a6e47b3ef84196547ad",
+    "drafts/n88-student-portal/activation/database-transport.mjs": "b8dee65bdc57e04da34c9c4ef8cfc5506a38d1140db893675509abe1e2d98326",
+    "drafts/n88-student-portal/existing-host.mjs": "970cadccfbea2a5e4c337e33bd0a5bc74e5a1eae1a96d264d85f7a26a9f0ebd3",
+    "drafts/n88-student-portal/activation/readiness-entry.mjs": "fdf2c5cbdf48d7a90c85e0cf816768ca3f77400f62977900a62ab483850b573f",
+    "drafts/n88-student-portal/activation/edge-request.mjs": "acf653ee96cdd3705fcae5b6dea376130200d14ada27a1016ff4a02fcb361330",
+    "supabase/functions/n88-student-portal/index.ts": "0582560364c98186ad94347d90fe4d14cbbeff6b00fc3220ef30a6564dd16aff",
+    "drafts/n88-student-portal/activation/private-document.mjs": "483d87b4889e1884cb34da521f4b1d53b1bd22977884e8e3b62907007316642f",
+    "drafts/n88-student-portal/cloudflare-entry.mjs": "fc07c6fbc6c77f59ccfd306597e20e1239adcef111ed34b3fef35cef521bc16e",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gateway.inactive.mjs": "06c03bb23ee50eef572bbcc9f3ee9b3767f36fbe9849484d4ec12aa968e01e05",
+    "drafts/n88-student-portal/activation/v2-student-scope-1031/private-assets.inactive.mjs": "3fb5d05688e7b1b56aa2fcf7be5b59781a5b4be6ca6e81fbb0eab742d3173e07",
+    "drafts/n88-student-portal/activation/v2-student-scope-1031/gateway.inactive.mjs": "b9c823d01541ce6542349682604970077bc392c80e2260aff396783030568c10"
+  },
+  "outputs": {
+    "student": "43b0923abfe546ef4d203c7d2ccf510066acf3e5aa96cf5a6511338d16a2c3c2",
+    "service": "9beb6a6685fabee6ac49e97c65cdb59b928975df2442ba5f35dc1f5ac73e6d1f",
+    "gateway": "e99d58320df99cb4c7b9ce72cbce1fe2f25a8996c8db2149742731991e92493a"
+  },
+  "assets": {
+    "/student": {
+      "type": "text/html; charset=utf-8",
+      "sha256": "16a23577cc44f3d72584ef1ac0c1b44d6c3598ebdb2304c659c4e7d498c8e20c",
+      "changed": false
+    },
+    "/n88-private/assets/student.mjs": {
+      "type": "text/javascript; charset=utf-8",
+      "sha256": "43b0923abfe546ef4d203c7d2ccf510066acf3e5aa96cf5a6511338d16a2c3c2",
+      "changed": true
+    },
+    "/n88-private/styles/app.css": {
+      "type": "text/css; charset=utf-8",
+      "sha256": "b572efdb1703ff17e7aca1161dfdf8bcf5649311a88b48889243b54c01d1d045",
+      "changed": true
+    },
+    "/n88-private/styles/student-portal-login.css": {
+      "type": "text/css; charset=utf-8",
+      "sha256": "9f1f9a093ea76c7bc5eb08f9aa90b1dc490f6dbc163675534340accb07f8c464",
+      "changed": true
+    },
+    "/n88-private/assets/brand/header-light-standard.svg": {
+      "type": "image/svg+xml",
+      "sha256": "9df8aadcdc294581a424bda8bfbe488f1a3120fee57f5d3cff969aa67393e29f",
+      "changed": false
+    },
+    "/n88-private/assets/brand/header-light-compact.svg": {
+      "type": "image/svg+xml",
+      "sha256": "7a7cdc0d29e48e47a68fea8ca28e1a3eca3aa5a3e25ca62fbf052cd0602377fa",
+      "changed": false
+    },
+    "/n88-private/assets/brand/header-dark-standard.svg": {
+      "type": "image/svg+xml",
+      "sha256": "3599a0eb29126571396a7ea00d715393ba9b72c9ea8cb7687a0f1c43a6222390",
+      "changed": false
+    },
+    "/n88-private/assets/brand/header-dark-compact.svg": {
+      "type": "image/svg+xml",
+      "sha256": "76bfc5d733b439c422e97dd25a848122f727983ba283e244c7e5c8110f969445",
+      "changed": false
+    },
+    "/n88-private/assets/brand/icon-192.png": {
+      "type": "image/png",
+      "sha256": "4bec74161cb7adbd2211e8e31618593d5ff0b8a2db50ab29696568be21c6f951",
+      "changed": false
+    },
+    "/n88-private/styles/student-portal.css": {
+      "type": "text/css; charset=utf-8",
+      "sha256": "0266d2930e199bc5f79c653f317046d2e589c6170fd347b3cb358dd0a547a610",
+      "changed": true
+    }
+  },
+  "externalServiceImports": [
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:process",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "pg",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:net",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "@supabase/auth-js",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "pg",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:buffer",
+      "kind": "import-statement",
+      "external": true
+    },
+    {
+      "path": "node:crypto",
+      "kind": "import-statement",
+      "external": true
+    }
+  ],
+  "denoImports": {
+    "@supabase/auth-js": "npm:@supabase/auth-js@2.118.0",
+    "pg": "npm:pg@8.23.1"
+  }
+}

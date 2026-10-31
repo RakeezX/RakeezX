@@ -11,8 +11,10 @@ import { manualTaskDraft } from '../../src/lib/n88-manual-task-link-safety.js';
 import { validDateTimeValue } from '../../src/lib/rakeez-datetime-values.js';
 import { CANONICAL_PROJECTION_REQUIREMENTS, studentPortalPublicationBindings, projectStudentPublicationV2 } from './student-projection.mjs';
 import { PRIVATE_HEADERS } from './service.mjs';
+import {parseStudentScopePath} from './web-protocol.mjs';
 
 export const PUBLICATION_V2_PATHS = Object.freeze(['/teacher/class/publication-v2', '/student/publication-v2/read']);
+export const isPublicationV2Path=path=>path===PUBLICATION_V2_PATHS[0]||!!parseStudentScopePath(path,'');
 const flags = ['required', 'scheduled', 'completed', 'grade'];
 const scopeKeys = ['ownerId', 'teachingId', 'sectionId', 'termId', 'subjectId'];
 const bindingKeys = ['sessionId', 'leaseId', 'contextRevision'];
@@ -30,7 +32,7 @@ const digest = v => createHash('sha256').update(JSON.stringify(stable(v))).diges
 const active = r => r && r.deleted === false && r.deletedAt == null && r.archivedAt == null && !['archived', 'closed', 'retired'].includes(r.status);
 const response = (status, body) => ({ status, body, headers: PRIVATE_HEADERS });
 const unavailable = () => response(503, { state: 'unknown', retry: false });
-const pupilInput = (snapshot, scope, member) => ({ canonical: snapshot.canonical, ownerId: scope.ownerId,
+const pupilInput = (snapshot, scope, member) => ({ canonical: snapshot.canonical, selectedTeachingId:scope.teachingId, ownerId: scope.ownerId,
   classId: scope.sectionId, termId: scope.termId, studentId: member.studentId, enrollmentId: member.id,
   teacherContextVersion: 'n88-canonical-teacher-context-v1', now: snapshot.now });
 
@@ -140,9 +142,9 @@ export function createPublicationV2Service({ executionMode, runtimeCapability, e
   if (enabled !== true || !publicationRuntimeAllowed(executionMode,runtimeCapability)) return async () => response(401, { error: 'unavailable' });
   if (![transaction, authenticate, readCurrent].every(fn => typeof fn === 'function') || !origin) fail();
   return async request => {
-    const student = request.path === PUBLICATION_V2_PATHS[1], r = request.body;
+    const student = !!parseStudentScopePath(request.path,''), r = request.body;
     const h = request.headers ?? {};
-    if (!PUBLICATION_V2_PATHS.includes(request.path) || request.method !== (student ? 'GET' : 'POST') ||
+    if (!isPublicationV2Path(request.path) || request.method !== (student ? 'GET' : 'POST') ||
         h.origin !== origin || h['x-n88-csrf'] !== '1' || h['sec-fetch-site'] && h['sec-fetch-site'] !== 'same-origin' ||
         !student && h['content-type'] !== 'application/json') return response(401, { error: 'unavailable' });
     try {
@@ -151,9 +153,15 @@ export function createPublicationV2Service({ executionMode, runtimeCapability, e
         if (!tx?.state || !Array.isArray(tx.state.scopes) || !Array.isArray(tx.state.receipts) || typeof tx.beforeCommit !== 'function') fail();
         const auth = await authenticate(request, tx, student ? 'student' : 'teacher');
         if (auth?.current !== true || !id(auth.ownerId) || !id(auth.sessionId)) fail();
+        if (tx.bindOwner) await tx.bindOwner(auth.ownerId);
+        if(student&&auth.selectionState&&auth.selectionState!=='selected'){
+          if(r!=null||!['choice','empty'].includes(auth.selectionState)||!Array.isArray(auth.choices))fail();
+          const before=digest(auth);
+          tx.beforeCommit(async()=>{if(digest(await authenticate(request,tx,'student'))!==before)fail();});
+          return response(200,{version:'n88-student-scope-v2',state:auth.selectionState,choices:auth.choices});
+        }
         // AI: durable ports load ONLY the authenticated owner, in this same
         // repository transaction. Existing synthetic ports need no load hook.
-        if (tx.bindOwner) await tx.bindOwner(auth.ownerId);
         const scope = student ? auth.scope : r?.scope;
         if (!exact(scope, scopeKeys) || !scopeKeys.every(k => id(scope[k])) || scope.ownerId !== auth.ownerId) fail();
         if (student) {
@@ -182,7 +190,8 @@ export function createPublicationV2Service({ executionMode, runtimeCapability, e
         if (student) {
           const member = current.members.find(m => m.studentId === auth.studentId && m.id === auth.enrollmentId);
           if (!member) fail();
-          return response(200, projectStudentPublicationV2(pupilInput(snapshot, scope, member), current.draft, stored.publications));
+          const projection=projectStudentPublicationV2(pupilInput(snapshot, scope, member), current.draft, stored.publications);
+          return response(200,auth.selectionState?{version:'n88-student-scope-v2',state:'selected',teachingId:scope.teachingId,choices:auth.choices,projection}:projection);
         }
         if (r.action === 'manual-preview' && exact(r, ['action', 'scope', 'binding', 'manualTask']) &&
             exact(r.manualTask, ['id', 'title', 'description', 'startDate', 'dueDate', 'link'])) {

@@ -11,6 +11,8 @@ import sourcePacket from '../v2-package-1028/manifest.json' with {type:'json'};
 import oldContract from '../error-boundary-contract.json' with {type:'json'};
 import typed from '../read-service-20261023/typed-read-operations.json' with {type:'json'};
 import {assertVerifiedBoundary,privateQuery} from '../private-error-boundary.mjs';
+import {LABEL_READ} from '../v2-student-scope-1031/labels.mjs';
+import labelPacket from '../v2-student-scope-1031/manifest.json' with {type:'json'};
 const fail=()=>{throw Error('n88_v2_host_unavailable');};const must=v=>{if(!v)fail();};
 const sha=s=>createHash('sha256').update(s).digest('hex');
 const clean=r=>({command:r.command,rowCount:r.rowCount,rows:r.rows});
@@ -24,7 +26,9 @@ export async function createHostedPublicationV2Runtime({enabled=false,acquire,as
  const oldReads=new Map([...oldContract.operations,...typed].filter(o=>o.sql===currentSession||o.sql===ingressSql||/^select n88_private\.lock_(?:canonical|projection)_sources\(/.test(o.sql)||o.sql.includes('from rakeezx.')).map(o=>[o.sql,o]));
  const prove=async c=>{const token=await authorizeRuntimeConnection(c,{expectedSystemIdentifier,assertTransport});await assertVerifiedBoundary(c);
  const fs=(await c.query(`select proname,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,prosecdef,pg_get_userbyid(proowner) as owner,has_function_privilege(current_user,p.oid,'EXECUTE') as callable,(has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE')) as public_call from pg_proc p where pronamespace='n88_private'::regnamespace and proname=any($1::text[]) order by proname`,[sourcePacket.functions.map(f=>f.name)])).rows;
- must(fs.length===14&&fs.every((f,i)=>f.proname===sourcePacket.functions[i].name&&f.definition===sourcePacket.functions[i].definition&&f.prosecdef&&f.owner==='n88_v2_guard'&&!f.callable&&!f.public_call));return token;};
+ must(fs.length===14&&fs.every((f,i)=>f.proname===sourcePacket.functions[i].name&&f.definition===sourcePacket.functions[i].definition&&f.prosecdef&&f.owner==='n88_v2_guard'&&!f.callable&&!f.public_call));
+ const label=(await c.query(`select encode(sha256(convert_to(prosrc,'UTF8')),'hex') as body,prosecdef,pg_get_userbyid(proowner) as owner,proconfig,has_function_privilege(current_user,oid,'EXECUTE') as callable,(has_function_privilege('anon',oid,'EXECUTE') or has_function_privilege('authenticated',oid,'EXECUTE')) as public_call from pg_proc where pronamespace='n88_private'::regnamespace and proname='safe_student_scope_labels_1031'`)).rows;
+ must(label.length===1&&label[0].body===labelPacket.labelRead.bodySha256&&label[0].prosecdef&&label[0].owner==='postgres'&&label[0].callable&&!label[0].public_call&&JSON.stringify(label[0].proconfig)==='["search_path=pg_catalog"]');return token;};
  const first=await acquire();let runtimeCapability;try{runtimeCapability=await prove(first);}finally{first.release();}
  const repository=createPublicationV2PostgresRepository({executionMode:'hosted',runtimeCapability,transactionMs,acquire:async()=>{const c=await acquire();try{await prove(c);return {query:(sql,args)=>oldReads.has(sql)?privateQuery(c,sql,args):c.query(sql,args),release:broken=>c.release(broken)};}catch{c.release(Error('n88_v2_host_unavailable'));fail();}}});
   const scopeOwner = 'select set_config(\'n88.v2_owner\',$1,true)';
@@ -61,6 +65,12 @@ export async function createHostedPublicationV2Runtime({enabled=false,acquire,as
         return clean(r);
       };
       const query = async (sql, args = []) => {
+        if(sql===LABEL_READ.sql){
+          must(identity?.role==='student'&&located&&args.length===1&&typeof args[0]==='string'&&args[0].length<=4096);
+          const labelArgs=JSON.parse(Buffer.from(args[0],'base64').toString('utf8'));
+          must(Array.isArray(labelArgs)&&labelArgs.length===4&&labelArgs[0]===identity.ownerId&&labelArgs[1]===located.classId&&labelArgs[2]===identity.sessionId&&/^\d{4}-\d{2}-\d{2}$/.test(labelArgs[3]));
+          try{return await ports.query(sql,args);}catch{ports.poison();fail();}
+        }
         must(oldReads.has(sql) && args.length === oldReads.get(sql).parameters.length);
         if (sql === currentSession) must(args.every(v => typeof v === 'string' && /^[a-f0-9-]{36}$/.test(v)));
         else if(sql===ingressSql)must(typeof args[0]==='string'&&/^[a-f0-9-]{36}$/.test(args[0])&&Number.isSafeInteger(args[1])&&args[1]>Math.floor(now()/1000)&&args[1]<=Math.floor(now()/1000)+32);

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-student-scope-source-20261031",
+  "runId": "9f046986-1f78-4ad5-a247-397a19fc7e66",
+  "sourceBase": "5b77024e36f254a6568a0224abb9ea25d78698af",
+  "enabled": false,
+  "installed": false,
+  "hostedOperations": 0,
+  "sqlBundleSha256": "aaaeb23eb4cb5e22c510cda30cc46c9d7f2bcaab798bb6749762aefb7c8eeb62",
+  "installerSha256": "3cb168cd95a260cd16b89d5f2ad17d9418e79ed2ea0020b2aee45be4e5c4f959",
+  "disableSha256": "f1328e7eb4464d68dfb707a967ac7b5de11e090620d919729de1cd9950deb77c",
+  "readbackSha256": "d83fc9c595d76604f3f2c517238732ef0d9ce3adb8ef391d2f66f8b7901ba819",
+  "outputs": {
+    "student": "43b0923abfe546ef4d203c7d2ccf510066acf3e5aa96cf5a6511338d16a2c3c2",
+    "service": "9beb6a6685fabee6ac49e97c65cdb59b928975df2442ba5f35dc1f5ac73e6d1f",
+    "gateway": "e99d58320df99cb4c7b9ce72cbce1fe2f25a8996c8db2149742731991e92493a"
+  },
+  "assetAllowlist": [
+    "/n88-private/assets/brand/header-dark-compact.svg",
+    "/n88-private/assets/brand/header-dark-standard.svg",
+    "/n88-private/assets/brand/header-light-compact.svg",
+    "/n88-private/assets/brand/header-light-standard.svg",
+    "/n88-private/assets/brand/icon-192.png",
+    "/n88-private/assets/student.mjs",
+    "/n88-private/styles/app.css",
+    "/n88-private/styles/student-portal-login.css",
+    "/n88-private/styles/student-portal.css",
+    "/student"
+  ],
+  "flags": {
+    "N88_PUBLICATION_V2_ENABLED": false,
+    "PUBLICATION_V2_READINESS": false,
+    "V1Readiness": true
+  },
+  "privateReaders": [
+    {
+      "id": "student-scope-labels-1031",
+      "name": "safe_student_scope_labels_1031",
+      "bodySha256": "c404e514185e2d2f84300cf7945d6eb3225ad2eddffc6d58d592bf1771562ff1",
+      "parameters": [
+        "owner:uuid",
+        "class:text200",
+        "verifiedNumericSession:uuid",
+        "currentDate:ISO"
+      ],
+      "maxRows": 2000,
+      "maxBytes": 2097152
+    }
+  ],
+  "storage14Unchanged": true,
+  "deliverySha256": "0cbf90605854181d43c045bcc59db03a05f06c1e533cb86b0f3c9c304e6d3390"
+}
