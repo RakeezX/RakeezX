@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-runtime-writer-integration-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100031,
+      "scopeKey": "n88-durable-publication-runtime-writer",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a1822d-de76-76d3-89eb-78fb47247a17",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-owner-admin-storage-install-20261031"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/runtime.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/**",
+        "tests/n88-runtime-writer-1031/**",
+        "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/hosted-runtime.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/sync-delete-attachment.sql"
+      ],
+      "requiredChecks": [
+        "n88_actual_restricted_login_finite_runtime_composition",
+        "n88_genuine_sync_rpc_same_transaction_retirement_receipt",
+        "n88_delete_restore_replay_conflict_rollback_owner_isolation",
+        "n88_exact_runtime_writer_package_default_off"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only complete runtime and genuine Sync/Delete attachment integration"
+      },
+      "releaseAuthority": "Latest explicit PO continuation on 2026-10-31 authorizes concrete engineering, affected native validation and inactive source-only publication through the original sole publisher. Existing installed storage is reused. This preparatory card does not replay the consumed storage grant or mutate hosted schema/Auth/data/runtime. Root will review the exact new delta and carry the standing user authorization into a separately bound hosted continuation after the candidate is concrete.",
+      "objective": "CURRENT MATERIAL GAP: actual N88 four-table/14-operation storage was installed and verified in project xlrubcwjqktzzunrvuns, main7417d8c2833f9036d254d1c07106bf3605db9d7d; service/runtime and genuine Sync/Delete attachment remain OFF. Original controller is healthy but had no next task. Resume original package session with current published source; do NOT reinstall storage or rerun completed actor/role/native packet campaigns. Deliver ONE cohesive production-capable runtime plus genuine canonical writer integration candidate, not another isolated mock or report-only layer. Reuse existing finite bridge/catalog and installed contracts. Review docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md for current installed state, not obsolete unapproved-install notes.\n\nBuild explicit hosted-capable finite runtime assembly with exact target/role/current-session/owner binding, bounded transaction/cleanup and original Auth/numeric admission. Prefer the smallest viable reuse of the existing restricted transport/credential contract; do not invent a new-credential blocker before proving it. Never relabel a real hosted client as synthetic or accept a privileged local SET ROLE harness as proof of restricted-login boundaries. Keep original local-only host proof honest; share internal pure logic if useful. New owned assembly/finite operations must not weaken or send denied SQL through old private-error-boundary. No raw Auth/private table exposure, generic service-role fallback, secret output, or new public UI complexity. Verify actual restricted LOGIN sessions, RESET ROLE/SET ROLE and finite-operation allowlists in owned native PG17.\n\nAttach retirement to the genuine complete current rakeezx.apply_sync_v2_mutation function, using actual repository schema and migrations in native PostgreSQL. The prior lifecycle-attach callback-only DML test is not this proof. Do not edit already-applied migrations or pinned installed storage files. Build exact new draft attachment SQL under the owned new packet, pinned to the current actual writer definition and narrowly required scoped helpers/ACL. Preserve original envelope validation, original immutable receipt and request_envelope equality, original Auth, owner/advisory/row locks, CAS and grade4. Capture after valid admission/CAS and before accepted canonical mutation, complete retirement after all valid dependent mutations, then original receipt before SAME commit. Accepted delete of parent must not leave live children. Rejected/conflicting mutation creates no tombstone. Restore must not revive old IDs/links. Timeout/unknown disposition never blindly replays a write. Preserve original response/receipt behavior.\n\nRequired evidence is a real integrated native journey through the assembled service and full actual RPC: publish/read -> canonical edit/delete -> stale link unavailable -> restore with old link still invalid, replay vs differing-envelope mutation, cross-owner refusal, conflict/no-op, parent/child atomicity and rollback across canonical/V2/receipt at meaningful injected failure points. Reuse unchanged past tests; only run affected proof plus needed regression. Fix actual failures inside scope and rerun only affected cases. Publish one minimal exact manifest/install/disable packet with hashes, baseline, required transport/role delta and writer replacement, default OFF. Report engineering complete vs actual hosted acceptance distinctly. Root will use this artifact for immediate next live continuation; don't end at a vague future plan or missing callback that can be implemented here. No service writes, real accounts/tokens/data, phone/browser actions, queue/controller/publisher edits or second executor.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "ede7afef0181999815826a3e1405341c63080cdd",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/runtime.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "supabase/migrations/0012_sync_v2_server_protocol.sql",
+          "drafts/n88-student-portal/activation/v2-package-1028/lifecycle-attach.inactive.mjs",
+          "drafts/n88-student-portal/activation/v2-package-1028/manifest.json",
+          "docs/automation-evidence/20261031/N88_OWNER_ADMIN_STORAGE_INSTALL.md",
+          "tests/n88-backend-package-1028/native-composition.test.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/runtime.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/integrated-service.mjs",
+          "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/hosted-runtime.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-boundary.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/sync-delete-attachment.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/INSTALL.md",
+          "tests/n88-runtime-writer-1031/native-runtime.test.mjs",
+          "tests/n88-runtime-writer-1031/native-sync-delete.test.mjs",
+          "tests/n88-runtime-writer-1031/results.json",
+          "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/hosted-runtime.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-boundary.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/sync-delete-attachment.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/INSTALL.md",
+          "tests/n88-runtime-writer-1031/native-runtime.test.mjs",
+          "tests/n88-runtime-writer-1031/native-sync-delete.test.mjs",
+          "tests/n88-runtime-writer-1031/results.json",
+          "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md"
+        ],
+        "workerChecks": [
+          "n88_actual_restricted_login_finite_runtime_composition",
+          "n88_genuine_sync_rpc_same_transaction_retirement_receipt",
+          "n88_delete_restore_replay_conflict_rollback_owner_isolation",
+          "n88_exact_runtime_writer_package_default_off"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
