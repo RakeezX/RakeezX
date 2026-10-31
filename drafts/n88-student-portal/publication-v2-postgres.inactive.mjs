@@ -42,21 +42,27 @@ export function createPublicationV2PostgresRepository({ executionMode, runtimeCa
   must(publicationRuntimeAllowed(executionMode,runtimeCapability) && typeof acquire === 'function' && Number.isInteger(transactionMs) && transactionMs >= 50 && transactionMs <= 10000 &&
     Number.isInteger(cleanupMs) && cleanupMs >= 1 && cleanupMs <= 1000);
   return Object.freeze({ async transaction(action) {
-    let client, live = true, committed = false, begun = false, timer, released = false;
+    let client, poisoned = false, live = true, committed = false, begun = false, timer, released = false;
     const release = (c, broken) => { if (!released) { released = true; c.release(broken ? Error('n88_v2_storage_unavailable') : undefined); } };
     const deadline = Date.now() + transactionMs, guards = [];
-    const fence = () => must(live && Date.now() < deadline);
-    const query = async (sql, args = []) => { fence(); const r = await client.query(sql, args); fence(); return r; };
+    const fence = () => must(live && !poisoned && Date.now() < deadline);
+    const query = async (sql, args = []) => { fence(); try { const r = await client.query(sql, args); fence(); return r; } catch { poisoned = true; fail(); } };
     const lease = Promise.resolve().then(acquire);
     lease.then(c => { if (!live) release(c, true); }, () => {});
     const work = (async () => {
       client = await lease; fence(); must(typeof client?.query === 'function' && typeof client.release === 'function');
       await query('begin isolation level read committed'); begun = true;
       await query("select set_config('statement_timeout',$1,true),set_config('lock_timeout',$1,true),set_config('idle_in_transaction_session_timeout',$1,true),set_config('search_path','pg_catalog',true),set_config('TimeZone','UTC',true),set_config('DateStyle','ISO, YMD',true),set_config('synchronous_commit','on',true)", [String(transactionMs)]);
+      if (executionMode === 'hosted') {
+        const effective=(await query("select current_setting('statement_timeout') as timeout")).rows[0]?.timeout;
+        must(effective === String(transactionMs)+'ms' || effective === String(transactionMs/1000)+'s');
+        must(transactionMs<=5000);
+      }
       // Same lock order as existing N88 source/canonical transactions. Bounded
       // single-pilot serialization is intentional, not a public-scale claim.
       await query('select pg_advisory_xact_lock(1312307256, 88)');
       const result = structuredClone(await action({}, Object.freeze({ query,
+        poison: () => { poisoned = true; },
         beforeCommit: fn => { fence(); must(typeof fn === 'function' && guards.length < 8); guards.push(fn); },
         canonicalReadMode: () => { fence(); return 'serial'; },
       })));

@@ -1,0 +1,32 @@
+{
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "7591f628-1af6-49e7-b76d-b9ee569a6700",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "savedCandidate": "3822bb4683e404ac08c32365bfeae10d6bb0017b",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "startedAt": "2026-10-31T13:04:41.429Z",
+  "status": "FAIL",
+  "stage": "restricted_connect",
+  "connections": 1,
+  "queries": 0,
+  "mutations": 0,
+  "privateValuesExported": false,
+  "custodyWrites": 0,
+  "hostedInstall": "NOT_RUN",
+  "serviceJourney": "NOT_RUN",
+  "enabled": false,
+  "guardSourceSha256": "9bc4da8d28fb87b5b4c23866fa4cbda84551111d098b0b66abf0358e1e08e5c7",
+  "leaseAcquire": "ACQUIRED integration",
+  "custody": {
+    "parentProtected": true,
+    "exactCurrentUserOnly": true,
+    "inheritanceVerified": true,
+    "childVerified": false,
+    "reparseDenied": true,
+    "aclWrites": 0
+  },
+  "refusal": "n88_profile_operation_refused",
+  "connectionClosed": true,
+  "leaseRelease": "RELEASED integration",
+  "finishedAt": "2026-10-31T13:04:45.184Z"
+}

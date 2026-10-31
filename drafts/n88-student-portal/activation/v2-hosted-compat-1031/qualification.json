@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "e064f942-5130-4715-ae80-fb2173033c90",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "sourceReady": true,
+  "state": "BLOCKED",
+  "blockerType": "environment",
+  "blocker": "Fresh original-custodian n88_backend profile NOT_RUN: protected restricted connection environment unavailable in original custody process; zero connections/queries. Native/source correction is complete. No credential search, denied-operation retry or alternate channel.",
+  "enabled": false,
+  "hostedExecuted": false,
+  "checks": [
+    {
+      "name": "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+      "status": "NOT_RUN",
+      "evidence": "actual-restricted-profile.json: actual0connections/queries; native12 PASS includes actual restricted LOGIN/provider-like profile and exact safe boundary."
+    },
+    {
+      "name": "n88_private_markers_cancellation_whole_transaction_rollback",
+      "status": "PASS",
+      "evidence": "tests/n88-hosted-compat-1031/results.json:56 malformed cases,14 valid equivalence, cancellation/assertion, retained owned-log/driver marker exclusion, caught failure rollback and real-service UNKNOWN/retry:false."
+    },
+    {
+      "name": "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+      "status": "PASS",
+      "evidence": "Native real N77 parent retirement/manual scope + surviving next read; original3 INVOKER locks,46/150 preimages,30 unchanged bodies and original canonical/Sync evidence reused."
+    },
+    {
+      "name": "n88_combined_native_owner_packet_and_private_service_assets_default_off",
+      "status": "PASS",
+      "evidence": "Native owner/admin install/readback/disable/restart;4 affected package tests PASS; manifest.json,assets-manifest.json; defaults OFF; no hosted install."
+    }
+  ],
+  "cleanup": {
+    "nativeIntegrationLease": "RELEASED",
+    "integrationStatus": "FREE",
+    "ownedDataRemoved": true,
+    "ownedLogsRemoved": 15,
+    "browserUsed": false,
+    "unrelatedResourcesTouched": false
+  },
+  "encoding": "UTF8/LF source identities; embedded asset base64 preserves exact decoded bytes",
+  "files": {
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile.json": "4b611ddaebed69df027f562afdf7d8198ae93f3e7207e0b3b95b674ad00cbaa6",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets.mjs": "d27c9c4ac27c7caa6139cca9ce28227026176cc658e419616c16a1c8ccdbcbad",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/bind.mjs": "91318c638cccc893e20cb4c7aa6343b7e46b905c9d744d39a973e40cf841b978",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/boundary.mjs": "641e5a95c728050a9270df1644c1d0cb436c21ca75588ce106da94f5e077d92a",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/current-main.json": "fdd891eb0138fb48ffe8a6c1e23f7ba0ee90b291006a35e6b2f6d8deaf5568b1",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/disable.inactive.sql": "5344e8a2f7001d66e8d8a6f359d3e5562e16a089652735dc320dcfb496f3c22a",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/gateway.inactive.mjs": "b9c823d01541ce6542349682604970077bc392c80e2260aff396783030568c10",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/gateway.prepared.mjs": "374f860d62310fceb57019e1ec68b3a10a7c5d0acb52283282b396ef2b2d2c48",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/generate.mjs": "fdae149fcbef72f41d618b731f69d96f82ec2f8c5d30639dabdea9fc0536a16c",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/install.inactive.sql": "62e06e5ad1b9eaae7407e6017d8d9905e89ee6450ea66c58dbf45144b0128819",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md": "da4db728fb32cf4edd0d6b83c3c648af34fac40cd6bb8540d776fefac6ec1ab9",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/operations.json": "d74c04c75ddd033b3130e7cdccb0d4001959b80c7e9091e8d1be34e2e496b34e",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/package.mjs": "ba7ea76e50507b038895b33a16da0f0b9c28c14259d80fd83e078c642dde1549",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/private-assets.inactive.mjs": "06378a385857f882e4940e2a30d8b5cb3127a032c9123b744a27309c9d936e46",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs": "67c1e9b250657cde5cd611e91f0887122c659f4a110957499b810a36dc952697",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/readback.sql": "6da07b3f5fe6c78c8a119e4ef73459fffbc1cdba8bc21efb2db818a6d1f485dc",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/safe-boundary.sql": "6681cde2e2d720e360eddc6db4d65cbb2960ebb929b5b02cd09ab3369d4218dd",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service.prepared.mjs": "471b084bc672274ac18c94a7fd6c9122715314e94bf8153d224f843a508302f5",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/student.prepared.mjs": "b5ac898a5f87e634f11edb232a621efa1b6a1aff5c7e33647a52e16558b11dd4",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/deno.json": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/deno.lock": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/index.ts": "471b084bc672274ac18c94a7fd6c9122715314e94bf8153d224f843a508302f5",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs": "f40e74d8d1adb5d154d1d8de66133ed560a952a91dac3fa47776288fce896ee9",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs": "fde20e710328fa7124e59ca4215d9ff32b6c16ce7b17e523dd0ffe1845adc600",
+    "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql": "f9007a336261808d09af8ae789ecf1dffeea5ebe41ff21c66e26617f61293269",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "eb317b16a492375db58871ce2b5326aa178f4cba86ba997f8434e5a530cd8860",
+    "tests/n88-hosted-compat-1031/assembly-failure.json": "4aa3493ca7b197a0637d1c6868202624650b8767085f0abc4bceb2788f6154bb",
+    "tests/n88-hosted-compat-1031/cancellation-harness-first-failure.json": "f5651637584d1e3c03b4a0d1850d69cf9f9761593480663a942baf848da3dca4",
+    "tests/n88-hosted-compat-1031/cases.mjs": "c2d8e9ac14761a9d7dd9f280571a3caf1edffad3d8b0da551c8829b4b1a81c12",
+    "tests/n88-hosted-compat-1031/ddl-log-assertion-first-failure.json": "2630db2d043115f7ed72ea2202731b5100f8f5419a1f5804bb97cffda8f74aba",
+    "tests/n88-hosted-compat-1031/first-failure.json": "a96b6188c583aaf9792afef25d3a9532711ad8f7c9fe1270e94a427f5dd43310",
+    "tests/n88-hosted-compat-1031/first-service-failure.json": "48abaaf4c46bd151db02c78359cc1a080397afff658fc03aefcc878d4994893d",
+    "tests/n88-hosted-compat-1031/log-cleanup.json": "73e816e89e507846c62f62ab9f87e0e32c8e0ba426a4f6a92179bd23a39fc63e",
+    "tests/n88-hosted-compat-1031/manual-fixture-first-failure.json": "e73a48865f3ecc2a8d71441c67e5b8521876f8831c9a38044599f5d72ab0d9f2",
+    "tests/n88-hosted-compat-1031/native.mjs": "12437685d27d615c2a3a9fa86394001c5e5c6a0e92716f5ec6d2c02ef808d853",
+    "tests/n88-hosted-compat-1031/owner-schema-first-failure.json": "89f95aab1c03b4098bb419dbc3873e041d9a2a41995de6abe9d6c0bd15ff15ee",
+    "tests/n88-hosted-compat-1031/package.test.mjs": "5fab607e40c5911ba8d7524c0580bacbb5bd32b688751b316b8230b79b1de1f4",
+    "tests/n88-hosted-compat-1031/pre-null-hardening-pass.json": "d7660feee20965e79a7094d0fccf0a5de91d37df7c2eac03c3976eccd0d3a264",
+    "tests/n88-hosted-compat-1031/results.json": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca",
+    "tests/n88-hosted-compat-1031/single-column-envelope-first-failure.json": "2b2ffa9b14a596c12d2b3fe79709288d306661b304b64a312d65aeae260bcd1b",
+    "tests/n88-hosted-compat-1031/unit-first-failure.json": "167eaa500a614821e9d0f27ba00b5a868aff87adfe26a6ba02bda74c23fb9323",
+    "tests/n88-hosted-compat-1031/unit-results.json": "0062604abdaff242aa68e24f53681ba440598d3045ae953b045658cc3ad4bde7",
+    "tests/n88-hosted-compat-1031/unit-results.tap": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3"
+  },
+  "nextAction": "Original custodian receives existing protected transport via same custody route, performs the single finite metadata observation, then controller/publisher uses the inactive candidate and exact INSTALL.md continuation. No unchanged native/UI retry, hosted installation or activation under this card."
+}

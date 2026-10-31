@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: shared exact original provenance predicate accepts valid state without mutation and refuses each invalid predicate
+ok 1 - shared exact original provenance predicate accepts valid state without mutation and refuses each invalid predicate
+  ---
+  duration_ms: 2.0295
+  type: 'test'
+  ...
+# Subtest: disarmed/refused state with nonempty password is rejected before mock connection and clears buffers/state
+ok 2 - disarmed/refused state with nonempty password is rejected before mock connection and clears buffers/state
+  ---
+  duration_ms: 1.4035
+  type: 'test'
+  ...
+# Subtest: valid consumption clears parsed state and buffer; malformed JSON and invalid password type also clear
+ok 3 - valid consumption clears parsed state and buffer; malformed JSON and invalid password type also clear
+  ---
+  duration_ms: 0.3947
+  type: 'test'
+  ...
+# Subtest: provenance refusal diagnostics expose only fixed safe code
+ok 4 - provenance refusal diagnostics expose only fixed safe code
+  ---
+  duration_ms: 0.2971
+  type: 'test'
+  ...
+# Subtest: original caller retains exact predicate position and every remaining original verification byte
+ok 5 - original caller retains exact predicate position and every remaining original verification byte
+  ---
+  duration_ms: 46.7102
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 156.8197

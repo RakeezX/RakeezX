@@ -6,11 +6,11 @@ import {createPublicationV2PostgresRepository} from '../../publication-v2-postgr
 import {createPublicationV2Service} from '../../publication-v2-service.inactive.mjs';
 import {authorizeRuntimeConnection,runtimeIdentitySql} from './capability.mjs';
 export {runtimeIdentitySql};
-import packet from '../v2-package-1028/boundary-operations.json' with {type:'json'};
+import {definitions,encodeArguments,unwrapEnvelope} from '../v2-hosted-compat-1031/boundary.mjs';
 import sourcePacket from '../v2-package-1028/manifest.json' with {type:'json'};
 import oldContract from '../error-boundary-contract.json' with {type:'json'};
 import typed from '../read-service-20261023/typed-read-operations.json' with {type:'json'};
-import {assertVerifiedBoundary} from '../private-error-boundary.mjs';
+import {assertVerifiedBoundary,privateQuery} from '../private-error-boundary.mjs';
 const fail=()=>{throw Error('n88_v2_host_unavailable');};const must=v=>{if(!v)fail();};
 const sha=s=>createHash('sha256').update(s).digest('hex');
 const clean=r=>({command:r.command,rowCount:r.rowCount,rows:r.rows});
@@ -19,14 +19,14 @@ const ingressSql='select n88_private.consume_ingress($1::uuid,$2::bigint) as acc
 
 export async function createHostedPublicationV2Runtime({enabled=false,acquire,assertTransport,expectedSystemIdentifier='7678071634733212629',canonical,origin,now=Date.now,transactionMs=5000}={}){
  if(enabled!==true)return Object.freeze({handle:createPublicationV2Service({origin})});
- must(typeof acquire==='function'&&typeof assertTransport==='function'&&canonical);
- const operations=new Map(packet.operations.map(o=>[o.sql,o]));
+ must(typeof acquire==='function'&&typeof assertTransport==='function'&&canonical&&Number.isInteger(transactionMs)&&transactionMs>=50&&transactionMs<=5000);
+ const operations=new Map(definitions.map(o=>[o.sql,o]));
  const oldReads=new Map([...oldContract.operations,...typed].filter(o=>o.sql===currentSession||o.sql===ingressSql||/^select n88_private\.lock_(?:canonical|projection)_sources\(/.test(o.sql)||o.sql.includes('from rakeezx.')).map(o=>[o.sql,o]));
  const prove=async c=>{const token=await authorizeRuntimeConnection(c,{expectedSystemIdentifier,assertTransport});await assertVerifiedBoundary(c);
  const fs=(await c.query(`select proname,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') as definition,prosecdef,pg_get_userbyid(proowner) as owner,has_function_privilege(current_user,p.oid,'EXECUTE') as callable,(has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE')) as public_call from pg_proc p where pronamespace='n88_private'::regnamespace and proname=any($1::text[]) order by proname`,[sourcePacket.functions.map(f=>f.name)])).rows;
- must(fs.length===14&&fs.every((f,i)=>f.proname===sourcePacket.functions[i].name&&f.definition===sourcePacket.functions[i].definition&&f.prosecdef&&f.owner==='n88_v2_guard'&&f.callable&&!f.public_call));return token;};
+ must(fs.length===14&&fs.every((f,i)=>f.proname===sourcePacket.functions[i].name&&f.definition===sourcePacket.functions[i].definition&&f.prosecdef&&f.owner==='n88_v2_guard'&&!f.callable&&!f.public_call));return token;};
  const first=await acquire();let runtimeCapability;try{runtimeCapability=await prove(first);}finally{first.release();}
- const repository=createPublicationV2PostgresRepository({executionMode:'hosted',runtimeCapability,transactionMs,acquire:async()=>{const c=await acquire();try{await prove(c);return c;}catch{c.release(Error('n88_v2_host_unavailable'));fail();}}});
+ const repository=createPublicationV2PostgresRepository({executionMode:'hosted',runtimeCapability,transactionMs,acquire:async()=>{const c=await acquire();try{await prove(c);return {query:(sql,args)=>oldReads.has(sql)?privateQuery(c,sql,args):c.query(sql,args),release:broken=>c.release(broken)};}catch{c.release(Error('n88_v2_host_unavailable'));fail();}}});
   const scopeOwner = 'select set_config(\'n88.v2_owner\',$1,true)';
   // All mutable admission state belongs to one request/transaction closure.
   const assemble = request => {
@@ -56,9 +56,9 @@ export async function createHostedPublicationV2Runtime({enabled=false,acquire,as
       must(!raw); raw = ports;
       const executePublicationV2 = async (sql, args, signal) => {
         const o = operations.get(sql); must(o && !signal?.aborted && now() < deadline);
-        const r = await ports.query(o.callSql, args);
+        let r;try { r=unwrapEnvelope(await ports.query(o.safeSql,[encodeArguments(args)])); } catch { ports.poison(); fail(); }
         if (o.id === 'numeric-session' && r.rows.length === 1) located = r.rows[0].payload;
-        return o.effect ? { command: o.command, rowCount: Number(r.rows[0]?.affected), rows: [] } : clean(r);
+        return clean(r);
       };
       const query = async (sql, args = []) => {
         must(oldReads.has(sql) && args.length === oldReads.get(sql).parameters.length);

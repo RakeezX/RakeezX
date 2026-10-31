@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "7591f628-1af6-49e7-b76d-b9ee569a6700",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "savedCandidate": "3822bb4683e404ac08c32365bfeae10d6bb0017b",
+  "state": "BLOCKED",
+  "blockerType": "external",
+  "blocker": "Original custody and DPAPI passed; the single restricted direct connection failed before metadata queries. Finite refusal n88_profile_operation_refused; driver cause unclassified. No alternate channel or unchanged retry.",
+  "reusedEvidence": [
+    {
+      "path": "tests/n88-hosted-compat-1031/results.json",
+      "sha256": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.tap",
+      "sha256": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+      "sha256": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json",
+      "sha256": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751",
+      "equalSavedCandidate": true
+    }
+  ],
+  "newHelperSha256": "b132d904944c881ca56e264df4a3190b69173369756bffbbe853d8c8b1f59ccb",
+  "actualRecordSha256": "7e6a04a6cc2280760e2d9a709df87ef9bcd8bc610956db052d7656a33c0c6137",
+  "newHelperUnitEvidence": "tests/n88-hosted-compat-1031/profile-continuation-unit.tap",
+  "newNativeOrUiRuns": 0,
+  "hostedInstall": "NOT_RUN",
+  "hostedServiceJourney": "NOT_RUN",
+  "enabled": false,
+  "checks": [
+    {
+      "name": "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+      "status": "FAIL",
+      "evidence": "actual-restricted-profile-continuation.json: stage restricted_connect;1 connection attempt,0 metadata queries; safe boundary12/12 native evidence reused, actual effective profile unavailable."
+    },
+    {
+      "name": "n88_private_markers_cancellation_whole_transaction_rollback",
+      "status": "PASS",
+      "evidence": "Unchanged saved native12/12 result; no rerun."
+    },
+    {
+      "name": "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+      "status": "PASS",
+      "evidence": "Unchanged saved native/SQL source identity; no writer changes."
+    },
+    {
+      "name": "n88_combined_native_owner_packet_and_private_service_assets_default_off",
+      "status": "PASS",
+      "evidence": "Exact saved manifest/assets and4/4 package evidence unchanged; all V2 flags OFF, installation NOT_RUN."
+    },
+    {
+      "name": "n88_existing_custody_guards_and_private_values_not_exported",
+      "status": "PASS",
+      "evidence": "Actual unchanged inherited verifier/owned marker/CurrentUser DPAPI passed; privateValuesExported=false,custodyWrites=0; closed connection and RELEASED integration."
+    }
+  ],
+  "nextAction": "Resume only with an evidenced material correction to the original restricted transport; retain this failed attempt and original NOT_RUN. No native/UI repeat, alternative custody or hosted activation under this card."
+}

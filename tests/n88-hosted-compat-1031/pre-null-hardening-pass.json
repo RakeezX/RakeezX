@@ -1,0 +1,2096 @@
+{
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "e064f942-5130-4715-ae80-fb2173033c90",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "startedAt": "2026-10-31T12:28:26.928Z",
+  "phase": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-hosted-runtime-compatibility-20261031\\artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp",
+  "checks": [
+    {
+      "name": "actual_current_function_and_trigger_baselines",
+      "status": "PASS",
+      "evidence": {
+        "currentFunctions": 46,
+        "originalTriggers": 150,
+        "actualMetadata": true
+      }
+    },
+    {
+      "name": "combined_non_superuser_exact_owner_install",
+      "status": "PASS",
+      "evidence": {
+        "wrappers": 14,
+        "existing14Untouched": true,
+        "canonicalEntries": 30,
+        "edgesRestored": true
+      }
+    },
+    {
+      "name": "actual_restricted_login_provider_like_profile_and_unsafe_negatives",
+      "status": "PASS",
+      "evidence": {
+        "restrictedLogin": true,
+        "defaultVerbosity": true,
+        "ddlOnly": true,
+        "autoExplain10000": true,
+        "databaseStatementTimeout3000": true,
+        "unsafeProfilesDenied": 11
+      }
+    },
+    {
+      "name": "all14_malformed_boundary_fixed_failure_no_successful_empty",
+      "status": "PASS",
+      "evidence": {
+        "malformedOperations": 14,
+        "failureDistinctFromEmpty": true,
+        "noPrivateDriverMessage": true
+      }
+    },
+    {
+      "name": "real_auth_service_finite_wrapper_valid_mapping",
+      "status": "PASS",
+      "evidence": {
+        "actualCurrentAuth": true,
+        "originalLegacyBoundary": true,
+        "readAndWrite": true,
+        "receiptAck": true
+      }
+    },
+    {
+      "name": "all14_valid_operation_mapping_matches_installed_semantics",
+      "status": "PASS",
+      "evidence": {
+        "validOperations": 14,
+        "originalFunctionResultsEqual": true,
+        "readEmptyIsExplicitSuccess": true,
+        "noOriginal14Changes": true
+      }
+    },
+    {
+      "name": "constraint_failure_poison_survives_caller_catch_whole_transaction_rollback",
+      "status": "PASS",
+      "evidence": {
+        "caughtFailureLatched": true,
+        "commits": 0,
+        "allPriorWritesRolledBack": true,
+        "originalReceiptsUnchanged": true,
+        "noRetry": true
+      }
+    },
+    {
+      "name": "cancellation_and_assertion_fixed_failures_no_private_logging",
+      "status": "PASS",
+      "evidence": {
+        "queryCanceledExplicit": true,
+        "assertFailureExplicit": true,
+        "ownedServerLogNoPrivateMarker": true,
+        "noHostedLogAccess": true
+      }
+    },
+    {
+      "name": "manual_parent_retirement_other_scope_survives_and_invoker_locks",
+      "status": "PASS",
+      "evidence": {
+        "actualN77ParentDeletion": true,
+        "manualTasksClearedOnlyRetiredScope": true,
+        "otherScopeNextRealReadValid": true,
+        "invokerEntries": 3,
+        "rlsUnchanged": true,
+        "edgesRestored": true
+      }
+    },
+    {
+      "name": "native_restart_preserves_corrected_attachment",
+      "status": "PASS"
+    }
+  ],
+  "sourceSha256": {
+    "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs": "f003fc0477efb23f6923075a92241a6ff4394ab590194d3c37497751f3793412",
+    "drafts/n88-student-portal/auth-verifier.mjs": "6605b61c5422a090c8220a346f5a1e7c00aea5bedde212f62b54ed6f4592be2c",
+    "drafts/n88-student-portal/canonical-adapter.mjs": "bdcf29c5dce1e406657d0361c5c5ee3e56f9fcbd8b4b8912d6f1b90bcde9c19f",
+    "drafts/n88-student-portal/numeric-credentials.mjs": "99831e65ad3dc977b459d204b7b0a0f1568cbed96f32a1a285a843e732554957",
+    "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs": "c54c5ddcca08a1bdc7d624cf5cd38e8b0766b169ccfbb6e4ea4be3e0e7a45619",
+    "drafts/n88-student-portal/publication-v2-storage.inactive.sql": "399f6d5f513bf0fd3bb3bb9f8a206018e451ed9d6cc5d9a9b7fa89b3a81525c0",
+    "drafts/n88-student-portal/publication-v2-service.inactive.mjs": "9ef37c55afad21845735bf6418f463680b6f9f2b51a67dbb33f9d7268ad849fc",
+    "drafts/n88-student-portal/student-projection.mjs": "b407eb68c492c6d861ceb2da9c8dafe24ab3736aa679174ff2539a881bb5d754",
+    "tests/n88-backend-package-1028/native-composition.test.mjs": "5ac265700c1f715bdb396695b58592d0581ecb3d51d1edba35e1f9b5c5680c12"
+  },
+  "cleanup": {
+    "stopped": true,
+    "pid": 18416,
+    "birth": "2026-10-31T12:28:41.4561450Z",
+    "pidAbsent": true,
+    "portFree": true,
+    "ownedDataRemoved": true
+  },
+  "ownershipEpochs": [
+    {
+      "commandLine": "\"C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/postgres.exe\"  -D \"C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-hosted-runtime-compatibility-20261031/artifacts/continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp/data\"  ",
+      "pid": 3692,
+      "executable": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\package\\native\\bin\\postgres.exe",
+      "birth": "2026-10-31T12:28:35.3698630Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-hosted-runtime-compatibility-20261031\\artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp\\data",
+      "port": 60041
+    },
+    {
+      "commandLine": "\"C:/Users/Abody/Projects/RakeezX/artifacts/n77-native-pg17/package/native/bin/postgres.exe\"  -D \"C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-hosted-runtime-compatibility-20261031/artifacts/continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp/data\"  ",
+      "pid": 18416,
+      "executable": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\n77-native-pg17\\package\\native\\bin\\postgres.exe",
+      "birth": "2026-10-31T12:28:41.4561450Z",
+      "data": "C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-hosted-runtime-compatibility-20261031\\artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp\\data",
+      "port": 60041
+    }
+  ],
+  "runtime": {
+    "existing": true,
+    "package": "@embedded-postgres/windows-x64@17.6.0-beta.15",
+    "provenance": "existing N77 REPORT.md and archive; third-party packaged native PG, NOT claimed as an official EDB download",
+    "archiveSha256": "342a4d42245f9562fc7e7652b353e8f1cecb56febebc72db1a8e2ace0b100528",
+    "postgresSha256": "54e7e05939e61f3462e3fd295bc12292623ad3cf010c02ae9cc3295a64b0770f",
+    "initdbSha256": "96da800ec12faed19209c7f9e21231c3dca2dcb12d2215751e18b0b9df20cec1",
+    "pgctlSha256": "4343536036689feb178461c559cc71c1003d11d9a7b9191ddd13e1fb835481f4",
+    "version": "postgres (PostgreSQL) 17.6",
+    "driver": "pg@8.16.3"
+  },
+  "leaseAcquire": "ACQUIRED integration",
+  "port": 60041,
+  "serverVersion": "PostgreSQL 17.6 on x86_64-windows, compiled by msvc-19.44.35213, 64-bit",
+  "localConfig": {
+    "listen": "127.0.0.1",
+    "port": "60041",
+    "password_encryption": "scram-sha-256"
+  },
+  "hba": [
+    {
+      "type": "host",
+      "address": "127.0.0.1",
+      "auth_method": "scram-sha-256",
+      "error": null
+    },
+    {
+      "type": "host",
+      "address": "0.0.0.0",
+      "auth_method": "reject",
+      "error": null
+    },
+    {
+      "type": "host",
+      "address": "::",
+      "auth_method": "reject",
+      "error": null
+    }
+  ],
+  "bootstrap": [
+    "0001_core_schema.sql",
+    "0002_indexes_triggers_rls.sql",
+    "0003_hybrid_calendar.sql",
+    "0004_student_notes.sql",
+    "0007_sections_active_normalized_identity.sql",
+    "0008_enrollment_membership_operations.sql",
+    "0009_transfer_and_renumber_rosters.sql",
+    "0010_profile_report_principal_name.sql",
+    "0011_session_roster_snapshots.sql",
+    "0012_sync_v2_server_protocol.sql",
+    "0013_sync_v2_enrollment_commands.sql",
+    "0014_sync_v2_attendance_snapshot_commands.sql",
+    "0015_sync_v2_lifecycle_commands.sql",
+    "0016_sync_v2_teaching_creation_commands.sql",
+    "0017_sync_v2_bulk_attendance_commands.sql",
+    "0018_profile_active_time_profile.sql",
+    "0019_class_rules.sql",
+    "0020_support_requests.sql",
+    "0021_section_archive_lifecycle.sql",
+    "0022_closed_term_reports.sql",
+    "0023_sync_v2_backup_restore.sql",
+    "0024_class_goal_runtime.sql",
+    "0025_group_arrangements.sql",
+    "0026_session_delete.sql",
+    "0027_support_notification_outbox.sql",
+    "0028_support_notification_contact_identity.sql",
+    "0029_student_lifecycle_safety.sql",
+    "0030_student_removal_preview.sql",
+    "0031_curriculum_sync_v2.sql",
+    "0032_account_profile_access_foundation.sql",
+    "0033_score_subitem_foundation.sql",
+    "0034_score_subitem_guard_acl_hardening.sql",
+    "20260924003436_beta_new_account_provisioning.sql",
+    "20260924173929_security_definer_direct_execute_hardening.sql",
+    "20260926115629_owner_sync_invalidation.sql",
+    "20260930094421_calendar_day_active_identity.sql",
+    "20260930234353_calendar_suspension_kind.sql",
+    "20261003000000_n03_education_department.sql",
+    "20261004070000_n58_calendar_persistence.sql",
+    "20261004070001_n58_extra_term_compatibility.sql",
+    "20261004070002_n58_effective_scope_revalidation.sql",
+    "20261007230123_n77_server_validated_delete.sql",
+    "20261012120000_n73_distribution_apply.sql",
+    "20261012163000_n71_unified_restore.sql",
+    "20261012234116_n94_subitem_dates_late_scoring.sql",
+    "20261013045630_n77_recreate_fresh_identity.sql",
+    "20261013083000_n73_n94_compatibility.sql",
+    "20261013090000_n73_distribution_error_contract.sql",
+    "20261013101500_n100_preserve_target_marks.sql",
+    "20261013110000_n71_restore_creation_history.sql",
+    "20261013122332_n90_reviewed_grade_import.sql",
+    "20261014090000_n100_automatic_safe_copy.sql",
+    "20261014100000_n90_unified_student_grade_import.sql",
+    "20261014203000_n58_atomic_empty_foundation_repair.sql"
+  ],
+  "packetQualification": {
+    "bundleSha256": "6e93ea7963097bd6d19b5c65a373356c30d7c56433db08da384ab05317a3fa63",
+    "installerSha256": "e6505199587372bf90a1193ff2d95d827cb6fb17d7d1cab5de4709073debe58d",
+    "localBoundSha256": "3b118e19658ba8360e7a1ce238eaca04a5405b1f7eaa1fe7580b60a6ae7187be",
+    "actualLogin": "postgres",
+    "superuser": false,
+    "edgesRestored": true
+  },
+  "operationTrace": [
+    {
+      "operation": "d95e39290c17cf597f9dd1ff01718eb9b96bff23b53c3e721bbf0fd9f5d6557f"
+    },
+    {
+      "operation": "b00d207ed5add3c827a15378e866ba7bd933615b24363ccb94926f73619dbe15"
+    },
+    {
+      "operation": "c0e9d2781f4026d74b0838f2a2aaae605ab27ed095c2d9ed1595d1a6757afc8e"
+    },
+    {
+      "operation": "2bd1f57f0f601ec72ebd69cf652eb92d6c041b1ddc3a5a143f9b29fb08664629"
+    },
+    {
+      "operation": "acc4bdd0254c0aa03724f8154f6b3eaa9d230393fdfb1ad54eaf8fd1f5f51834"
+    },
+    {
+      "operation": "77267655754088604a5f665057964c375e0aa3951f386ba87d64abae21477bf0"
+    },
+    {
+      "operation": "2614aed4bc693db0ecb3b6553b95d9562210fced1b1451fb83daf9e9dac0692d"
+    },
+    {
+      "operation": "9f9dd6599783b7dc5c753f5a45c37756b02cc8f0252e28dc649b53584da66a52"
+    },
+    {
+      "operation": "6c5164418a4efdbd155c954b4dcded84ec2f048fda01d78fe658b7bea62f9a58"
+    },
+    {
+      "operation": "d11c71104beb6389d82391dfbd8a8e6dfed24725c27e4838b8a15e7564f6a009"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-scopes",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-items",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 5,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-high_water",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 6,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-receipts",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 0,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "cas-scope",
+      "ok": true,
+      "command": "UPDATE",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "cas-item",
+      "ok": true,
+      "command": "UPDATE",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "insert-receipt",
+      "ok": true,
+      "command": "INSERT",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098"
+    },
+    {
+      "operation": "d95e39290c17cf597f9dd1ff01718eb9b96bff23b53c3e721bbf0fd9f5d6557f"
+    },
+    {
+      "operation": "b00d207ed5add3c827a15378e866ba7bd933615b24363ccb94926f73619dbe15"
+    },
+    {
+      "operation": "c0e9d2781f4026d74b0838f2a2aaae605ab27ed095c2d9ed1595d1a6757afc8e"
+    },
+    {
+      "operation": "2bd1f57f0f601ec72ebd69cf652eb92d6c041b1ddc3a5a143f9b29fb08664629"
+    },
+    {
+      "operation": "acc4bdd0254c0aa03724f8154f6b3eaa9d230393fdfb1ad54eaf8fd1f5f51834"
+    },
+    {
+      "operation": "77267655754088604a5f665057964c375e0aa3951f386ba87d64abae21477bf0"
+    },
+    {
+      "operation": "2614aed4bc693db0ecb3b6553b95d9562210fced1b1451fb83daf9e9dac0692d"
+    },
+    {
+      "operation": "9f9dd6599783b7dc5c753f5a45c37756b02cc8f0252e28dc649b53584da66a52"
+    },
+    {
+      "operation": "6c5164418a4efdbd155c954b4dcded84ec2f048fda01d78fe658b7bea62f9a58"
+    },
+    {
+      "operation": "d11c71104beb6389d82391dfbd8a8e6dfed24725c27e4838b8a15e7564f6a009"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-scopes",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-items",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 5,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-high_water",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 6,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-receipts",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098"
+    },
+    {
+      "operation": "d95e39290c17cf597f9dd1ff01718eb9b96bff23b53c3e721bbf0fd9f5d6557f"
+    },
+    {
+      "operation": "b00d207ed5add3c827a15378e866ba7bd933615b24363ccb94926f73619dbe15"
+    },
+    {
+      "operation": "c0e9d2781f4026d74b0838f2a2aaae605ab27ed095c2d9ed1595d1a6757afc8e"
+    },
+    {
+      "operation": "2bd1f57f0f601ec72ebd69cf652eb92d6c041b1ddc3a5a143f9b29fb08664629"
+    },
+    {
+      "operation": "acc4bdd0254c0aa03724f8154f6b3eaa9d230393fdfb1ad54eaf8fd1f5f51834"
+    },
+    {
+      "operation": "77267655754088604a5f665057964c375e0aa3951f386ba87d64abae21477bf0"
+    },
+    {
+      "operation": "2614aed4bc693db0ecb3b6553b95d9562210fced1b1451fb83daf9e9dac0692d"
+    },
+    {
+      "operation": "9f9dd6599783b7dc5c753f5a45c37756b02cc8f0252e28dc649b53584da66a52"
+    },
+    {
+      "operation": "6c5164418a4efdbd155c954b4dcded84ec2f048fda01d78fe658b7bea62f9a58"
+    },
+    {
+      "operation": "d11c71104beb6389d82391dfbd8a8e6dfed24725c27e4838b8a15e7564f6a009"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-scopes",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-items",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 5,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-high_water",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 6,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-receipts",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "insert-scope",
+      "ok": true,
+      "command": "INSERT",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098"
+    },
+    {
+      "operation": "d95e39290c17cf597f9dd1ff01718eb9b96bff23b53c3e721bbf0fd9f5d6557f"
+    },
+    {
+      "operation": "b00d207ed5add3c827a15378e866ba7bd933615b24363ccb94926f73619dbe15"
+    },
+    {
+      "operation": "c0e9d2781f4026d74b0838f2a2aaae605ab27ed095c2d9ed1595d1a6757afc8e"
+    },
+    {
+      "operation": "2bd1f57f0f601ec72ebd69cf652eb92d6c041b1ddc3a5a143f9b29fb08664629"
+    },
+    {
+      "operation": "acc4bdd0254c0aa03724f8154f6b3eaa9d230393fdfb1ad54eaf8fd1f5f51834"
+    },
+    {
+      "operation": "77267655754088604a5f665057964c375e0aa3951f386ba87d64abae21477bf0"
+    },
+    {
+      "operation": "2614aed4bc693db0ecb3b6553b95d9562210fced1b1451fb83daf9e9dac0692d"
+    },
+    {
+      "operation": "9f9dd6599783b7dc5c753f5a45c37756b02cc8f0252e28dc649b53584da66a52"
+    },
+    {
+      "operation": "6c5164418a4efdbd155c954b4dcded84ec2f048fda01d78fe658b7bea62f9a58"
+    },
+    {
+      "operation": "d11c71104beb6389d82391dfbd8a8e6dfed24725c27e4838b8a15e7564f6a009"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-scopes",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 2,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-items",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 7,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-high_water",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 6,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-receipts",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "da25480fb483e6ce3d30f1a179c3c07e9f3b045425b0ac54acc6758a97e2db62"
+    },
+    {
+      "operation": "d95e39290c17cf597f9dd1ff01718eb9b96bff23b53c3e721bbf0fd9f5d6557f"
+    },
+    {
+      "operation": "b00d207ed5add3c827a15378e866ba7bd933615b24363ccb94926f73619dbe15"
+    },
+    {
+      "operation": "c0e9d2781f4026d74b0838f2a2aaae605ab27ed095c2d9ed1595d1a6757afc8e"
+    },
+    {
+      "operation": "2bd1f57f0f601ec72ebd69cf652eb92d6c041b1ddc3a5a143f9b29fb08664629"
+    },
+    {
+      "operation": "acc4bdd0254c0aa03724f8154f6b3eaa9d230393fdfb1ad54eaf8fd1f5f51834"
+    },
+    {
+      "operation": "77267655754088604a5f665057964c375e0aa3951f386ba87d64abae21477bf0"
+    },
+    {
+      "operation": "2614aed4bc693db0ecb3b6553b95d9562210fced1b1451fb83daf9e9dac0692d"
+    },
+    {
+      "operation": "9f9dd6599783b7dc5c753f5a45c37756b02cc8f0252e28dc649b53584da66a52"
+    },
+    {
+      "operation": "6c5164418a4efdbd155c954b4dcded84ec2f048fda01d78fe658b7bea62f9a58"
+    },
+    {
+      "operation": "d11c71104beb6389d82391dfbd8a8e6dfed24725c27e4838b8a15e7564f6a009"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-scopes",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 2,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-items",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 7,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-high_water",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 6,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        },
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "read-receipts",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "body"
+          ],
+          "bodyType": "string",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "cas-scope",
+      "ok": true,
+      "command": "UPDATE",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "cas-item",
+      "ok": true,
+      "command": "UPDATE",
+      "rowCount": 1,
+      "shapes": []
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "8bcd5e5935ad104ec635425ce9ec3bd78ca4d0eb0df6404269faea2065324677"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "owner-context",
+      "ok": true,
+      "command": "SELECT",
+      "rowCount": 1,
+      "shapes": [
+        {
+          "keys": [
+            "active",
+            "owner_id",
+            "namespace"
+          ],
+          "bodyType": "undefined",
+          "bodyNull": false
+        }
+      ]
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "f709b7ef59fff49129041adeeca731efde38a15c8462216636d836ecfaf44c91"
+    },
+    {
+      "operation": "60f39fbb8ed3fe5a5b8166742b34f6305d8e77f37f1df126232cb3e595bb8f26"
+    },
+    {
+      "operation": "783da26396a81edcbdbae279e8bbe624aebdfb0919343afee7700ce327798533"
+    },
+    {
+      "operation": "4af3f68b6e72b66a5bc50fbe827a0b75e13c75a5a1d717e7c1ee20602648845f"
+    },
+    {
+      "operation": "191a3f17196abfaf86c7530a45a53357a184910c9d4ff794772c179c8a75e0b2"
+    },
+    {
+      "operation": "73cc33a00a8dcef23f0fad9809ce22803aaaf01685dd0c56c714b50cb7edd511"
+    },
+    {
+      "operation": "68b75891181898da92217716c225257959a92765c7d7c88712809c1cdf339644"
+    },
+    {
+      "operation": "15bc4579f15f95f195ae38acd0a3ad002750e693866a56fa45507aecce783962"
+    },
+    {
+      "operation": "e2ff5a47f7bbd2c2f99084e83387e5972e1dcbb07f41a92c6bef5227c7f4a184"
+    },
+    {
+      "operation": "0b4f4ed2be717f6e7a160ef657714fb7ed399eb16b7f6d09b3d5bc23e5dfebb7"
+    },
+    {
+      "operation": "b7de9c7ff48ddd906e102b98fa12190145d484eba07aff1a64ab882f8703b150"
+    },
+    {
+      "operation": "6cde67e56979b98efa889b6e6f2e7c5c0f67ce25fc3413b001d3fe7e3e6f3414"
+    },
+    {
+      "operation": "1a345eff766f33b73f0f2bf8e1f7d804dbfa5a635b95d4d2a0257dbc55ba82fd"
+    },
+    {
+      "operation": "68ad1bb41cf411079c52a8dec67ac88b78e4cd6b6573aa2cc73ed5b24c6b47ad"
+    },
+    {
+      "operation": "f92777cada148fd2a8b02843726cbf3f52d5fe36bf73d6fa3afc12c6ef84fb13"
+    },
+    {
+      "operation": "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098"
+    }
+  ],
+  "serviceResult": {
+    "status": 200,
+    "body": {
+      "receipt": {
+        "version": 2,
+        "scope": {
+          "ownerId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "teachingId": "teaching",
+          "sectionId": "class",
+          "termId": "term",
+          "subjectId": "subject"
+        },
+        "binding": {
+          "sessionId": "11111111-1111-4111-8111-111111111111",
+          "leaseId": "synthetic-source-lease",
+          "contextRevision": "synthetic-context"
+        },
+        "requestId": "intent_7da5a79692034987afabd1ae6ba6bb10",
+        "rowId": "[\"item\",\"direct\",\"direct\"]",
+        "sourceRevision": "d7c04218a0bb7098b1d40fcc9256a695ce7ad58e38da2fbf56805fccbab2b21a",
+        "state": "applied",
+        "publicationRevision": 1
+      },
+      "fresh": {
+        "version": 2,
+        "scope": {
+          "ownerId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "teachingId": "teaching",
+          "sectionId": "class",
+          "termId": "term",
+          "subjectId": "subject"
+        },
+        "binding": {
+          "sessionId": "11111111-1111-4111-8111-111111111111",
+          "leaseId": "synthetic-source-lease",
+          "contextRevision": "synthetic-context"
+        },
+        "requestId": "intent_7da5a79692034987afabd1ae6ba6bb10",
+        "rowId": "[\"item\",\"direct\",\"direct\"]",
+        "sourceRevision": "d7c04218a0bb7098b1d40fcc9256a695ce7ad58e38da2fbf56805fccbab2b21a",
+        "state": "applied",
+        "publicationRevision": 1,
+        "fresh": true,
+        "membershipRevision": "74aa10579720c80c54a7ea588f583d34ea627ffa52f8c6343b2f4e7cee1ace21",
+        "decisions": {
+          "required": false,
+          "scheduled": false,
+          "completed": false,
+          "grade": true
+        }
+      }
+    }
+  },
+  "restart": {
+    "prior": {
+      "pid": 3692,
+      "birth": "2026-10-31T12:28:35.3698630Z",
+      "pidAbsent": true,
+      "portFree": true
+    },
+    "newIdentity": {
+      "pid": 18416,
+      "birth": "2026-10-31T12:28:41.4561450Z"
+    }
+  },
+  "leaseRelease": "RELEASED integration",
+  "finishedAt": "2026-10-31T12:28:44.537Z",
+  "status": "PASS"
+}

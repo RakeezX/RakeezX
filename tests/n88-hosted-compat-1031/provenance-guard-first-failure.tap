@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: shared exact original provenance predicate accepts valid state without mutation and refuses each invalid predicate
+ok 1 - shared exact original provenance predicate accepts valid state without mutation and refuses each invalid predicate
+  ---
+  duration_ms: 1.9979
+  type: 'test'
+  ...
+# Subtest: disarmed/refused state with nonempty password is rejected before mock connection and clears buffers/state
+ok 2 - disarmed/refused state with nonempty password is rejected before mock connection and clears buffers/state
+  ---
+  duration_ms: 1.3888
+  type: 'test'
+  ...
+# Subtest: valid consumption clears parsed state and buffer; malformed JSON and invalid password type also clear
+ok 3 - valid consumption clears parsed state and buffer; malformed JSON and invalid password type also clear
+  ---
+  duration_ms: 0.425
+  type: 'test'
+  ...
+# Subtest: provenance refusal diagnostics expose only fixed safe code
+ok 4 - provenance refusal diagnostics expose only fixed safe code
+  ---
+  duration_ms: 0.3168
+  type: 'test'
+  ...
+# Subtest: original caller retains exact predicate position and every remaining original verification byte
+not ok 5 - original caller retains exact predicate position and every remaining original verification byte
+  ---
+  duration_ms: 51.7989
+  type: 'test'
+  location: 'C:\\Users\\Abody\\Projects\\RakeezX\\.worktrees\\continuous-n88-hosted-runtime-compatibility-20261031\\tests\\n88-hosted-compat-1031\\provenance-guard.test.mjs:33:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(helper.includes("state=JSON.parse(plain.toString('utf8'));\n  qualifyOriginalRuntimeState(state);\n  const password=state.password;"))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-hosted-runtime-compatibility-20261031/tests/n88-hosted-compat-1031/provenance-guard.test.mjs:42:2)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 164.7344

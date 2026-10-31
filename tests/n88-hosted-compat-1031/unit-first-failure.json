@@ -1,0 +1,1 @@
+{"status":"FAIL","check":"asset source closure","reason":"Test resolved input paths two parents above owned worktree; compared different source bytes. Corrected only the test path to owned worktree; manifest hashes unchanged."}

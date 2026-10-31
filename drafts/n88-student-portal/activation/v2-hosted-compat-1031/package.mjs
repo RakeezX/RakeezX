@@ -1,0 +1,26 @@
+/** AI: offline combined installer; NULL authority remains mandatory by default. */
+import {readFile,writeFile} from 'node:fs/promises';import {createHash} from 'node:crypto';
+const dir=new URL('./',import.meta.url),writer=new URL('../v2-runtime-writer-1031/',import.meta.url);
+const read=async(u)=>(await readFile(u,'utf8')).replaceAll('\r\n','\n');const sha=s=>createHash('sha256').update(s).digest('hex');
+const ops=JSON.parse(await read(new URL('operations.json',dir))).definitions;
+let gate=await read(new URL('gate.sql',writer));gate=gate.replaceAll('install-n88-runtime-writer-1031','install-n88-hosted-compat-1031');
+const collision=`DO $collision$ BEGIN IF EXISTS(select 1 from pg_proc where pronamespace='n88_private'::regnamespace and proname like 'safe_1031_%') THEN RAISE EXCEPTION 'n88_safe_partial_state';END IF;END $collision$;\n`;
+let role=await read(new URL('runtime-role.sql',writer));role=role.replace(/^grant execute on function n88_private\.v2_[a-f0-9]+\([^\n]+ to n88_backend;\n/gm,'');
+const boundary=await read(new URL('safe-boundary.sql',dir));role=role.replace('SET LOCAL ROLE n88_v2_guard;',()=>"DO $schema$ BEGIN IF has_schema_privilege('n88_v2_guard','n88_private','CREATE') THEN RAISE EXCEPTION 'n88_schema_create_preimage';END IF;END $schema$;\ngrant create on schema n88_private to n88_v2_guard;\nSET LOCAL ROLE n88_v2_guard;");role=role.replace('SET LOCAL ROLE postgres;',()=>boundary+'\nSET LOCAL ROLE postgres;\nrevoke create on schema n88_private from n88_v2_guard;');
+let post=await read(new URL('post.sql',writer));post=post.replace("p.proname ~ '^v2_[a-f0-9]{24}$'",()=>"p.proname ~ '^safe_1031_[a-f0-9]{24}$'");
+const expected=JSON.stringify(ops.map(o=>({name:o.safeName,hash:o.bodySha256})));
+post=post.replace('END $post$;',()=>` IF EXISTS(select 1 from jsonb_to_recordset('${expected}'::jsonb) e(name text,hash text) left join pg_proc p on p.pronamespace='n88_private'::regnamespace and p.proname=e.name where p.oid is null or encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')<>e.hash or p.proconfig<>array['search_path=pg_catalog']) THEN RAISE EXCEPTION 'n88_safe_source_mismatch';END IF;
+ IF EXISTS(select 1 from pg_proc p where p.pronamespace='n88_private'::regnamespace and p.proname ~ '^v2_[a-f0-9]{24}$' and has_function_privilege('n88_backend',p.oid,'EXECUTE')) THEN RAISE EXCEPTION 'n88_original_typed_exposed';END IF;
+END $post$;`);
+const body=role+await read(new URL('writer-helpers.sql',writer))+await read(new URL('writer-replacement.sql',writer));
+const dependencies=['../../publication-v2-postgres.inactive.mjs','../v2-runtime-writer-1031/host.mjs','../v2-runtime-writer-1031/capability.mjs','../v2-runtime-writer-1031/writer-helpers.sql','../v2-runtime-writer-1031/writer-replacement.sql','../v2-runtime-writer-1031/gate.sql','../v2-runtime-writer-1031/post.sql','../v2-package-1028/manifest.json','safe-boundary.sql','operations.json','boundary.mjs','generate.mjs','package.mjs','bind.mjs'];
+const files={};for(const f of dependencies)files[f]=sha(await read(new URL(f,dir)));
+const bundleSha256=sha(JSON.stringify(files));const sql=(gate+collision+body+post).replaceAll('_N88_BUNDLE_SHA256_',bundleSha256);
+await writeFile(new URL('install.inactive.sql',dir),sql);
+let disable=await read(new URL('disable.sql',writer));disable=disable.replaceAll('disable-n88-runtime-writer-1031','disable-n88-hosted-compat-1031').replaceAll('_N88_BUNDLE_SHA256_',bundleSha256);
+for(const o of ops)disable=disable.replace(new RegExp('REVOKE EXECUTE ON FUNCTION n88_private\\.'+o.name+'\\([^;]+;'),`REVOKE EXECUTE ON FUNCTION n88_private.${o.safeName}(text) FROM n88_backend;`);
+await writeFile(new URL('disable.inactive.sql',dir),disable);
+const readback=`-- fixed metadata only; no user rows\nselect p.proname,encode(sha256(convert_to(p.prosrc,'UTF8')),'hex') as body_sha256,p.prosecdef,p.proconfig,pg_get_userbyid(p.proowner) as owner,has_function_privilege('n88_backend',p.oid,'EXECUTE') as runtime_execute from pg_proc p where p.pronamespace='n88_private'::regnamespace and p.proname=any(array[${ops.map(o=>"'"+o.safeName+"'").join(',')}]) order by p.proname;\n`;
+await writeFile(new URL('readback.sql',dir),readback+await read(new URL('readback.sql',writer)));
+await writeFile(new URL('manifest.json',dir),JSON.stringify({aiAuthored:true,taskId:'continuous-n88-hosted-runtime-compatibility-20261031',runId:'e064f942-5130-4715-ae80-fb2173033c90',baseSha:'5e5c19be4779eadb555dc9641f6ae1f91e029cd9',files,bundleSha256,installerSha256:sha(sql),disableSha256:sha(disable),readbackSha256:sha(readback+await read(new URL('readback.sql',writer))),enabled:false,hostedExecuted:false,original14Unchanged:true,newFixedWrappers:14,newTables:0,newCredentials:0,privateProfileChanges:0,canonicalBodiesUnchanged:true},null,2)+'\n');
+console.log(JSON.stringify({bundleSha256,installerSha256:sha(sql),enabled:false}));

@@ -1,0 +1,50 @@
+{
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "269dc6b9-d3e1-4f2c-a5d3-14e741b2a92a",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "savedCandidate": "e2c8ba5b07b2f0dc5feed907d846e4de60708cd6",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "startedAt": "2026-10-31T13:16:14.556Z",
+  "status": "FAIL",
+  "stage": "restricted_connect",
+  "transportRoute": "approved-session-pooler",
+  "connections": 1,
+  "sqlAttempts": 0,
+  "queries": 0,
+  "attempts": {
+    "connect": 1,
+    "transaction": 0,
+    "metadata": 0,
+    "cleanup": 0
+  },
+  "successes": {
+    "connect": 0,
+    "transaction": 0,
+    "metadata": 0,
+    "cleanup": 0
+  },
+  "mutations": 0,
+  "privateValuesExported": false,
+  "custodyWrites": 0,
+  "hostedInstall": "NOT_RUN",
+  "serviceJourney": "NOT_RUN",
+  "enabled": false,
+  "guardSourceSha256": "9bc4da8d28fb87b5b4c23866fa4cbda84551111d098b0b66abf0358e1e08e5c7",
+  "leaseAcquire": "ACQUIRED integration",
+  "custody": {
+    "parentProtected": true,
+    "exactCurrentUserOnly": true,
+    "inheritanceVerified": true,
+    "childVerified": false,
+    "reparseDenied": true,
+    "aclWrites": 0
+  },
+  "failure": {
+    "category": "postgres",
+    "code": "28P01"
+  },
+  "refusal": "postgres_28P01",
+  "connectionClosed": true,
+  "leaseRelease": "RELEASED integration",
+  "finishedAt": "2026-10-31T13:16:19.433Z"
+}

@@ -1,0 +1,442 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-qualified-source-release-20261031",
+  "runId": "87f9e945-6b36-4e41-a7be-948b1b90cebf",
+  "createdAt": "2026-10-31T15:09:57.935542+00:00",
+  "scope": "inactive source publication only",
+  "integrationBase": "3a1464e31d41c44583a54c1791bfcf869dfc3a0d",
+  "observedOriginMain": "3a1464e31d41c44583a54c1791bfcf869dfc3a0d",
+  "savedSourceCandidate": "08d4fd2f107e8c79203247df95024e9c1cee4ca2",
+  "savedSourceBase": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "savedTaskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "savedRunId": "77a8f94c-1f32-44a3-b551-4b63f2e46247",
+  "savedResultSha256": "1b6d7ef276cfa229ff840a4e3b84bdbf13a245f3ae75c42d485976642d004f97",
+  "copiedFiles": [
+    {
+      "path": "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md",
+      "gitBlob": "2f95d3b263e086bd115bc79491f80befda450485",
+      "sha256": "b19330092147720d8cb79080fb7389a669bf28805e7ec5623454a637962caa41"
+    },
+    {
+      "path": "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md",
+      "gitBlob": "53a3325a669dea732be64034821fd3c0535a3cfd",
+      "sha256": "7143ffdc077c53b824d64c23c892b8bd4fd58238ff1489f3af672c304ea85e15"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/denied-read-20261023/runtime-expectations.mjs",
+      "gitBlob": "4e745cd8d5fda7ae52866a38127c1466fc082739",
+      "sha256": "38625094fd68f0b6d1d56acaceff79c0de38b2e83bdee79bf781313290fa617b"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md",
+      "gitBlob": "59fda2023a6ac61359ca68ea9c09440e00aed033",
+      "sha256": "ca619343e038cf720a661cb9421d71745475451480f21dcfc231d3c445c5841e"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-continuation.json",
+      "gitBlob": "9305fe1289871e1e97f0a0e49d67ca06cb9ab342",
+      "sha256": "7e6a04a6cc2280760e2d9a709df87ef9bcd8bc610956db052d7656a33c0c6137"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-session.json",
+      "gitBlob": "5c5428e05b5cea1d264519348561a49e50d11980",
+      "sha256": "87ec56d9331d1b2135214ba5e3b28f3ae04e5553af42c93fc31a7281e7fa6ef5"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile.json",
+      "gitBlob": "a5e52ca7f5bf9bf19930a9282fd1be7e0225467b",
+      "sha256": "4b611ddaebed69df027f562afdf7d8198ae93f3e7207e0b3b95b674ad00cbaa6"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json",
+      "gitBlob": "13db6880a95dac38ff808c6e7508be6e4d5ceab8",
+      "sha256": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets.mjs",
+      "gitBlob": "0696ab705ee91ec9099fe2b3af52c1b9f43b05e5",
+      "sha256": "d27c9c4ac27c7caa6139cca9ce28227026176cc658e419616c16a1c8ccdbcbad"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/bind.mjs",
+      "gitBlob": "00fa89c250540ff281bf7d935fd9ef7f3408ad3b",
+      "sha256": "91318c638cccc893e20cb4c7aa6343b7e46b905c9d744d39a973e40cf841b978"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/boundary.mjs",
+      "gitBlob": "50bfd118b826d50d8b932d9fc3f4489858a4e8e8",
+      "sha256": "641e5a95c728050a9270df1644c1d0cb436c21ca75588ce106da94f5e077d92a"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/current-main.json",
+      "gitBlob": "cee7fd405138b58afca971782ce8a5f63d26d039",
+      "sha256": "fdd891eb0138fb48ffe8a6c1e23f7ba0ee90b291006a35e6b2f6d8deaf5568b1"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/disable.inactive.sql",
+      "gitBlob": "80d7a58b82f8e1836040ddd7e5912d1fdfb0a1b1",
+      "sha256": "5344e8a2f7001d66e8d8a6f359d3e5562e16a089652735dc320dcfb496f3c22a"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/gateway.inactive.mjs",
+      "gitBlob": "bb7b26b1be81cb8d856f8a4ad22bc49327bb9fab",
+      "sha256": "b9c823d01541ce6542349682604970077bc392c80e2260aff396783030568c10"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/gateway.prepared.mjs",
+      "gitBlob": "8333dcdc7f4dde7c1440076a7d70b3cd34bd82c6",
+      "sha256": "374f860d62310fceb57019e1ec68b3a10a7c5d0acb52283282b396ef2b2d2c48"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/generate.mjs",
+      "gitBlob": "ad31441c9e59dd3881b304ec25f220b83fb09d0e",
+      "sha256": "fdae149fcbef72f41d618b731f69d96f82ec2f8c5d30639dabdea9fc0536a16c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/install.inactive.sql",
+      "gitBlob": "d973a910ba4303ae577af4aa1909084df4dd5043",
+      "sha256": "62e06e5ad1b9eaae7407e6017d8d9905e89ee6450ea66c58dbf45144b0128819"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+      "gitBlob": "649d763c8a064aad23312d85c3b7cb7c8b7641a5",
+      "sha256": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/operations.json",
+      "gitBlob": "caf38d006eb1c2d41b997138f4a2603455bfc401",
+      "sha256": "d74c04c75ddd033b3130e7cdccb0d4001959b80c7e9091e8d1be34e2e496b34e"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/package.mjs",
+      "gitBlob": "2cf331b2fc1acdcf038c5cdef344ec95e82ac4f0",
+      "sha256": "ba7ea76e50507b038895b33a16da0f0b9c28c14259d80fd83e078c642dde1549"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/private-assets.inactive.mjs",
+      "gitBlob": "7628f630018c1a176c9d819279941216425c9103",
+      "sha256": "06378a385857f882e4940e2a30d8b5cb3127a032c9123b744a27309c9d936e46"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs",
+      "gitBlob": "d3c7f56bbbbbcfbb2ce55306410cb6e8010308a7",
+      "sha256": "a6daf722b532e1d6ffc9383a24d18481de2c7a737ddc3d84258184808acd3040"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-continuation.json",
+      "gitBlob": "65b8e488e01234b1bf669b10fb7e021639c1885e",
+      "sha256": "0ab5232e2dcfc5b07ae3ff646f50eacdbfba87282c3d82ac2028ff212b989b9f"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-provenance.json",
+      "gitBlob": "3b04f2f92eb94682721674591b05d38595160977",
+      "sha256": "92bfb0cf8c338f6183be353beddedfeab86ebbba764c553a7dde366f3dea1b62"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-session.json",
+      "gitBlob": "8ccd0e11f40bb79d3aa9045b4d5120edb275bc91",
+      "sha256": "63b5daf9cfe80e19ee096b7432ea78b27be511a7e97dbabdcd2000906733c858"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification.json",
+      "gitBlob": "5a29af3502a72562a5372c88f72e4e38884dda89",
+      "sha256": "8101c82ffb68525752b7aa96258f2db478716f9be32404fba8a5abb8f687ad8a"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/readback.sql",
+      "gitBlob": "9b21fc196addc2be156bd388e49145daa4cf3b45",
+      "sha256": "6da07b3f5fe6c78c8a119e4ef73459fffbc1cdba8bc21efb2db818a6d1f485dc"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/safe-boundary.sql",
+      "gitBlob": "d44509acb0eab3c78422048982d0d3be81194d60",
+      "sha256": "6681cde2e2d720e360eddc6db4d65cbb2960ebb929b5b02cd09ab3369d4218dd"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service.prepared.mjs",
+      "gitBlob": "9c86f345bd5b1fafe8064f0a7f4690c03f4073d5",
+      "sha256": "471b084bc672274ac18c94a7fd6c9122715314e94bf8153d224f843a508302f5"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/deno.json",
+      "gitBlob": "5b44b5e799512247efe8c6c2956892fb96fc3b81",
+      "sha256": "d99fdadb057ffefd4e8b394aaa331f62bd6685d6cd07b78459ff068042b18574"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/deno.lock",
+      "gitBlob": "321cd1a145d55b25be8b35c6d281fa081afe6878",
+      "sha256": "f4fe9f23edcb6d7e2ab0418fffa54818ca24cf83bdaf15a89efeb0bbc4d1609d"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/service/index.ts",
+      "gitBlob": "9c86f345bd5b1fafe8064f0a7f4690c03f4073d5",
+      "sha256": "471b084bc672274ac18c94a7fd6c9122715314e94bf8153d224f843a508302f5"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/student.prepared.mjs",
+      "gitBlob": "4ab628b5053c5f33c0abadf8e09c8b0dae5e3ce9",
+      "sha256": "b5ac898a5f87e634f11edb232a621efa1b6a1aff5c7e33647a52e16558b11dd4"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+      "gitBlob": "183324a3c6d848a98871fb47038bc6398c0826dc",
+      "sha256": "f40e74d8d1adb5d154d1d8de66133ed560a952a91dac3fa47776288fce896ee9"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+      "gitBlob": "49d2e924b182f21f9e11efddb0d89462154409b7",
+      "sha256": "fde20e710328fa7124e59ca4215d9ff32b6c16ce7b17e523dd0ffe1845adc600"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql",
+      "gitBlob": "3f1629fc785b436b9059235e515ff90b1b4f8aa2",
+      "sha256": "f9007a336261808d09af8ae789ecf1dffeea5ebe41ff21c66e26617f61293269"
+    },
+    {
+      "path": "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+      "gitBlob": "d9741a6eada117e561fb156e9d455c38ceffae6f",
+      "sha256": "eb317b16a492375db58871ce2b5326aa178f4cba86ba997f8434e5a530cd8860"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/assembly-failure.json",
+      "gitBlob": "5ebbb7045f21fd14b369050ad31035a0984dc991",
+      "sha256": "4aa3493ca7b197a0637d1c6868202624650b8767085f0abc4bceb2788f6154bb"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/cancellation-harness-first-failure.json",
+      "gitBlob": "dd695a921567ff4075c6cb8b4e33ee20893c2e5a",
+      "sha256": "f5651637584d1e3c03b4a0d1850d69cf9f9761593480663a942baf848da3dca4"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/cases.mjs",
+      "gitBlob": "9df35733174247a3c2f00e6e6760a52bab281f39",
+      "sha256": "c2d8e9ac14761a9d7dd9f280571a3caf1edffad3d8b0da551c8829b4b1a81c12"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/ddl-log-assertion-first-failure.json",
+      "gitBlob": "b9308b99caa4724cb6c9117c8451441a596052bb",
+      "sha256": "2630db2d043115f7ed72ea2202731b5100f8f5419a1f5804bb97cffda8f74aba"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/first-failure.json",
+      "gitBlob": "01ec5edc6f451807a234e6209919bec616df8fb0",
+      "sha256": "a96b6188c583aaf9792afef25d3a9532711ad8f7c9fe1270e94a427f5dd43310"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/first-service-failure.json",
+      "gitBlob": "7ffe99227105e1c4dce753bff7236365904c5462",
+      "sha256": "48abaaf4c46bd151db02c78359cc1a080397afff658fc03aefcc878d4994893d"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/log-cleanup.json",
+      "gitBlob": "05ebf48ef946571f6e902b7109edae7abb681489",
+      "sha256": "73e816e89e507846c62f62ab9f87e0e32c8e0ba426a4f6a92179bd23a39fc63e"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/manual-fixture-first-failure.json",
+      "gitBlob": "a9bbc817fac9f77f4868019a220ae8e331ad3ba7",
+      "sha256": "e73a48865f3ecc2a8d71441c67e5b8521876f8831c9a38044599f5d72ab0d9f2"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/native.mjs",
+      "gitBlob": "ca37a7be19244a6ff766c7e24bc56f44571161b3",
+      "sha256": "12437685d27d615c2a3a9fa86394001c5e5c6a0e92716f5ec6d2c02ef808d853"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/owner-schema-first-failure.json",
+      "gitBlob": "8ebfb5eb9c32ea47db491699546bbb7fa8eb4a34",
+      "sha256": "89f95aab1c03b4098bb419dbc3873e041d9a2a41995de6abe9d6c0bd15ff15ee"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/package.test.mjs",
+      "gitBlob": "fbb7f06ebfd2fa70dc9fa160056f357fbe6902f5",
+      "sha256": "5fab607e40c5911ba8d7524c0580bacbb5bd32b688751b316b8230b79b1de1f4"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/pre-null-hardening-pass.json",
+      "gitBlob": "2550d55e312e038b645f2d3bf87d8ef28a7f3467",
+      "sha256": "d7660feee20965e79a7094d0fccf0a5de91d37df7c2eac03c3976eccd0d3a264"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-continuation-unit.tap",
+      "gitBlob": "d438f604e1b8fa72f136ec930c68408b90555b26",
+      "sha256": "6e14842a5542931ba3d1f5522489a76a62efa9568c2828e4653b860315c886a8"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-continuation.test.mjs",
+      "gitBlob": "4b9143dd3af67824ab2beefc5ffd773d190e1e7d",
+      "sha256": "ef6785ea9a6219a1bceb68f058e8ccc912efb05a1d2cca0c401d039caf54beee"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-session-diagnostics.test.mjs",
+      "gitBlob": "b9af6835258ab764b8521202c7a2cb2abab80940",
+      "sha256": "c5d932dc23b59497cf8020e37a837e420a81a832d187c3216d38cc42ff982a94"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-session-unit.tap",
+      "gitBlob": "697401714a93e66307901426d5071acd9278070f",
+      "sha256": "dedd1d031871c6527e15bbfbd2446708ab9629bbedd59f6048ca652121a6252b"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/provenance-guard-first-failure.tap",
+      "gitBlob": "29db5f9194d0c158dc2465a1e18c62d37f71d206",
+      "sha256": "b5e8cde32b03bea95e3fe0bc8cb9a8a488803d0f970d64cb0de94761f1cf77a1"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/provenance-guard.tap",
+      "gitBlob": "b382609dc18ebcaee0fa09a5ca6cb2cc989ccc0b",
+      "sha256": "140c0463c5938f024fbb05319bac381645bf44a2f868db65d6e612aecf9fd36e"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/provenance-guard.test.mjs",
+      "gitBlob": "1e8c4806948b1ac2bc79ea6b28697105da323566",
+      "sha256": "8591df0f44dd275de39203da343788d2bca44b85811dc78fc671404f87dccbb5"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/results.json",
+      "gitBlob": "97a0f12181cd1fbd468e4c2a678cc29a8b31d335",
+      "sha256": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/single-column-envelope-first-failure.json",
+      "gitBlob": "25b8d2dc65293b304330c745194ebce92655500b",
+      "sha256": "2b2ffa9b14a596c12d2b3fe79709288d306661b304b64a312d65aeae260bcd1b"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-first-failure.json",
+      "gitBlob": "8d3ea0590287b7903b1a93fa8a6de6bf0ca5e0c6",
+      "sha256": "167eaa500a614821e9d0f27ba00b5a868aff87adfe26a6ba02bda74c23fb9323"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.json",
+      "gitBlob": "f60acc03a86b5ff960c46439fe9296d39f7bce86",
+      "sha256": "0062604abdaff242aa68e24f53681ba440598d3045ae953b045658cc3ad4bde7"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.tap",
+      "gitBlob": "d63a3c0bf40bd2a0a4297fbf6a43f0b70c318cd9",
+      "sha256": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3"
+    }
+  ],
+  "qualificationEvidence": [
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+      "sha256": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json",
+      "sha256": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification.json",
+      "sha256": "8101c82ffb68525752b7aa96258f2db478716f9be32404fba8a5abb8f687ad8a"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-continuation.json",
+      "sha256": "0ab5232e2dcfc5b07ae3ff646f50eacdbfba87282c3d82ac2028ff212b989b9f"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-session.json",
+      "sha256": "63b5daf9cfe80e19ee096b7432ea78b27be511a7e97dbabdcd2000906733c858"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-provenance.json",
+      "sha256": "92bfb0cf8c338f6183be353beddedfeab86ebbba764c553a7dde366f3dea1b62"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile.json",
+      "sha256": "4b611ddaebed69df027f562afdf7d8198ae93f3e7207e0b3b95b674ad00cbaa6"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-continuation.json",
+      "sha256": "7e6a04a6cc2280760e2d9a709df87ef9bcd8bc610956db052d7656a33c0c6137"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-session.json",
+      "sha256": "87ec56d9331d1b2135214ba5e3b28f3ae04e5553af42c93fc31a7281e7fa6ef5"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/results.json",
+      "sha256": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.tap",
+      "sha256": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-session-unit.tap",
+      "sha256": "dedd1d031871c6527e15bbfbd2446708ab9629bbedd59f6048ca652121a6252b"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/provenance-guard.tap",
+      "sha256": "140c0463c5938f024fbb05319bac381645bf44a2f868db65d6e612aecf9fd36e"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/provenance-guard-first-failure.tap",
+      "sha256": "b5e8cde32b03bea95e3fe0bc8cb9a8a488803d0f970d64cb0de94761f1cf77a1"
+    }
+  ],
+  "composition": {
+    "intersectingConflicts": 0,
+    "supportingAssetInputs": 65,
+    "unchangedSupportingInputBlobs": 58,
+    "assetInputHashesMatch": true,
+    "packetFileHashesMatch": true,
+    "syntaxOnlyModules": 21,
+    "testsRerun": 0,
+    "builds": 0
+  },
+  "checks": [
+    {
+      "name": "n88_exact_saved_qualified_source_identity",
+      "status": "PASS",
+      "evidence": "61 declared Git blobs and working bytes equal saved candidate; no intersecting main divergence; 58 unchanged supporting input blobs; 21 modules syntax-only PASS."
+    },
+    {
+      "name": "n88_native_package_provenance_evidence_reused_without_replay",
+      "status": "PASS",
+      "evidence": "Exact native12/package4/diagnostic5/provenance5 evidence and implementation identities retained; zero tests, builds or campaigns rerun."
+    },
+    {
+      "name": "n88_inactive_packet_and_actual_authentication_blocker_preserved",
+      "status": "PASS",
+      "evidence": "Exact inactive packet/asset inputs verified; flags OFF; all three profile records unchanged; original28P01 FAIL/BLOCKED retained, not a source-release blocker."
+    }
+  ],
+  "whitespace": {
+    "fullDiff": "FAIL",
+    "sourceExcludingExactHistoricalArtifact": "PASS",
+    "artifact": "tests/n88-hosted-compat-1031/provenance-guard-first-failure.tap",
+    "lines": [
+      35,
+      37
+    ],
+    "disposition": "Exact historical whitespace-only TAP diagnostic lines retained; no policy change or relabeling."
+  },
+  "v2Enabled": false,
+  "flags": {
+    "N88_PUBLICATION_V2_ENABLED": false,
+    "PUBLICATION_V2_READINESS": false
+  },
+  "v1": "Published V1/public source outside the exact qualified inactive delta untouched; qualified existing behavior retained.",
+  "originalHostedAuthentication": {
+    "state": "BLOCKED",
+    "actualProfileCheck": "FAIL",
+    "sqlstate": "28P01",
+    "cause": "Unknown beyond observed authentication refusal; protected state not inspected."
+  },
+  "hostedInstall": "NOT_RUN",
+  "serviceJourney": "NOT_RUN",
+  "operations": {
+    "privateReads": 0,
+    "connections": 0,
+    "sql": 0,
+    "provider": 0,
+    "browser": 0,
+    "deployments": 0,
+    "leases": 0
+  },
+  "publicationOwner": "sole original controller/publisher",
+  "productStatus": "N88 OPEN"
+}

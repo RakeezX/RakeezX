@@ -1,0 +1,13 @@
+/** AI: bounded pure checks only; never touches original custody or a DB. */
+import test from 'node:test';import assert from 'node:assert/strict';
+import {qualifyInvocation,finiteSettings,compareProfile,taskId,runId,sessionId,settingNames} from '../../drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs';
+const root='C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-hosted-runtime-compatibility-20261031';
+const card={id:taskId,status:'running',attempt:{runId},sessionId,model:'gpt-6.1-sol',effort:'medium',worktreePath:root,baseSha:'5e5c19be4779eadb555dc9641f6ae1f91e029cd9',activationId:'synthetic',preparationAuthority:{originalPrivateCustodianOnly:sessionId,originalCustodianRoot:'C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018'}};
+const cp={taskId,runId,sessionId,runnerPid:123,runnerCreatedAt:'2026-10-31T00:00:00.000Z'},lease={resource:'integration',taskId,activationId:'synthetic',owner:{type:'worker',token:runId,pid:123,createdAt:cp.runnerCreatedAt}};
+test('fresh run/session/checkpoint/lease binding refuses stale or foreign phases',()=>{assert(qualifyInvocation(card,cp,lease));for(const patch of [{status:'blocked'},{attempt:{runId:'old'}},{sessionId:'foreign'},{model:'old'},{baseSha:'old'}])assert.throws(()=>qualifyInvocation({...card,...patch},cp,lease));assert.throws(()=>qualifyInvocation(card,{...cp,runId:'old'},lease));assert.throws(()=>qualifyInvocation(card,cp,{...lease,owner:{...lease.owner,token:'foreign'}}));});
+test('finite metadata allowlist rejects raw/unexpected values; corrected profile only',()=>{
+ const raw={log_error_verbosity:'default',log_statement:'ddl',log_parameter_max_length_on_error:'0',log_min_error_statement:'error',log_min_duration_statement:'-1',log_min_duration_sample:'-1',log_transaction_sample_rate:'0','pgaudit.log':'none','auto_explain.log_min_duration':'10000','auto_explain.log_parameter_max_length':'-1',statement_timeout:'3000',lock_timeout:'0'};
+ const rows=settingNames.map(name=>({name,setting:raw[name],unit:['statement_timeout','lock_timeout','auto_explain.log_min_duration','log_min_duration_statement','log_min_duration_sample'].includes(name)?'ms':null}));
+ assert(compareProfile(finiteSettings(rows)));assert.equal(compareProfile(rows.map(r=>r.name==='log_statement'?{...r,setting:'all'}:r)),false);assert.equal(compareProfile(rows.map(r=>r.name==='auto_explain.log_min_duration'?{...r,setting:'4000'}:r)),false);
+ assert.throws(()=>finiteSettings([...rows,{name:'unapproved',setting:'private',unit:null}]));assert.throws(()=>finiteSettings([{name:'log_statement',setting:'untrusted-private-text',unit:null}]));assert.throws(()=>finiteSettings([rows[0],rows[0]]));
+});

@@ -1,0 +1,10 @@
+{
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "e064f942-5130-4715-ae80-fb2173033c90",
+  "at": "2026-10-31T12:23:16.331Z",
+  "status": "NOT_RUN",
+  "connections": 0,
+  "queries": 0,
+  "mutations": 0,
+  "reason": "Original protected restricted connection environment is not available to this process; no credential discovery or alternative access attempted."
+}

@@ -1,0 +1,112 @@
+{
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "e064f942-5130-4715-ae80-fb2173033c90",
+  "ownedLogs": [
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-36773e6f-c0f3-4df5-b373-c127930e0649.tmp",
+      "logSha256": "bab0437739929833223e4e7104151c3e0cf3a00bb871c987bb3c7ae2e5687b6c",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-3c2c56ca-daf0-4b4a-a5c0-f4fe9d432bcc.tmp",
+      "logSha256": "3fbd297bf05b7196bb4a92b3b2f6acc2e5cd79911ea80bc3eab78c6ff03a6260",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-4be305c1-29b6-4bb8-85e3-7c6362fa0323.tmp",
+      "logSha256": "54ca057b1129a15b152a331fe6254e20b3c69a0a15f156121dd8dfb69c046635",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-54137d16-3244-48a2-a478-3b8b0987315e.tmp",
+      "logSha256": "359742fd6775778cb7b6c6ce36716e9caf1041695bf67c79d5c3f6303acefb58",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-7b7e4c37-f021-43c6-8e36-ad89bfce8461.tmp",
+      "logSha256": "43c0862ebaa498d064a6a7623bfa2ce9e8ffa55f5da19271a352342033b4f670",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-83bdeea6-12e0-4532-9925-ea5c3714c902.tmp",
+      "logSha256": "069cc3ae6112bfb607cab4f6e1d1acb356e6dc663e0a5e92272d6eed433bef37",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-87f6a6a0-63bc-4605-b278-a47ecf33efe2.tmp",
+      "logSha256": "c73f880366e7f6083497a8fa2407185deb32792c5e923e43c37320000f7eb93d",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-89d50d01-476a-48c3-a3a9-2fad6454db78.tmp",
+      "logSha256": "9362580666bb7c4dac5ccafacf1e1f165e579deb5cf326fc5fc603f2ee9ae1bb",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-a62b30a5-f813-4e10-8cf5-345475be5751.tmp",
+      "logSha256": "cea3a496bad66085fa85423b63b436ceb91b74e684c6c48cc62de7c0dfcd6682",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-abc15d88-7f4f-4eb3-a213-477daa138db3.tmp",
+      "logSha256": "7478ff28bf43d3274d551f76020e00526c40508501e1451112cb732058ef7df7",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-baf362c5-5f23-47ed-8740-e1798d7d88a4.tmp",
+      "logSha256": "28c1bd903920d1099c09a061a2a7c5b8708e4df141801a7331b7b7e91c0b7336",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-c008d62c-4e4b-4f98-9fb4-373e0e44c413.tmp",
+      "logSha256": "11caa62b2ff81acf311dd99f27bfe0f21bfedffec2a3a084a4c2ee46e340c860",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-d09e5dd9-b918-4511-bc56-06bd311a46a2.tmp",
+      "logSha256": "9ec9eba1d96fefc844d3a4b1784b1bf49a58b94caf22ff4efbd7db3ff148e2a8",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-dcc8369c-ad39-46e6-a176-a8335fbc77e1.tmp",
+      "logSha256": "649bb1f6287bf97b2ed7f5eec1be26df17ee6091298b88bc26c3a9fa7ede4f59",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    },
+    {
+      "phase": "artifacts\\continuous-n88-hosted-runtime-compatibility-20261031-e4b8cec8-92d1-4e36-ac0c-8928e06eb907.tmp",
+      "logSha256": "5ade290ac37a17837800611c0cf16997fe5337e24033da582ee1bc65b11ff87f",
+      "ownSyntheticLogRemoved": true,
+      "runnerAbsent": true,
+      "clusterAbsent": true
+    }
+  ],
+  "unrelatedResourcesTouched": false
+}

@@ -22,7 +22,9 @@ begin
   payload=payload||jsonb_build_object('publicationRevision',publication_revision+1,'tombstone',true,'decisions',jsonb_build_object('required',false,'scheduled',false,'completed',false,'grade',false))
  where owner_id=p_owner and scope_key=p_scope and not tombstone and (p_item is null or
   p_subitem is null and row_id::jsonb->>1=p_item or p_subitem is not null and row_id::jsonb->>0='subitem' and row_id::jsonb->>2=p_subitem);
- update n88_private.publication_v2_scopes set store_revision=store_revision+1 where owner_id=p_owner and scope_key=p_scope;
+ update n88_private.publication_v2_scopes set store_revision=store_revision+1,
+  payload=case when p_item is null then jsonb_set(payload,'{manualTasks}','[]'::jsonb) else payload end
+ where owner_id=p_owner and scope_key=p_scope;
 end $$;
 
 create function n88_private.v2_writer_after_1031() returns trigger

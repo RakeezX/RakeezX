@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "269dc6b9-d3e1-4f2c-a5d3-14e741b2a92a",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "savedCandidate": "e2c8ba5b07b2f0dc5feed907d846e4de60708cd6",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "state": "BLOCKED",
+  "blockerType": "auth",
+  "blocker": "Single approved session-pooler restricted connection returned PostgreSQL authentication SQLSTATE28P01 before any SQL attempt. No retry or alternative permitted after this refusal.",
+  "reusedEvidence": [
+    {
+      "path": "tests/n88-hosted-compat-1031/results.json",
+      "sha256": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.tap",
+      "sha256": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+      "sha256": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json",
+      "sha256": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile.json",
+      "sha256": "4b611ddaebed69df027f562afdf7d8198ae93f3e7207e0b3b95b674ad00cbaa6",
+      "equalSavedCandidate": true
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-continuation.json",
+      "sha256": "7e6a04a6cc2280760e2d9a709df87ef9bcd8bc610956db052d7656a33c0c6137",
+      "equalSavedCandidate": true
+    }
+  ],
+  "publicNetworkReview": {
+    "path": "C:\\Users\\Abody\\Projects\\RakeezX\\artifacts\\ops-supervisor-v4\\n88-profile-network-review-20261031.json",
+    "sha256": "9adde6336334e90d87608d1f46bf1593df6015f37645f5caf1bc030138a95cc7",
+    "authenticationSent": false,
+    "sqlSent": false,
+    "doesNotReclassifyOldFailure": true
+  },
+  "actualObservation": {
+    "path": "actual-restricted-profile-session.json",
+    "sha256": "87ec56d9331d1b2135214ba5e3b28f3ae04e5553af42c93fc31a7281e7fa6ef5"
+  },
+  "helperSha256": "177a5f78607fa19ca3fbf8d91a75761ddba22c6a8ea9ad267be2ed4db5cd0a17",
+  "checks": [
+    {
+      "name": "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+      "status": "FAIL",
+      "evidence": "Actual authentication refusal postgres_28P01 at restricted_connect;1 attempt,0successful connections,0SQL attempts/metadata. Native safe boundary evidence unchanged."
+    },
+    {
+      "name": "n88_private_markers_cancellation_whole_transaction_rollback",
+      "status": "PASS",
+      "evidence": "Exact unchanged12/12 native proof reused."
+    },
+    {
+      "name": "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+      "status": "PASS",
+      "evidence": "Exact unchanged saved candidate/runtime/writer qualification reused."
+    },
+    {
+      "name": "n88_combined_native_owner_packet_and_private_service_assets_default_off",
+      "status": "PASS",
+      "evidence": "Exact unchanged combined manifest/assets and4/4 package proof; no rebuild or activation."
+    },
+    {
+      "name": "n88_existing_custody_guards_and_private_values_not_exported",
+      "status": "PASS",
+      "evidence": "Fresh inherited/owned/DPAPI guards passed;0custody writes,privateValuesExported=false; client closed/integration released."
+    },
+    {
+      "name": "n88_profile_error_phase_and_network_classification",
+      "status": "PASS",
+      "evidence": "profile-session-unit.tap:5 focused tests; actual phase and counters distinguish authentication failure from BEGIN/metadata. EPIPE/network/TLS/SQLSTATE and unknown handling covered."
+    }
+  ],
+  "enabled": false,
+  "hostedInstall": "NOT_RUN",
+  "hostedServiceJourney": "NOT_RUN",
+  "nextAction": "Stop this path. Resume only after legitimate original-custodian authentication access is materially corrected and a new bounded attempt is admitted. No alternate endpoint/credential, setting/grant change, unchanged retry or repeated native/UI qualification."
+}

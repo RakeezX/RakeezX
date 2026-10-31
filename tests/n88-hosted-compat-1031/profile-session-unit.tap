@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: fresh run/session/checkpoint/lease binding refuses stale or foreign phases
+ok 1 - fresh run/session/checkpoint/lease binding refuses stale or foreign phases
+  ---
+  duration_ms: 1.2576
+  type: 'test'
+  ...
+# Subtest: finite metadata allowlist rejects raw/unexpected values; corrected profile only
+ok 2 - finite metadata allowlist rejects raw/unexpected values; corrected profile only
+  ---
+  duration_ms: 0.9372
+  type: 'test'
+  ...
+# Subtest: Node network/TLS codes stay distinct from PostgreSQL SQLSTATE; private diagnostics never exported
+ok 3 - Node network/TLS codes stay distinct from PostgreSQL SQLSTATE; private diagnostics never exported
+  ---
+  duration_ms: 2.2754
+  type: 'test'
+  ...
+# Subtest: connect failure and BEGIN failure preserve different phases and dispatched/succeeded counts
+ok 4 - connect failure and BEGIN failure preserve different phases and dispatched/succeeded counts
+  ---
+  duration_ms: 0.6333
+  type: 'test'
+  ...
+# Subtest: each metadata dispatch is counted before failure; successful metadata only increments queries
+ok 5 - each metadata dispatch is counted before failure; successful metadata only increments queries
+  ---
+  duration_ms: 0.2538
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 110.6186

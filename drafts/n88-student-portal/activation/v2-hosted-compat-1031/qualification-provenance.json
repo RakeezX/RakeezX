@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "aiAuthored": true,
+  "taskId": "continuous-n88-hosted-runtime-compatibility-20261031",
+  "runId": "77a8f94c-1f32-44a3-b551-4b63f2e46247",
+  "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+  "baseSha": "5e5c19be4779eadb555dc9641f6ae1f91e029cd9",
+  "savedCandidate": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c",
+  "state": "BLOCKED",
+  "blockerType": "auth",
+  "blocker": "Unchanged actual authentication refusal SQLSTATE28P01 from run269dc6b9; this source-only repair authorizes no private retry and does not explain that refusal.",
+  "privateOperations": 0,
+  "connections": 0,
+  "sqlAttempts": 0,
+  "leaseAcquisitions": 0,
+  "enabled": false,
+  "hostedInstall": "NOT_RUN",
+  "hostedServiceJourney": "NOT_RUN",
+  "actualEncryptedStateFlags": "UNKNOWN_NOT_INSPECTED",
+  "reusedEvidence": [
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile.json",
+      "sha256": "4b611ddaebed69df027f562afdf7d8198ae93f3e7207e0b3b95b674ad00cbaa6",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-continuation.json",
+      "sha256": "7e6a04a6cc2280760e2d9a709df87ef9bcd8bc610956db052d7656a33c0c6137",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-session.json",
+      "sha256": "87ec56d9331d1b2135214ba5e3b28f3ae04e5553af42c93fc31a7281e7fa6ef5",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+      "sha256": "a7e37ec1f7a6dfe76c174fa0947384f1d6808e5304a8b6759430ee07e176fff9",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "drafts/n88-student-portal/activation/v2-hosted-compat-1031/assets-manifest.json",
+      "sha256": "b86d691f7e1163ee22975b42c12e87077febb09e715bb120b72b301bb9834751",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/results.json",
+      "sha256": "d5f4b9510cad47a977f501e18cb1dab681b67a366d9d84d4cc3b4679308358ca",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/unit-results.tap",
+      "sha256": "abfd2ff1f83837596dff7a3ed51c4b2fecd382e34ae8eeacaa179ae741d044a3",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-session-diagnostics.test.mjs",
+      "sha256": "c5d932dc23b59497cf8020e37a837e420a81a832d187c3216d38cc42ff982a94",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    },
+    {
+      "path": "tests/n88-hosted-compat-1031/profile-session-unit.tap",
+      "sha256": "dedd1d031871c6527e15bbfbd2446708ab9629bbedd59f6048ca652121a6252b",
+      "unchangedFrom": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c"
+    }
+  ],
+  "sourceHashes": {
+    "drafts/n88-student-portal/activation/denied-read-20261023/runtime-expectations.mjs": "38625094fd68f0b6d1d56acaceff79c0de38b2e83bdee79bf781313290fa617b",
+    "drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs": "a6daf722b532e1d6ffc9383a24d18481de2c7a737ddc3d84258184808acd3040",
+    "tests/n88-hosted-compat-1031/provenance-guard.test.mjs": "8591df0f44dd275de39203da343788d2bca44b85811dc78fc671404f87dccbb5"
+  },
+  "checks": [
+    {
+      "name": "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+      "status": "FAIL",
+      "evidence": "Historical actual profile-session authentication SQLSTATE28P01 unchanged; no current private attempt."
+    },
+    {
+      "name": "n88_private_markers_cancellation_whole_transaction_rollback",
+      "status": "PASS",
+      "evidence": "Unchanged native12/12 proof reused."
+    },
+    {
+      "name": "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+      "status": "PASS",
+      "evidence": "Unchanged qualified writer/runtime packet reused."
+    },
+    {
+      "name": "n88_combined_native_owner_packet_and_private_service_assets_default_off",
+      "status": "PASS",
+      "evidence": "Exact unchanged manifest/assets and4/4 package proof; no build or activation."
+    },
+    {
+      "name": "n88_existing_custody_guards_and_private_values_not_exported",
+      "status": "PASS",
+      "evidence": "No custody code/security changes or private operation; historical guarded outcome retained."
+    },
+    {
+      "name": "n88_profile_error_phase_and_network_classification",
+      "status": "PASS",
+      "evidence": "Unchanged diagnostic tests/evidence reused; added fixed safe provenance code covered by pure test."
+    },
+    {
+      "name": "n88_original_credential_provenance_guard_preserved",
+      "status": "PASS",
+      "evidence": "provenance-guard.tap5/5: exact predicate and remaining original-caller bytes; every invalid predicate; fake-password disarmed/refused cases; pre-connection refusal; clearing and fixed diagnostics."
+    }
+  ],
+  "nextAction": "Keep actual authentication BLOCKED. Legitimate working original service authentication and separately authorized private continuation are required; no unchanged retry or alternate credential/channel.",
+  "whitespaceChecks": [
+    {
+      "name": "full_candidate_whitespace",
+      "status": "FAIL",
+      "evidence": "Raw preserved provenance-guard-first-failure.tap lines35/37 contain literal whitespace-only diagnostic lines; no policy or artifact alteration."
+    },
+    {
+      "name": "affected_source_whitespace",
+      "status": "PASS",
+      "evidence": "git diff HEAD^ HEAD --check excluding only that explicitly retained raw failure TAP succeeded. Source, tests, report and qualified guard remain unchanged."
+    }
+  ]
+}

@@ -1,0 +1,421 @@
+{
+  "version": 1,
+  "definitions": [
+    {
+      "id": "owner-context",
+      "sql": "select namespace,owner_id,active from n88_private.contexts where owner_id=$1::uuid for share",
+      "sha256": "f8a1689cd78951d7fc52ef91eb51423510f98cbf717a42c162572b2c69bf692b",
+      "parameters": [
+        "owner:uuid"
+      ],
+      "output": [
+        "namespace:text",
+        "owner_id:uuid",
+        "active:boolean"
+      ],
+      "maxRows": 1,
+      "maxBytes": 4096,
+      "effect": false,
+      "name": "v2_f8a1689cd78951d7fc52ef91",
+      "types": [
+        "uuid"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_f8a1689cd78951d7fc52ef91($1::uuid)",
+      "safeName": "safe_1031_f8a1689cd78951d7fc52ef91",
+      "safeSql": "select n88_private.safe_1031_f8a1689cd78951d7fc52ef91($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>1 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('namespace',r.namespace,'owner_id',r.owner_id,'active',r.active)),'[]'::jsonb)) into v from n88_private.v2_f8a1689cd78951d7fc52ef91((a->>0)::uuid) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "885239c2ca3cc58212c5745ae37314334fa03f2f98249dace54f8250c34ea0bc"
+    },
+    {
+      "id": "numeric-session",
+      "sql": "select payload from n88_private.numeric_sessions where token_hash=$1 for share",
+      "sha256": "7874a827dae2373223bc8adc67a2a30d158ed7e1e40183e72a8cff2c1df55a90",
+      "parameters": [
+        "tokenHash:hex64"
+      ],
+      "output": [
+        "payload:numericSession"
+      ],
+      "maxRows": 1,
+      "maxBytes": 4096,
+      "effect": false,
+      "name": "v2_7874a827dae2373223bc8adc",
+      "types": [
+        "text"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_7874a827dae2373223bc8adc($1::text)",
+      "safeName": "safe_1031_7874a827dae2373223bc8adc",
+      "safeSql": "select n88_private.safe_1031_7874a827dae2373223bc8adc($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>1 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('payload',r.payload)),'[]'::jsonb)) into v from n88_private.v2_7874a827dae2373223bc8adc((a->>0)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "7ef5ad1d07da770a914fc4f5aad6fb1715535d042dc24ad18da82fd4cadb35b2"
+    },
+    {
+      "id": "numeric-credential",
+      "sql": "select payload from n88_private.numeric_credentials where id=$1::uuid and owner_id=$2::uuid and student_id=$3 and version=$4::bigint for share",
+      "sha256": "6d27c8049efec0665b9d1f91f20f631f036ebb8403a3301bcc211176a6d1c751",
+      "parameters": [
+        "credentialId:uuid",
+        "owner:uuid",
+        "studentId:text240",
+        "version:positiveBigint"
+      ],
+      "output": [
+        "payload:numericCredential"
+      ],
+      "maxRows": 1,
+      "maxBytes": 2048,
+      "effect": false,
+      "name": "v2_6d27c8049efec0665b9d1f91",
+      "types": [
+        "uuid",
+        "uuid",
+        "text",
+        "text"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_6d27c8049efec0665b9d1f91($1::uuid,$2::uuid,$3::text,$4::text)",
+      "safeName": "safe_1031_6d27c8049efec0665b9d1f91",
+      "safeSql": "select n88_private.safe_1031_6d27c8049efec0665b9d1f91($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('payload',r.payload)),'[]'::jsonb)) into v from n88_private.v2_6d27c8049efec0665b9d1f91((a->>0)::uuid,(a->>1)::uuid,(a->>2)::text,(a->>3)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "48575aa509c436696460926928cd6980fa94c68a32ea38e0f397ac2622a17761"
+    },
+    {
+      "id": "read-scopes",
+      "sql": "select case when octet_length(body)<=$3 and sum(octet_length(body)) over (rows unbounded preceding)<=$4 then body else null end as body from (select row_to_json(r)::text as body from (select scope_key,store_revision::text as store_revision,payload from n88_private.publication_v2_scopes where owner_id=$1::uuid order by scope_key limit $2) r) bounded",
+      "sha256": "e1b1c0927f6164faeccb760bbe7678f49ff4bfec39ac0e057b7be9b754ec33bf",
+      "parameters": [
+        "owner:uuid",
+        "overflowLimit:10001",
+        "rowBytes:2097152",
+        "remainingBytes:1..4194304"
+      ],
+      "output": [
+        "body:typedStorageJSON"
+      ],
+      "maxRows": 10000,
+      "maxBytes": 4194304,
+      "effect": false,
+      "name": "v2_e1b1c0927f6164faeccb760b",
+      "types": [
+        "uuid",
+        "integer",
+        "integer",
+        "integer"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_e1b1c0927f6164faeccb760b($1::uuid,$2::integer,$3::integer,$4::integer)",
+      "safeName": "safe_1031_e1b1c0927f6164faeccb760b",
+      "safeSql": "select n88_private.safe_1031_e1b1c0927f6164faeccb760b($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('body',r.body)),'[]'::jsonb)) into v from n88_private.v2_e1b1c0927f6164faeccb760b((a->>0)::uuid,(a->>1)::integer,(a->>2)::integer,(a->>3)::integer) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "28378cc1586c9deb10e301edbd383e12bad506ac725e77c3dd9b5082d5527a13"
+    },
+    {
+      "id": "read-items",
+      "sql": "select case when octet_length(body)<=$3 and sum(octet_length(body)) over (rows unbounded preceding)<=$4 then body else null end as body from (select row_to_json(r)::text as body from (select scope_key,row_id,publication_revision::text as publication_revision,tombstone,payload from n88_private.publication_v2_items where owner_id=$1::uuid order by scope_key,row_id limit $2) r) bounded",
+      "sha256": "f46afed1e023d013cdabf257a722636fc6929997f1612d157d83327bae417a22",
+      "parameters": [
+        "owner:uuid",
+        "overflowLimit:10001",
+        "rowBytes:2097152",
+        "remainingBytes:1..4194304"
+      ],
+      "output": [
+        "body:typedStorageJSON"
+      ],
+      "maxRows": 10000,
+      "maxBytes": 4194304,
+      "effect": false,
+      "name": "v2_f46afed1e023d013cdabf257",
+      "types": [
+        "uuid",
+        "integer",
+        "integer",
+        "integer"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_f46afed1e023d013cdabf257($1::uuid,$2::integer,$3::integer,$4::integer)",
+      "safeName": "safe_1031_f46afed1e023d013cdabf257",
+      "safeSql": "select n88_private.safe_1031_f46afed1e023d013cdabf257($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('body',r.body)),'[]'::jsonb)) into v from n88_private.v2_f46afed1e023d013cdabf257((a->>0)::uuid,(a->>1)::integer,(a->>2)::integer,(a->>3)::integer) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "5e0ad30a54f22ad48842598ec9edbb6a6255fcc12ad3efbff52262cc90dec3a0"
+    },
+    {
+      "id": "read-high_water",
+      "sql": "select case when octet_length(body)<=$3 and sum(octet_length(body)) over (rows unbounded preceding)<=$4 then body else null end as body from (select row_to_json(r)::text as body from (select scope_key,source_key,canonical_revision::text as canonical_revision,retired from n88_private.publication_v2_high_water where owner_id=$1::uuid order by scope_key,source_key limit $2) r) bounded",
+      "sha256": "0dad27a56bfdc5bfab552235376bffb18292e9cfd59f29465272b0ba1bef11f3",
+      "parameters": [
+        "owner:uuid",
+        "overflowLimit:10001",
+        "rowBytes:2097152",
+        "remainingBytes:1..4194304"
+      ],
+      "output": [
+        "body:typedStorageJSON"
+      ],
+      "maxRows": 10000,
+      "maxBytes": 4194304,
+      "effect": false,
+      "name": "v2_0dad27a56bfdc5bfab552235",
+      "types": [
+        "uuid",
+        "integer",
+        "integer",
+        "integer"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_0dad27a56bfdc5bfab552235($1::uuid,$2::integer,$3::integer,$4::integer)",
+      "safeName": "safe_1031_0dad27a56bfdc5bfab552235",
+      "safeSql": "select n88_private.safe_1031_0dad27a56bfdc5bfab552235($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('body',r.body)),'[]'::jsonb)) into v from n88_private.v2_0dad27a56bfdc5bfab552235((a->>0)::uuid,(a->>1)::integer,(a->>2)::integer,(a->>3)::integer) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "92c724304a7787820ab23063d020a6193931a3d64e3860d77be80c796d2c9a0f"
+    },
+    {
+      "id": "read-receipts",
+      "sql": "select case when octet_length(body)<=$3 and sum(octet_length(body)) over (rows unbounded preceding)<=$4 then body else null end as body from (select row_to_json(r)::text as body from (select request_id,scope_key,fingerprint,payload from n88_private.publication_v2_receipts where owner_id=$1::uuid order by request_id limit $2) r) bounded",
+      "sha256": "71a3e914da47cf1053850671fc8c2835603b1bc3490153fbb1784e773e0417eb",
+      "parameters": [
+        "owner:uuid",
+        "overflowLimit:10001",
+        "rowBytes:2097152",
+        "remainingBytes:1..4194304"
+      ],
+      "output": [
+        "body:typedStorageJSON"
+      ],
+      "maxRows": 10000,
+      "maxBytes": 4194304,
+      "effect": false,
+      "name": "v2_71a3e914da47cf1053850671",
+      "types": [
+        "uuid",
+        "integer",
+        "integer",
+        "integer"
+      ],
+      "command": "SELECT",
+      "callSql": "select * from n88_private.v2_71a3e914da47cf1053850671($1::uuid,$2::integer,$3::integer,$4::integer)",
+      "safeName": "safe_1031_71a3e914da47cf1053850671",
+      "safeSql": "select n88_private.safe_1031_71a3e914da47cf1053850671($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','SELECT','rowCount',count(*)::integer,'rows',coalesce(jsonb_agg(jsonb_build_object('body',r.body)),'[]'::jsonb)) into v from n88_private.v2_71a3e914da47cf1053850671((a->>0)::uuid,(a->>1)::integer,(a->>2)::integer,(a->>3)::integer) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "e15ee1938b5948b3b15e09da534c59ca89cc78d8f418601cc6e3729f62b78266"
+    },
+    {
+      "id": "insert-scope",
+      "sql": "insert into n88_private.publication_v2_scopes(owner_id,scope_key,store_revision,payload) values($1::uuid,$2,1,$3::jsonb)",
+      "sha256": "74c4aa4d430911e99002af80476a8c2647e430d81bd66eff0ce4ca1c1d7ddf12",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "root:canonicalJSON"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_74c4aa4d430911e99002af80",
+      "types": [
+        "uuid",
+        "text",
+        "text"
+      ],
+      "command": "INSERT",
+      "callSql": "select * from n88_private.v2_74c4aa4d430911e99002af80($1::uuid,$2::text,$3::text)",
+      "safeName": "safe_1031_74c4aa4d430911e99002af80",
+      "safeSql": "select n88_private.safe_1031_74c4aa4d430911e99002af80($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>3 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','INSERT','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_74c4aa4d430911e99002af80((a->>0)::uuid,(a->>1)::text,(a->>2)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "850423d46a42ca040032674480e535ac20056b34b10d204a4a1b09e28271904b"
+    },
+    {
+      "id": "cas-scope",
+      "sql": "update n88_private.publication_v2_scopes set store_revision=store_revision+1,payload=$3::jsonb where owner_id=$1::uuid and scope_key=$2 and store_revision=$4::bigint",
+      "sha256": "dbe074dae923ca8a3746d390240287893cd777e5f01b8b27fe07477aeda85df0",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "root:canonicalJSON",
+        "priorStoreRevision:positiveBigint"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_dbe074dae923ca8a3746d390",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text"
+      ],
+      "command": "UPDATE",
+      "callSql": "select * from n88_private.v2_dbe074dae923ca8a3746d390($1::uuid,$2::text,$3::text,$4::text)",
+      "safeName": "safe_1031_dbe074dae923ca8a3746d390",
+      "safeSql": "select n88_private.safe_1031_dbe074dae923ca8a3746d390($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>4 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','UPDATE','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_dbe074dae923ca8a3746d390((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "63fa35c9404ed82c24ff0da077a1d33de2fbf58a2b7bfe943a4c4e9622bf601e"
+    },
+    {
+      "id": "insert-item",
+      "sql": "insert into n88_private.publication_v2_items(owner_id,scope_key,row_id,publication_revision,tombstone,payload) values($1::uuid,$2,$3,$4::bigint,$5,$6::jsonb)",
+      "sha256": "a3e6d95cdff2d66f56ae84f6530f07f9bc970a014b2f3a25d31f548173d2c508",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "rowId:text",
+        "revision:safeBigint",
+        "tombstone:boolean",
+        "publication:canonicalJSON"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_a3e6d95cdff2d66f56ae84f6",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "boolean",
+        "text"
+      ],
+      "command": "INSERT",
+      "callSql": "select * from n88_private.v2_a3e6d95cdff2d66f56ae84f6($1::uuid,$2::text,$3::text,$4::text,$5::boolean,$6::text)",
+      "safeName": "safe_1031_a3e6d95cdff2d66f56ae84f6",
+      "safeSql": "select n88_private.safe_1031_a3e6d95cdff2d66f56ae84f6($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>6 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','INSERT','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_a3e6d95cdff2d66f56ae84f6((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text,(a->>4)::boolean,(a->>5)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "b6a2457c600b33dd7bd88f021ef8fd76143e22e128bc8fc20f8b61ae6f9badad"
+    },
+    {
+      "id": "cas-item",
+      "sql": "update n88_private.publication_v2_items set publication_revision=$4::bigint,tombstone=$5,payload=$6::jsonb where owner_id=$1::uuid and scope_key=$2 and row_id=$3 and publication_revision=$7::bigint and payload=$8::jsonb",
+      "sha256": "5d62e77b02ab6a1fb4e97688aa1810d3559d998a42ab85a04435819f19017f21",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "rowId:text",
+        "revision:safeBigint",
+        "tombstone:boolean",
+        "publication:canonicalJSON",
+        "priorRevision:safeBigint",
+        "priorPublication:canonicalJSON"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_5d62e77b02ab6a1fb4e97688",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "boolean",
+        "text",
+        "text",
+        "text"
+      ],
+      "command": "UPDATE",
+      "callSql": "select * from n88_private.v2_5d62e77b02ab6a1fb4e97688($1::uuid,$2::text,$3::text,$4::text,$5::boolean,$6::text,$7::text,$8::text)",
+      "safeName": "safe_1031_5d62e77b02ab6a1fb4e97688",
+      "safeSql": "select n88_private.safe_1031_5d62e77b02ab6a1fb4e97688($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>8 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','UPDATE','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_5d62e77b02ab6a1fb4e97688((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text,(a->>4)::boolean,(a->>5)::text,(a->>6)::text,(a->>7)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "877c8715199fe7fe11fdbd80c315c615e19492415206f268fc7abd00171037f9"
+    },
+    {
+      "id": "insert-high-water",
+      "sql": "insert into n88_private.publication_v2_high_water(owner_id,scope_key,source_key,canonical_revision,retired) values($1::uuid,$2,$3,$4::bigint,$5)",
+      "sha256": "23ccfc1e16cd0b122d0cb3c342a2492cc10f5e108becfcd5b1955b3a42772c73",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "sourceKey:text220",
+        "canonicalRevision:positiveBigint",
+        "retired:boolean"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_23ccfc1e16cd0b122d0cb3c3",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "boolean"
+      ],
+      "command": "INSERT",
+      "callSql": "select * from n88_private.v2_23ccfc1e16cd0b122d0cb3c3($1::uuid,$2::text,$3::text,$4::text,$5::boolean)",
+      "safeName": "safe_1031_23ccfc1e16cd0b122d0cb3c3",
+      "safeSql": "select n88_private.safe_1031_23ccfc1e16cd0b122d0cb3c3($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>5 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','INSERT','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_23ccfc1e16cd0b122d0cb3c3((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text,(a->>4)::boolean) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "eab985bb8e138507157e54b2a0b0e61a385456b63e6400296f2eefed2cb158a9"
+    },
+    {
+      "id": "cas-high-water",
+      "sql": "update n88_private.publication_v2_high_water set canonical_revision=$4::bigint,retired=$5 where owner_id=$1::uuid and scope_key=$2 and source_key=$3 and canonical_revision=$6::bigint and retired=$7",
+      "sha256": "94bb23dac56c2e002713130ac7ddb2c686561f7c1bbe1f1464a873629c5237fc",
+      "parameters": [
+        "owner:uuid",
+        "scopeKey:hex64",
+        "sourceKey:text220",
+        "canonicalRevision:positiveBigint",
+        "retired:boolean",
+        "priorRevision:positiveBigint",
+        "priorRetired:boolean"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_94bb23dac56c2e002713130a",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "boolean",
+        "text",
+        "boolean"
+      ],
+      "command": "UPDATE",
+      "callSql": "select * from n88_private.v2_94bb23dac56c2e002713130a($1::uuid,$2::text,$3::text,$4::text,$5::boolean,$6::text,$7::boolean)",
+      "safeName": "safe_1031_94bb23dac56c2e002713130a",
+      "safeSql": "select n88_private.safe_1031_94bb23dac56c2e002713130a($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>7 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','UPDATE','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_94bb23dac56c2e002713130a((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text,(a->>4)::boolean,(a->>5)::text,(a->>6)::boolean) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "5843b74f44e12f9670c10651a7fa43564c140b77e16082f08a25191709084543"
+    },
+    {
+      "id": "insert-receipt",
+      "sql": "insert into n88_private.publication_v2_receipts(owner_id,request_id,scope_key,fingerprint,payload) values($1::uuid,$2,$3,$4,$5::jsonb)",
+      "sha256": "3b143936c792a16ff5425c3dd129c1065921837cfaa15fdcc018734517196acf",
+      "parameters": [
+        "owner:uuid",
+        "requestId:text16..100",
+        "scopeKey:hex64",
+        "fingerprint:hex64",
+        "receipt:canonicalJSON"
+      ],
+      "output": [],
+      "maxRows": 0,
+      "maxBytes": 0,
+      "effect": true,
+      "name": "v2_3b143936c792a16ff5425c3d",
+      "types": [
+        "uuid",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      "command": "INSERT",
+      "callSql": "select * from n88_private.v2_3b143936c792a16ff5425c3d($1::uuid,$2::text,$3::text,$4::text,$5::text)",
+      "safeName": "safe_1031_3b143936c792a16ff5425c3d",
+      "safeSql": "select n88_private.safe_1031_3b143936c792a16ff5425c3d($1::text) as envelope",
+      "body": "\nbegin\n if p is null or length(p)>11184812 or p !~ '^[A-Za-z0-9+/]*={0,2}$' then raise exception 'n88_fixed_failure';end if;\n declare a jsonb;v jsonb;begin\n a:=convert_from(decode(p,'base64'),'UTF8')::jsonb;\n if jsonb_typeof(a)<>'array' or jsonb_array_length(a)<>5 or exists(select 1 from jsonb_array_elements(a) x where jsonb_typeof(x) not in ('string','number','boolean')) then raise exception 'n88_fixed_failure';end if;\n select jsonb_build_object('command','INSERT','rowCount',coalesce(max(affected),0)::integer,'rows','[]'::jsonb) into v from n88_private.v2_3b143936c792a16ff5425c3d((a->>0)::uuid,(a->>1)::text,(a->>2)::text,(a->>3)::text,(a->>4)::text) r;\n return jsonb_build_object('ok',true,'result',v);\n end;\n exception when query_canceled then return '{\"ok\":false,\"failure\":\"cancelled\"}'::jsonb;\n when assert_failure then return '{\"ok\":false,\"failure\":\"assertion\"}'::jsonb;\n when others then return '{\"ok\":false,\"failure\":\"unavailable\"}'::jsonb;\nend\n",
+      "bodySha256": "7a21d04ca74df248ab8c4f7c1a4de90cc950f71f424c7a47efd0a570ae653c59"
+    }
+  ]
+}
