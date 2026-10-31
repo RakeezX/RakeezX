@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-hosted-off-install-delivery-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100041,
+      "scopeKey": "n88-hosted-off-install-delivery",
+      "riskClass": "CRITICAL",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-OFF-INSTALL-DELIVERY",
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 80,
+      "idleMinutes": 12,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-fresh-service-credential-enrolment-20261031",
+        "continuous-n88-student-scope-source-20261031"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/activation/hosted-off-install-1031/**",
+        "tests/n88-hosted-off-install-1031/**",
+        "docs/automation-evidence/20261031/N88_HOSTED_OFF_INSTALL.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/hosted-off-install-1031/manifest.json",
+        "drafts/n88-student-portal/activation/hosted-off-install-1031/result.public.json",
+        "drafts/n88-student-portal/activation/hosted-off-install-1031/delivery.public.json",
+        "docs/automation-evidence/20261031/N88_HOSTED_OFF_INSTALL.md"
+      ],
+      "requiredChecks": [
+        "n88_new_record_safe_profile_and_exact_published_packet",
+        "n88_bound_atomic_combined_install_and_fixed_readback",
+        "n88_actual_native_source_pin_and_private_carrier_off_delivery",
+        "n88_legacy_unauthenticated_nonexposure_and_shared_peer_preservation"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N88",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "publication": true,
+        "publicationScope": "source-only implementation and minimized receipts for the separately authorized actual OFF installation and delivery; sole publisher does not execute SQL or service transitions",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018",
+        "liveAuthorizationRef": "PO-20261031-N88-BOUNDED-OFF-INSTALL-DELIVERY",
+        "providerOperations": {
+          "combinedInstallerDispatchesMax": 1,
+          "nativeFunctionUploadsMax": 1,
+          "n88SourcePinPromotionsMax": 1,
+          "n88OwnedCarrierDeploymentsMax": 1,
+          "runtimeV2Enablements": 0,
+          "publicV2Enablements": 0,
+          "customerRowReads": 0,
+          "customerRowWrites": 0,
+          "credentialRefreshes": 0,
+          "oldProtectedRecordReads": 0,
+          "loggingDDL": 0
+        },
+        "credentialSource": "C2 independently acknowledged NEW protected record only",
+        "sourceOnlyPublication": true,
+        "exactTemporaryOwnerEdgesOnlyWithinQualifiedInstaller": true,
+        "roleMembershipChangesAtRest": 0
+      },
+      "releaseAuthority": "Direct owner continuation on31October explicitly authorizes completing concrete repairs and resolving blockers, with existing full project authority. This new separately bounded phase authorizes the exact combined SQL installer and native service/source-pin/carrier/private-assets delivery with V2 OFF after the actual C2 credential/profile and published B-source prerequisites. Original custodian alone uses the independently acknowledged NEW record. Historical denials/consumed operations remain immutable; no old-record reread, replay, public/runtime enablement or customer-row operation. Verify exact real source-pin/deployment capability before mutation. The only temporary privilege edges are those already qualified and restored inside the exact atomic installer; no membership/role-attribute change at rest or logging DDL. Sole existing controller/publisher only.",
+      "objective": "Resume original custodian session 01a14fc3-b292-7390-9952-8549a286c80f, gpt-6.1-sol / medium / Standard. This is a NEW actual OFF installation/delivery milestone after both named dependencies actually deliver. C2 fresh-service-credential-enrolment must establish independently acknowledged new protected record provenance, exact consumer cutover and actual restricted LOGIN/TLS/profile success. Acknowledged credential change alone is insufficient. B source is published b0648a9811ea3e7733d05c4002a73f7d6c7f452e (candidate2c1a62286a40701323a09c0485bc6458dcd86a23); use actual current main and preserve intervening N44/native-peer changes. Reuse B affected native10, unit8, mounted evidence and A2 native12/package4 by exact source identity. Do not repeat unchanged campaigns or relabel old A28P01/protected-record refusal. Original B remains pending whole-task reconciliation; consume these milestones without repeat.\n\nRead actual v2-runtime-writer-1031/INSTALL.md and v2-hosted-compat-1031/INSTALL.md together with the NEW v2-student-scope-1031 manifest/package/control. There is no B-specific INSTALL.md. The B package.mjs is generation-only and has no binding export. Build a minimal exact binder in this new hosted-off-install folder using unchanged approved immutable original-custodian authority intake/security/expiry semantics, adapted explicitly to the new manifest/action. Do not modify historic binder/SQL, execute an older packet or bypass NULL authority. Before operation verify normalized UTF8/LF (preserve BOM) SQL bundle aaaeb23eb4cb5e22c510cda30cc46c9d7f2bcaab798bb6749762aefb7c8eeb62; installer3cb168cd95a260cd16b89d5f2ad17d9418e79ed2ea0020b2aee45be4e5c4f959; readbackd83fc9c595d76604f3f2c517238732ef0d9ce3adb8ef391d2f66f8b7901ba819; disablef1328e7eb4464d68dfb707a967ac7b5de11e090620d919729de1cd9950deb77c; delivery0cbf90605854181d43c045bcc59db03a05f06c1e533cb86b0f3c9c304e6d3390. The binding action is install-n88-student-scope-1031, exact projectxlrubcwjqktzzunrvuns/databasepostgres/system identifier7678071634733212629. Authority artifact must name current run/bundle/project/product, approved true, nonempty authorityRef and expiry within45minutes. Bind exact SQL once and journal its nonsecret hash/intent before dispatch. Qualify only new binder/loader/intents with fabricated values; no new native DB campaign.\n\nUse ONLY the independently acknowledged NEW C2 record through its new provenance/loader contract and existing legitimate administrative/channel/account guards. Never reread rejected old record, run old profile helper/old provenance-guard admission, borrow old flags, inspect alternate custody or rotate credentials. New loader must preserve all applicable ownership/inherited-security/DPAPI/current-run/session guards while binding the new record's actual independently attested lineage. Do not guess record paths, plaintext, source pins or native versions. Read C2's published minimized receipt and actual new-loader capability first; missing verified capability is a concrete blocker. This milestone grants no credential refresh, consumer-secret promotion, account, role-attribute or logging DDL. No role-membership change at rest is allowed. The exact already-qualified temporary owner SET/schema-CREATE edges inside the one combined atomic installer are explicitly authorized and must be restored before commit; they are not a separate operation. The current verified official CLI administrative SQL channel may submit the exact bound transaction if tool rules support it; after any actual denial stop that operation without fallback identity/channel or second attempt.\n\nAcquire ordinary shared integration/live-mutation leases only for actual protected/provider/native/carrier phases; release during pure preparation/operator waits. Before installation perform bounded fresh target/actor/preimage/role/provider-nonexposure metadata checks and a NEW-record restricted session profile check. Preserve C2 profile success separately. Unsafe data/parameter/duration/sample/audit logging denies. Default verbosity is permissible only with exact safe boundary verification, not a profile label. Read actual transaction-local database timeout before locks/private work: positive at most5000ms, and positive explain threshold must exceed it by strictly more than2000ms. Do not change role/server logging settings. On preinstall missing new wrappers, inspect/establish only bounded metadata-safe supported capability; never read private rows before wrapper verification. If the safe preinstall profile cannot be established without configuration change, stop for an exact follow-up.\n\nAt most ONE dispatch of the exact combined SERIALIZABLE installer through legitimate postgres session/current user, retaining its15s install statement/3s lock/15s idle limits and exact46 function/150 trigger preimages, existing four FORCE-RLS tables/original14 operations and collision/owner/temporary-edge gates. The private runtime<=5000ms rule applies to restricted private service transactions, not a rewrite of the qualified install. No storage reinstall, old grant replay, canonical/Auth/customer row writes or guessed drift repair. If already installed or partial/collision state is observed, do fixed metadata readback and stop mutations; do not replay. UNKNOWN preserves intent and only read-only reconciliation is allowed. Exact readback must verify safe14+identity+new label reader body/ACL/owner, unchanged original14, all23 compatible hooks/writer attributes, restored temporary SET/schema edges, FORCE-RLS and provider nonexposure. Do not trust null pgrst.db_schemas alone. After committed install verify actual NEW-record restricted session exact safe bodies and effective safe profile again. Never read hosted logs through SQL/OS; no malformed/private-marker hosted tests.\n\nThen at most ONE exact native n88-student-portal upload plus its ONE N88 source-pin promotion, and ONE N88-owned carrier deployment including the exact ten private static assets from B delivery manifest. Prepared service9beb6a6685fabee6ac49e97c65cdb59b928975df2442ba5f35dc1f5ac73e6d1f, gatewaye99d58320df99cb4c7b9ce72cbce1fe2f25a8996c8db2149742731991e92493a, student43b0923abfe546ef4d203c7d2ccf510066acf3e5aa96cf5a6511338d16a2c3c2. Read actual asset manifest/current source closure; preserve existing service/index.ts deno.json/deno.lock and external imports/JWT settings. Inspect exact real current source-pin key/receipt contract before one atomic N88-only promotion; do not invent a key/version or broaden configuration. Preserve current credential secret and every N44/native-peer source/map/pin/config key. Legitimate concurrent N44/C2 metadata version advancement alone is not drift: bind current observed version under shared lease and verify peer identities unchanged. Keep N88_PUBLICATION_V2_ENABLED OFF in service AND gateway and PUBLICATION_V2_READINESS OFF, V1 enabled. Preserve ingress HMAC/TLS/origin/CSRF/nonces/deadlines/cookies/CSP/India placement and existing route/bindings; no new secret/route/binding. If one carrier deploy cannot include exact allowlisted asset closure through available supported capability, stop and report concrete gap without exploratory deploys or alternate channel.\n\nRequire actual nonsecret deployment/source-pin receipts, current native/carrier version readback and credential-free served HTML/student module/CSS hashes against manifest (LF identities/BOM rules). A bounded ordinary unauthenticated legacy/dispatch request may verify original denial/nonexposure only; no numeric code/claim, authenticated teacher/student request, publication/read receipt write, account creation, hosted fixture, customer row or message. Readback must prove V2 OFF/legacy availability and no private payload/headers; it is not positive V2 service acceptance. Do not activate pilot/public runtime for a journey. Any deployment unknown/failure preserves intent and stops mutation; do not spend another upload/deploy. Disable SQL is a separately bound follow-up, not automatic destructive rollback. Keep hooks/receipts/tombstones/high-water; no restoration of unsafe writers.\n\nPublish only minimized new helper/test/source and actual receipt evidence through sole publisher. PASS requires actual exact installation and verified OFF native/carrier/private-assets delivery; source tests or upload success alone are insufficient. Record SQL/install/native/pin/carrier/static readback identities independently, every attempt/ACK and partial state. Actual teacher/student/pilot/privacy/public positive acceptance remains NOT_RUN, public enablement unauthorized, N88 OPEN. Existing source files and qualified package remain read-only unless a concrete assembly defect requires separately admitted minimal edit; new folder is the implementation boundary. No controller/queue/guard mutation or repeat of old protected-record denial.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "2c1a62286a40701323a09c0485bc6458dcd86a23",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/package.mjs",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/delivery-manifest.json",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/install.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/readback.sql",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/disable.inactive.sql",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/labels.mjs",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/bind.mjs",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/assets-manifest.json",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gateway.inactive.mjs",
+          "drafts/n88-student-portal/activation/database-transport.mjs",
+          "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt",
+          "docs/automation-evidence/20261031/N88_STUDENT_SCOPE_RESOLUTION.md",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/service.prepared.mjs",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/gateway.prepared.mjs",
+          "drafts/n88-student-portal/activation/v2-student-scope-1031/student.prepared.mjs"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/bind.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/deploy-original-custodian.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/new-record-loader.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/manifest.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/intent.public.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/result.public.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/delivery.public.json",
+          "tests/n88-hosted-off-install-1031/contracts.test.mjs",
+          "tests/n88-hosted-off-install-1031/results.json",
+          "docs/automation-evidence/20261031/N88_HOSTED_OFF_INSTALL.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/bind.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/deploy-original-custodian.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/new-record-loader.mjs",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/manifest.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/intent.public.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/result.public.json",
+          "drafts/n88-student-portal/activation/hosted-off-install-1031/delivery.public.json",
+          "tests/n88-hosted-off-install-1031/contracts.test.mjs",
+          "tests/n88-hosted-off-install-1031/results.json",
+          "docs/automation-evidence/20261031/N88_HOSTED_OFF_INSTALL.md"
+        ],
+        "workerChecks": [
+          "n88_new_record_safe_profile_and_exact_published_packet",
+          "n88_bound_atomic_combined_install_and_fixed_readback",
+          "n88_actual_native_source_pin_and_private_carrier_off_delivery",
+          "n88_legacy_unauthenticated_nonexposure_and_shared_peer_preservation"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}

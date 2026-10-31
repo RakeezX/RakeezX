@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-manual-file-admission-source-20261031",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100028,
+      "scopeKey": "n44-manual-phone-ui-offline",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 40,
+      "idleMinutes": 10,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+        "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+        "drafts/n44-push/activation/manual-file-admission-1031/**",
+        "tests/n44-manual-file-admission-1031/**",
+        "docs/automation-evidence/20261031/N44_MANUAL_FILE_ADMISSION.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+        "drafts/n44-push/activation/manual-file-admission-1031/manifest.json",
+        "docs/automation-evidence/20261031/N44_MANUAL_FILE_ADMISSION.md"
+      ],
+      "requiredChecks": [
+        "n44_manual_ingestion_actual_entrypoint_and_old_observation_guard",
+        "n44_manual_ingestion_unforgeable_exact_bytes_and_nonce",
+        "n44_manual_ingestion_original_freshness_and_provenance",
+        "n44_manual_ingestion_custodial_source_composition_and_channel_pending"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only typed custodial manual-file admission adapter and minimized qualification; no live intake or transfer readiness claim",
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019",
+        "privateSourceOnlyPaths": [
+          "drafts/n44-push/activation/core-v1-host-handoff.mjs",
+          "drafts/n44-push/activation/core-v1-live.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs"
+        ],
+        "privateRuntimeReads": 0,
+        "credentialReads": 0,
+        "providerOperations": 0,
+        "liveGrantOperations": 0,
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N44",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "sourceOnlyPublication": true
+      },
+      "releaseAuthority": "Separate direct-user delegated SOURCE-only repair of the confirmed manual-file handoff gap. Same original custodian may edit only the three listed original private SOURCE glue files without runtime/credential/state reads. Preserve old tool-observation admission, all finite grant/clock/nonce/authentication guards and pinned producer. No live intake, real challenge/phone capture, provider/config/lease operation, UI/backend change, grant activation or deadline extension.",
+      "objective": "Resume same original custodian session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 after the active original-custodian work releases its conflicting scope. This source-only correction is independently justified by the confirmed published wrapper defect and does not require a live service to qualify. There is no dependency on the service result: record its actual disposition separately, never infer service success. Controller file conflicts serialize against the service task. This card has higher priority than queued UI and EXACT scopeKey n44-manual-phone-ui-offline to serialize shared host/private source glue with that UI work. Do not modify active service card, queued UI metadata or any controller/queue/result records. Use gpt-6.1-sol / medium / Standard; 40-minute budget, 10-minute idle.\n\nConfirmed source defect: manual-phone-handoff-1031/host.mjs createManualHost().admit requires observation.reader === 'mcp__cua_repl'. Normal owner PWA file transfer cannot truthfully supply that independent browser observation. Keep existing admit operation and its observation checks unchanged. Add a separately named admitManualTransfer operation requiring a genuinely typed original-custodial ingestion capability. Do not spoof reader, relabel a user file as independent browser inspection, remove old guards or make ordinary report JSON authenticate its own provenance.\n\nInspect READ-ONLY immutable producer src/lib/notification-push-gateway.js at 571fc483d711780af666be4926c80ab00eeaba91 (recorded exact gateway hash 992b2b36a63602767bf9eb4ba085a426afd7edad28c693044afc7b832a052099), especially admitPhoneReadinessExport and immediate validators. The new public wrapper currently calls that helper without an observation argument; establish the real complete helper contract before wiring. Reuse pinned functions/bytes and preserve exact encryption/scope/source/freshness/claimOnce semantics; no producer patch or alternate synthetic verifier.\n\nImplement a reusable source module under manual-file-admission-1031 plus the smallest public host edit. Define a concrete original-custodian file-ingestion API whose issuer actually opens a received private file at an existing authorized custody boundary, bounds size, snapshots exact bytes, computes SHA-256 itself and records actual ingestion time plus a nonsecret transfer reference. Explicitly scope the file opener/root ownership guard as trusted original-custodian dependencies; no arbitrary public caller file-read primitive or default network/watcher. A caller-supplied receipt/digest/reader label is not a capability. Mint internal object-identity/content-bound receipt capability, or existing protected custody mechanism when process persistence is required. Bind receipt to immutable bytes and issued challenge/run/slot/nonce, reject clone/edit/substitution, and ensure later file replacement cannot change admitted bytes. Do not expose raw private paths, data, keys or reports in public artifacts.\n\nadmitManualTransfer must verify the capability and use its exact stored byte snapshot/digest with the actual immutable producer and existing durable claimOnce. Preserve claim-before-decryption and consumed-on-failed-admission semantics; do not implicitly retry. Follow original challenge scope/time/expiry and signed manualContext before/after verification, canonical pair equality/currentness, browser UNKNOWN rejection, admitted/batch identity and original preactivation sealing. No ingestion timestamp may refresh capture or server-attestation timestamps. Preserve five-minute challenge and every existing sixty-second check through admission, assembly and prepared output. Record new path as manual-file-ingestion only. Server HMAC proves authenticated canonical context/pair checkpoint; browser outcome/quiet/preferences stay client observations; manual file ingestion proves custody received exact bytes, not that an independent tool inspected a browser or that verified UI bytes actually ran. Keep expected verified UI delivery pin separate from observed execution provenance. No server/peer truth from UI booleans.\n\nSame custodian may wire SOURCE dependency injection in only core-v1-host-handoff.mjs, core-v1-live.mjs and device-custodian.mjs, using existing guards/ingress dependency/claim journal/protected record path. No runtime keys, DPAPI material, protected records, actual reports, credentials or actual private dispatcher reads/calls. Raw private source excluded from Git; record nonsecret source hashes. Original static qualified source36a3e2e98097038bbb33002b3f8e6967ba86426d and producer571fc483 identities remain historical; this correction gets its own source identity/receipt. Update only affected composition manifest if necessary; retain all old receipts/failures/tests. New manifest records actual adapter inputs and source-only qualifications without claiming a service or UI runtime delivery not performed here.\n\nQualify actual new entrypoint and actual original host/helper using fabricated files/keys/identities through injected file IO, not a test-only alternate admission implementation. Focus only on new risks: old admit still refuses missing/false tool observation; new entrypoint rejects forged/cloned/edited ingestion capability; exact byte snapshot survives file replacement; foreign challenge/run/slot and digest substitution fail; replay and failed-decrypt nonce consumption retain original behavior; stale capture or pair evidence fails despite fresh ingestion time; manual provenance never claims independent browser inspection. Exercise real assembly/prepared deadline behavior and SOURCE composition. Reuse unchanged source19 and historical29/14/11/15 proofs by exact identity; no broad rerun or live test campaign.\n\nDocument exact future operator intake API: who receives public challenge text, where original downloaded files actually enter original private custody, how existing process invokes mint/admit, and which trusted inputs/pins/ownership guards it requires. Define executable API/code and honest operator boundary, not a fabricated deployment. Actual transfer-channel readiness MUST remain false until a real supported channel and end-to-end latency are independently verified. ChatGPTweb upload/model processing/relay has no established sixty-second bound; do not assert it fits, invent an attachment watcher/share service/linked phone browser, reset capture clocks, or extend a deadline. Source qualification can PASS while actual channel readiness remains false. If actual channel is unknown, say exactly that; no repeated owner availability/settings request and no challenge while waiting. Future OS arrival/tap evidence remains a separate finite-trial acceptance requirement.\n\nCreate new manifest.json and N44_MANUAL_FILE_ADMISSION.md at exact verification paths, plus focused results/tests, and publish clean source-only candidate through sole publisher. No frontend, SW, backend, active service/config, account/customer/source/registration/notification/send/cron change. No actual private file ingestion, phone capture, challenge, live/integration/browser lease, provider operation or original finite operation. Preserve original grant efedbcea-f227-4a91-bbab-79cad814fc81, c137 archive/history, unspent disposition and all real finite acceptance NOT_RUN. This task prepares a usable truthful source adapter; it does not claim installed end-to-end handoff readiness.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "36a3e2e98097038bbb33002b3f8e6967ba86426d",
+        "requiredSourcePaths": [
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/producer.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "src/lib/notification-push-gateway.js",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+        ],
+        "editPaths": [
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-file-admission-1031/ingestion.mjs",
+          "drafts/n44-push/activation/manual-file-admission-1031/manifest.json",
+          "tests/n44-manual-file-admission-1031/path.test.mjs",
+          "tests/n44-manual-file-admission-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_FILE_ADMISSION.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/manual-file-admission-1031/ingestion.mjs",
+          "drafts/n44-push/activation/manual-file-admission-1031/manifest.json",
+          "tests/n44-manual-file-admission-1031/path.test.mjs",
+          "tests/n44-manual-file-admission-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_FILE_ADMISSION.md"
+        ],
+        "workerChecks": [
+          "n44_manual_ingestion_actual_entrypoint_and_old_observation_guard",
+          "n44_manual_ingestion_unforgeable_exact_bytes_and_nonce",
+          "n44_manual_ingestion_original_freshness_and_provenance",
+          "n44_manual_ingestion_custodial_source_composition_and_channel_pending"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
