@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-publication-controls-compatibility-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100034,
+      "scopeKey": "n88-publication-browser-integration",
+      "riskClass": "HIGH",
+      "validationTier": "HIGH",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a17f74-7497-71a1-ad06-e7aadcce8f6b",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 15,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-publication-ui-integration-20261031"
+      ],
+      "allowedPaths": [
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-publications.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal.css",
+        "sw.js",
+        "tests/n88-publication-controls-1031/**",
+        "docs/automation-evidence/20261031/N88_PUBLICATION_CONTROLS_COMPATIBILITY.md"
+      ],
+      "verificationPaths": [
+        "src/views/student-portal-class.js",
+        "src/views/student-portal-publications.js"
+      ],
+      "requiredChecks": [
+        "n88_v2_single_authoritative_controls_no_legacy_requests",
+        "n88_v1_default_off_and_numeric_management_preserved",
+        "n88_changed_mobile_rtl_and_sw104_affected_assets"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "frontend compatibility correction with V2 activation OFF"
+      },
+      "releaseAuthority": "Latest explicit PO orders actual defects corrected and stable clear RakeezX delivered. The mounted duplicate controls and unnecessary student implementation copy are directly observed. Normal frontend source/asset publication is authorized, V2 stays OFF, no hosted data/service mutation.",
+      "objective": "Correct one established mounted N88 V2 UI contradiction and publish the small default-OFF frontend correction through the original publisher. Reuse original UI session01a17f74-7497-71a1-ad06-e7aadcce8f6b and published candidate259dc82442b0a9f936fd447b694aa25f087f6aba / main97e39d269d0a19686a9e7e9764a017cec7232780. Start from current main. Backend writer compatibility has a separate active owner; do not touch its files.\n\nActual worker teacher-390/student-390 screenshot evidence shows legacy class-wide grades checkbox UNCHECKED while the V2 student displays published per-item grades5/4. Source confirms mountClassPortal unconditionally mounts legacy guidance/field controls then also mounts publicationClient controls. Legacy saves go only to client.saveVisibility, whereas V2 pupil projection uses stored per-item publications. This is a misleading teacher control, not a reason to add a new server-wide gate or change privacy contracts.\n\nSmallest fix: when the already-admitted publicationClient exists, render/mount ONLY relevant V2 per-item publishing controls and current anchors; do not mount the obsolete global field/guidance editors or initiate their legacy reads. Default V2 OFF must preserve the existing V1 field/guidance path unchanged. Preserve numeric student code management, roster actions, rotation/revocation, entry links and all original UNKNOWN/reconciliation controls in both modes. Handle absent legacy guidance lifecycle safely and remove/retarget legacy quick-navigation links so no visible link points to an irrelevant/absent section. Do not merely CSS-hide active legacy editors. Source list/command authority and per-item four decisions stay unchanged.\n\nClean the unnecessary student phrase 'دون جمع البنود المخفية' in student-portal-publications.js; 'درجاتي المنشورة' and individual values already communicate the useful result. No added explanation about implementation/hidden data, no broad redesign, no changes to grade computations or rendering authority. Keep RTL/mobile/dark mode consistent.\n\nAffected verification only: actual mounted V2 route shows one working publication control set, no legacy visibility/guidance requests, per-item grade off removes it/on displays it after server-confirmed save; code management remains reachable. Actual default-OFF route retains its legacy controls and existing endpoints. Check current keyboard/mobile390/no-overflow; inspect changed result. Reuse prior service/client/Auth/SW/native evidence where code paths are unchanged. SW is a required startup asset: advance from actual current baseline103, retain every N44/offline/private-cache exclusion and update exact affected asset identity. No broad test campaign. Preserve previous failure/evidence files, save focused new proof.\n\nNo hosted SQL/Auth/data/service/config operations, real account/browser sessions or messages. V2 readiness stays source-controlled OFF, V1 stays enabled. The already-prepared hosted runtime compatibility successor depends on this correction so its final private student bundle uses these current sources. Complete code, affected proof and eligible frontend delivery; no routine approval handoff.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "8131721fad6982f68c73101ad00e59746ded56a2",
+        "requiredSourcePaths": [
+          "src/views/student-portal-class.js",
+          "src/views/student-portal-publications.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal.css",
+          "sw.js",
+          "src/lib/student-portal-runtime.js",
+          "src/lib/student-portal-publication-client.js",
+          "tests/n88-publication-ui-1031/browser.mjs",
+          "tests/n88-publication-ui-1031/sw.test.mjs",
+          "docs/automation-evidence/20261031/N88_PUBLICATION_UI_INTEGRATION.md"
+        ],
+        "editPaths": [
+          "src/views/student-portal-class.js",
+          "src/views/student-portal-publications.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal.css",
+          "sw.js",
+          "tests/n88-publication-controls-1031/browser.mjs",
+          "tests/n88-publication-controls-1031/results.json",
+          "docs/automation-evidence/20261031/N88_PUBLICATION_CONTROLS_COMPATIBILITY.md"
+        ],
+        "newPaths": [
+          "tests/n88-publication-controls-1031/browser.mjs",
+          "tests/n88-publication-controls-1031/results.json",
+          "docs/automation-evidence/20261031/N88_PUBLICATION_CONTROLS_COMPATIBILITY.md"
+        ],
+        "workerChecks": [
+          "n88_v2_single_authoritative_controls_no_legacy_requests",
+          "n88_v1_default_off_and_numeric_management_preserved",
+          "n88_changed_mobile_rtl_and_sw104_affected_assets"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
