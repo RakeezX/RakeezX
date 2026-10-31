@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-publication-ui-integration-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100030,
+      "scopeKey": "n88-publication-browser-integration",
+      "riskClass": "HIGH",
+      "validationTier": "HIGH",
+      "executionMode": "synthetic",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a17f74-7497-71a1-ad06-e7aadcce8f6b",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 90,
+      "idleMinutes": 18,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-work-and-grades-publication-contract-20261028",
+        "continuous-n88-owner-admin-storage-install-20261031"
+      ],
+      "allowedPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/lib/student-portal-class-client.js",
+        "src/lib/student-portal-unified-client.js",
+        "src/views/student-portal-class.js",
+        "src/views/student-portal.js",
+        "src/views/student-portal-login.js",
+        "src/styles/student-portal-class.css",
+        "src/styles/student-portal.css",
+        "sw.js",
+        "src/lib/student-portal-publication-client.js",
+        "src/views/student-portal-publications.js",
+        "tests/n88-publication-ui-1031/**",
+        "docs/automation-evidence/20261031/N88_PUBLICATION_UI_INTEGRATION.md"
+      ],
+      "verificationPaths": [
+        "src/lib/student-portal-runtime.js",
+        "src/views/student-portal-class.js"
+      ],
+      "requiredChecks": [
+        "n88_actual_mounted_teacher_student_v2_protocol_journey",
+        "n88_server_authoritative_revisions_ack_unknown_no_replay",
+        "n88_account_class_session_cross_tab_stale_context_clear",
+        "n88_default_off_legacy_preserved_rtl_mobile_sw"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "staged browser protocol and mounted UI with new V2 activation OFF"
+      },
+      "releaseAuthority": "Latest explicit PO continuation authorizes implementing missing N88 browser integration and normal frontend publication through the sole publisher, with the new V2 activation OFF until exact hosted-backend acceptance. Existing live V1 readiness is preserved. No new hosted SQL/Auth/data/service mutation or actual account session/browser interaction is authorized by this preparatory card.",
+      "objective": "Close a concrete remaining functional gap in N88: src/lib/n88-item-publication-proposal.js is still a dormant pure proposal, not imported by the mounted current app. The original approved four per-item publication choices and manual safe links need a real client/actual mounted UI. Resume the original UI-contract session with current source. In parallel, separate original worker continuous-n88-runtime-writer-integration-20261031 owns backend files and native DB qualification; do NOT touch its worktree or paths, install schema, or alter service contracts. Stable published protocol is drafts/n88-student-portal/publication-v2-service.inactive.mjs PUBLICATION_V2_PATHS: teacher/class/publication-v2 and student/publication-v2/read under existing /api/n88 prefix. Read actual request/response shapes and existing native/synthetic service fixtures, never invent a parallel contract.\n\nWire the CURRENT mounted route: student-portal-runtime.js -> mountClassPortal in src/views/student-portal-class.js, not only old unmounted mountTeacherInvitations prototype. Implement a bounded same-origin typed publication client and real mounted teacher controls for required/scheduled/completed/grade per saved item/subitem and approved manual task/link creation. Teacher gets clear Arabic labels, explicit save/status/recheck, clean responsive RTL controls and useful concise errors; no SQL/IDs/session/receipt internals in ordinary flow. Preserve distinction between individual subitem grade and parent total; no unsolicited grade aggregation. Reuse existing safe-link/date rules and old prototype semantics without editing shared server-imported proposal/manual helper files. Server list provides authoritative source and membership revisions; never mint authority from local JSON draft tokens. Use original current account/teaching/term/lease/session binding. Numeric student entry/auth remains original; add a strictly parsed V2 student projection renderer/adapter using only server-permitted work/grades. Never infer hidden grades or revive stale data. Backend may later generalize scope selection; browser must not hardcode teacher/class/owner IDs or choose a privileged teaching scope.\n\nNew V2 mount/read mode stays disabled by a source-controlled distinct readiness constant, not URL/storage/global configuration, until later exact actual service activation. Do not flip or degrade existing PORTAL_READINESS/V1. When V2 is disabled current user flows keep working without visible future-feature placeholders. Native/local mounted qualification may inject a trusted explicit readiness dependency; production must not accept request/browser-provided enablement. Implement the actual app wiring now, not a detached demo. Keep the original numeric login, revocation, cross-tab retirement observers and no-private-projection persistence. Context changes/route changes/signout remove old views and invalidate in-flight responses. An uncertain write retains original request identity and permits status-only reconciliation, never automatic resend. Distinguish known pre-dispatch validation refusal from unknown possible commit.\n\nQualify mounted teacher and student journeys against actual published V2 service implementation with owned fabricated ports, and use the real fetch/client codec rather than a duplicate fake server schema. Verify successful save/reload/read, each allowed visibility choice, manual link rejection, error/offline/timeout/lost response, stable context and cross-account/class changes, keyboard/mobile390 RTL and no horizontal overflow. Reuse unchanged prior evidence; do not rerun broad native DB campaigns or old hosted trials. Update SW atomically for newly referenced frontend assets (current published baseline SW102); preserve N44 offline/core assets and grade4. Only original publisher performs Git/Pages delivery. Record exact implemented UI path, real affected check evidence and activation-OFF boundary. No customer data, personal Chrome/phone actions, notifications, fixture accounts, backend changes or controller edits.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "85f0638f4feb515795f9d34a377a26392f6c19a2",
+        "requiredSourcePaths": [
+          "src/lib/student-portal-runtime.js",
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-unified-client.js",
+          "src/views/student-portal-class.js",
+          "src/views/student-portal.js",
+          "src/views/student-portal-login.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal.css",
+          "sw.js",
+          "src/lib/n88-item-publication-proposal.js",
+          "src/lib/n88-manual-task-link-safety.js",
+          "src/lib/sync-ownership.js",
+          "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-review.inactive.mjs",
+          "docs/automation-evidence/20261028/N88_ITEM_LEVEL_PUBLICATION_AND_MANUAL_LINKS_CONTRACT.md"
+        ],
+        "editPaths": [
+          "src/lib/student-portal-runtime.js",
+          "src/lib/student-portal-class-client.js",
+          "src/lib/student-portal-unified-client.js",
+          "src/views/student-portal-class.js",
+          "src/views/student-portal.js",
+          "src/views/student-portal-login.js",
+          "src/styles/student-portal-class.css",
+          "src/styles/student-portal.css",
+          "sw.js",
+          "src/lib/student-portal-publication-client.js",
+          "src/views/student-portal-publications.js",
+          "tests/n88-publication-ui-1031/transport.test.mjs",
+          "tests/n88-publication-ui-1031/mounted-flow.test.mjs",
+          "tests/n88-publication-ui-1031/results.json",
+          "docs/automation-evidence/20261031/N88_PUBLICATION_UI_INTEGRATION.md"
+        ],
+        "newPaths": [
+          "src/lib/student-portal-publication-client.js",
+          "src/views/student-portal-publications.js",
+          "tests/n88-publication-ui-1031/transport.test.mjs",
+          "tests/n88-publication-ui-1031/mounted-flow.test.mjs",
+          "tests/n88-publication-ui-1031/results.json",
+          "docs/automation-evidence/20261031/N88_PUBLICATION_UI_INTEGRATION.md"
+        ],
+        "workerChecks": [
+          "n88_actual_mounted_teacher_student_v2_protocol_journey",
+          "n88_server_authoritative_revisions_ack_unknown_no_replay",
+          "n88_account_class_session_cross_tab_stale_context_clear",
+          "n88_default_off_legacy_preserved_rtl_mobile_sw"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
