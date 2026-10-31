@@ -7,7 +7,7 @@ const link = r => r.link?`<a href="${esc(r.link)}" target="_blank" rel="noopener
 export function renderStudentPublications(raw) {
   const data=projectPublicationStudentData(raw);
   const work=(category,title)=>{const rows=data.work.filter(r=>r.categories.includes(category));return rows.length?`<section data-section="${category}"><h2>${title}</h2>${rows.map(r=>`<article class="n88-unified-work" data-work-id="${esc(r.id)}"><h3>${esc(r.title)}</h3>${dates(r)}${r.description?`<p class="n88-guidance-text">${esc(r.description)}</p>`:''}${link(r)}</article>`).join('')}</section>`:'';};
-  return work('required','المطلوب مني')+work('scheduled','الأعمال القادمة')+(data.grades.length?`<section class="n88-unified-grades"><h2>درجاتي المنشورة</h2><p>تُعرض درجة كل بند اختاره المعلم دون جمع البنود المخفية.</p><dl class="n88-v2-grades">${data.grades.map(r=>`<div><dt>${esc(r.title)}</dt><dd dir="ltr">${r.value===null?'لم تُرصد':esc(r.value)}</dd></div>`).join('')}</dl></section>`:'')+work('completed','الأعمال المكتملة')+(!data.work.length&&!data.grades.length?'<p class="n88-unified-empty">لا توجد أعمال أو درجات منشورة حاليًا.</p>':'');
+  return work('required','المطلوب مني')+work('scheduled','الأعمال القادمة')+(data.grades.length?`<section class="n88-unified-grades"><h2>درجاتي المنشورة</h2><dl class="n88-v2-grades">${data.grades.map(r=>`<div><dt>${esc(r.title)}</dt><dd dir="ltr">${r.value===null?'لم تُرصد':esc(r.value)}</dd></div>`).join('')}</dl></section>`:'')+work('completed','الأعمال المكتملة')+(!data.work.length&&!data.grades.length?'<p class="n88-unified-empty">لا توجد أعمال أو درجات منشورة حاليًا.</p>':'');
 }
 
 export function mountTeacherPublications(root,{client,getContext,subscribe=()=>()=>{}}) {

@@ -86,10 +86,11 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
   let deliveryIntent = null;
   let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = true, rosterOpen = false, uncertainMutation = false;
   root.classList.add('n88-class'); root.dir = 'rtl';
-  const panel=root.ownerDocument.createElement('div'),guidanceRoot=root.ownerDocument.createElement('div'),accessRoot=root.ownerDocument.createElement('div');root.append(panel,guidanceRoot,accessRoot);
-  const guidance=mountTaskGuidance(guidanceRoot,{client,getContext,subscribe});
-  let publications=null;
-  if(publicationClient){const target=root.ownerDocument.createElement('div');guidanceRoot.after(target);publications=mountTeacherPublications(target,{client:publicationClient,getContext,subscribe});}
+  const panel=root.ownerDocument.createElement('div'),guidanceRoot=root.ownerDocument.createElement('div'),publicationRoot=root.ownerDocument.createElement('div'),accessRoot=root.ownerDocument.createElement('div');
+  root.append(panel,publicationClient?publicationRoot:guidanceRoot,accessRoot);
+  // One authoritative editor mode. Do not start legacy guidance reads in V2.
+  const guidance=publicationClient?null:mountTaskGuidance(guidanceRoot,{client,getContext,subscribe});
+  const publications=publicationClient?mountTeacherPublications(publicationRoot,{client:publicationClient,getContext,subscribe}):null;
   const context = () => { try { return getContext(); } catch { return null; } };
   const key = () => classContextKey(context());
   const valid = (g, k) => !disposed && g === generation && k !== null && k === key();
@@ -107,9 +108,9 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
     const unsaved = !!roster && (roster.policyRevision === 0 || !!draft && PORTAL_FIELDS.some(f => draft[f] !== roster.visibility[f]));
     const issueBlocked = !writable || uncertainMutation || !roster?.credentialRevision || !roster.students.some(s=>!s.hasActiveCode&&s.credentialVersion===0);
     const issueExplanation = uncertainMutation ? 'نتيجة عملية سابقة غير مؤكدة. نجاح قراءة القائمة لا يؤكد إنشاء الرموز؛ لا يمكن إعادة الإنشاء قبل إقرار مصير الطلب.' : roster && !roster.credentialRevision ? 'القائمة مقروءة، لكن مراجعة إصدار الرموز غير متاحة؛ إنشاء الرموز متوقف لحماية الطلبات السابقة.' : '';
-    panel.innerHTML = `<section aria-label="ما يراه الطلاب"><header class="n88-class-heading"><div><p class="n88-eyebrow">مساحة الطلاب</p><h2>${esc(classLabel())}</h2></div></header><nav class="n88-class-nav" aria-label="إعداد مساحة الطلاب"><button class="btn" data-action="open-guidance">المهام المطلوبة وتعليماتها</button><button class="btn" data-action="open-settings">ما يراه الطلاب: الحقول والدرجات</button></nav>
+    panel.innerHTML = `<section aria-label="ما يراه الطلاب"><header class="n88-class-heading"><div><p class="n88-eyebrow">مساحة الطلاب</p><h2>${esc(classLabel())}</h2></div></header><nav class="n88-class-nav" aria-label="إعداد مساحة الطلاب">${publicationClient?'<button class="btn" data-action="open-publications">نشر الأعمال والدرجات</button><button class="btn" data-action="open-codes">إدارة رموز الطلاب</button>':'<button class="btn" data-action="open-guidance">المهام المطلوبة وتعليماتها</button><button class="btn" data-action="open-settings">ما يراه الطلاب: الحقول والدرجات</button>'}</nav>
       <div class="n88-class-status"><p role="status" aria-live="polite">${esc([message || (!ready?'مساحة الطلاب غير مفعّلة حاليًا.':busy&&!roster?'جارٍ قراءة القائمة…':''),issueExplanation].filter(Boolean).join(' '))}</p>${ready ? `<button class="btn" data-action="refresh" ${busy?'disabled':''}>إعادة التحقق من الحالة الحالية</button>`:''}</div>
-      ${roster ? `<details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${SELECTABLE_FIELDS.filter(f=>formFields[f]).length} من ${SELECTABLE_FIELDS.length} مختار${unsaved?' · غير محفوظ':''}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر ما يراه الطلاب ثم احفظ</legend><div class="n88-class-fields">${SELECTABLE_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${formFields[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}</section>`;
+      ${roster && !publicationClient ? `<details class="n88-class-settings" ${settingsOpen ? 'open' : ''}><summary>الحقول الظاهرة للطلاب <small>${SELECTABLE_FIELDS.filter(f=>formFields[f]).length} من ${SELECTABLE_FIELDS.length} مختار${unsaved?' · غير محفوظ':''}</small></summary><form data-visibility><fieldset ${!writable ? 'disabled' : ''}><legend>اختر ما يراه الطلاب ثم احفظ</legend><div class="n88-class-fields">${SELECTABLE_FIELDS.map(f => `<label><input type="checkbox" name="${f}" ${formFields[f] ? 'checked' : ''}> ${labels[f]}</label>`).join('')}</div><button class="btn" type="submit">حفظ الحقول</button></fieldset></form></details>` : ''}</section>`;
     accessRoot.innerHTML = `<details class="n88-code-management" ${rosterOpen?'open':''}><summary>إدارة رموز الطلاب <small>${roster?esc(roster.students.length):''}</small></summary><div class="n88-code-body">
       <div class="n88-class-toolbar"><p class="n88-class-purpose">${roster ? 'الطلاب: '+esc(roster.students.length)+' · الرموز الفعّالة: '+esc(roster.students.filter(s=>s.hasActiveCode===true).length)+(busy||retry?' · آخر حالة مؤكدة':'') : 'لم تُؤكّد القائمة بعد'}</p>${ready?`<button class="btn btn--primary" data-action="batch" ${issueBlocked?'disabled':''}>إنشاء الرموز الناقصة${roster?` (${roster.students.filter(s=>!s.hasActiveCode&&s.credentialVersion===0).length})`:''}</button>`:''}</div>
       ${resolution?.eligible?`<button class="btn" data-action="close-unknown" ${busy?'disabled':''}>إغلاق الطلب السابق دون إنشاء رموز</button><p>يسجّل إغلاقًا جديدًا يمنع تنفيذ الطلب المتأخر؛ لا يثبت أن المحاولة السابقة تراجعت.</p>`:''}${resolution?.canRecover?`<button class="btn" data-action="recover-closure" ${busy?'disabled':''}>مراجعة إقرار الإغلاق مرة واحدة</button>`:''}
@@ -122,7 +123,7 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
 
   // AI: invalidate synchronously, coalesce only reads; never queue a mutation.
   function invalidate(nextKey = key()) {
-    guidance.contextChanged(); generation++; clearSecrets(); rosterOpen = false; roster = null; selected = null; outcomes = []; retry = false;
+    guidance?.contextChanged(); generation++; clearSecrets(); rosterOpen = false; roster = null; selected = null; outcomes = []; retry = false;
     if (nextKey !== boundKey) { draft = null; draftRevision = null; settingsOpen = true; uncertainMutation = false; }
     boundKey = nextKey; clearTimeout(expiryTimer);
   }
@@ -202,7 +203,16 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
     const button = e.target.closest('[data-action]'); if (!button || !root.contains(button) || disposed) return;
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
     const action = button.dataset.action;
+    if (publicationClient && action === 'open-publications') {
+      const target=publicationRoot.querySelector('[data-publication-source]');
+      target?.focus();target?.scrollIntoView({block:'nearest'});return;
+    }
+    if (publicationClient && action === 'open-codes') {
+      const details=accessRoot.querySelector('.n88-code-management');
+      if(details){details.open=true;details.querySelector('summary')?.focus();}return;
+    }
     if (action === 'open-guidance' || action === 'open-settings') {
+      if(publicationClient)return;
       const details = root.querySelector(action === 'open-guidance' ? '.n88-task-guidance' : '.n88-class-settings');
       if (details) { details.open = true; details.querySelector('summary')?.focus(); }
       return;
@@ -259,13 +269,13 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
   };
   const submit = e => {
     if (!e.target.matches('[data-visibility]')) return;
-    e.preventDefault(); if (busy || retry || !roster) return;
+    e.preventDefault(); if (publicationClient || busy || retry || !roster) return;
     if (key() !== boundKey) { invalidate(); void refresh(); return; }
     const fields = Object.fromEntries(PORTAL_FIELDS.map(f => [f, f==='name'||f==='class'?true:e.target.elements.namedItem(f).checked]));
     void perform(r => client.saveVisibility(context().teachingId, { policyRevision: r.policyRevision, fields }), () => { draft = null; draftRevision = null; message = 'حُفظت الحقول المختارة.'; });
   };
   const change = e => {
-    if (!e.target.closest('[data-visibility]') || !roster) return;
+    if (publicationClient || !e.target.closest('[data-visibility]') || !roster) return;
     draft = Object.fromEntries(PORTAL_FIELDS.map(f => [f, f==='name'||f==='class'?true:root.querySelector(`[name="${f}"]`).checked]));
     draftRevision = roster.policyRevision;
     draw();
@@ -286,7 +296,7 @@ export function mountClassPortal(root, { client, publicationClient = null, getCo
   root.ownerDocument.addEventListener('visibilitychange', visibility);
   const unsubscribe = subscribe(changed); void refresh();
   return { contextChanged: changed, refresh, dispose() {
-    guidance.dispose(); publications?.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
+    guidance?.dispose(); publications?.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
     roster = null; selected = null; draft = null; unsubscribe?.();
     root.removeEventListener('toggle', toggleRoster, true); root.removeEventListener('keydown', keydown); root.removeEventListener('click', click); root.removeEventListener('submit', submit); root.removeEventListener('change', change);
     win.removeEventListener('pagehide', pagehide); win.removeEventListener('pageshow', wake); win.removeEventListener('focus', wake);

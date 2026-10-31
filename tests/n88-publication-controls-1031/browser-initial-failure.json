@@ -1,0 +1,78 @@
+{
+  "taskId": "continuous-n88-publication-controls-compatibility-20261031",
+  "runId": "75f5be38-08e5-4e3b-b9c7-f808acf94706",
+  "status": "FAIL",
+  "checks": [
+    "V2 mounts one per-item editor, no legacy editors; keyboard anchors and numeric roster/rotate/revoke/cancel controls remain reachable",
+    "Actual server-confirmed per-item grade ON displays 5, OFF removes it, ON restores it; concise student copy and mobile390/light/dark RTL inspected; zero legacy visibility/guidance requests in V2"
+  ],
+  "pageErrors": [],
+  "teacherRequests": [
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/list"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/list"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/list"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v2",
+      "path": "/api/n88/teacher/class/publication-v2"
+    },
+    {
+      "mode": "v1",
+      "path": "/api/n88/teacher/class/list"
+    },
+    {
+      "mode": "v1",
+      "path": "/api/n88/teacher/class/guidance-list"
+    },
+    {
+      "mode": "v1",
+      "path": "/api/n88/teacher/class/visibility"
+    }
+  ],
+  "realAccountOperations": 0,
+  "providerOperations": 0,
+  "cleanup": {
+    "serverClosed": true,
+    "browserClosedByHelper": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "stage": "dispose V2 without guidance and default-OFF V1",
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.",
+  "sourceHashes": {
+    "src/views/student-portal-class.js": "20e64227a2fa8b9d3ccb79918de153041334805631553966db0753c8b8409116",
+    "src/views/student-portal-publications.js": "9038bea7ade7fdf0ed342b060d7f195c655e331316e30d4d241da8ae42392e0e",
+    "sw.js": "45e7244edfa62d65106a7d904cd651263d99071139b18914bcc047b40df88f24"
+  }
+}
