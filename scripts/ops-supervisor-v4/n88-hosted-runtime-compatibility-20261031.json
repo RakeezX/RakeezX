@@ -15,8 +15,8 @@
       "liveAuthorizationRef": null,
       "model": "gpt-6.1-sol",
       "effort": "medium",
-      "budgetMinutes": 35,
-      "idleMinutes": 10,
+      "budgetMinutes": 20,
+      "idleMinutes": 8,
       "executionProfile": {
         "singleAgent": true
       },
@@ -43,7 +43,8 @@
         "tests/n88-writer-compatibility-1031/**",
         "tests/n88-hosted-compat-1031/**",
         "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md",
-        "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md"
+        "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md",
+        "drafts/n88-student-portal/activation/denied-read-20261023/runtime-expectations.mjs"
       ],
       "verificationPaths": [
         "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
@@ -56,7 +57,8 @@
         "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
         "n88_combined_native_owner_packet_and_private_service_assets_default_off",
         "n88_existing_custody_guards_and_private_values_not_exported",
-        "n88_profile_error_phase_and_network_classification"
+        "n88_profile_error_phase_and_network_classification",
+        "n88_original_credential_provenance_guard_preserved"
       ],
       "postDeliveryChecks": [],
       "preparationAuthority": {
@@ -65,33 +67,28 @@
         "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
         "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018"
       },
-      "releaseAuthority": "Latest explicit user resumption/full project authority authorizes this evidenced network compatibility correction and ONE original-custodian read-only profile via the exact session endpoint already permitted by unchanged transport. Independent public DNS/TCP/TLS observations justify the route selection; prior generic failure is not reclassified. No access guard weakening, alternate credentials, hosted mutations, consumed allowance reset or public enablement. Inactive source publication remains through sole publisher.",
-      "objective": "Continue the SAME original private custodian session01a14fc3-b292-7390-9952-8549a286c80f and owned hosted-compatibility worktree from clean preserved candidatee2c8ba5b07b2f0dc5feed907d846e4de60708cd6, retaining ancestor3822bb4683e404ac08c32365bfeae10d6bb0017b. The original controller and sole publisher own execution/publication. Original custody root remains C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018. gpt-6.1-sol/medium/Standard/Fastfalse. All12native and4package proofs already PASS; no repeat native/Auth/SQL/browser campaign or new fixture. Preserve original required checks, all failure records, exact14 storage operations,46canonical functions/150trigger preimages, corrected30writer entries including3INVOKERs, manual-task consistency, failure latch, strict logging gates and current inactive package.\n\nMaterial evidence: read ABSOLUTE C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/n88-profile-network-review-20261031.json. Prior actual attempt7591f628-1af6-49e7-b76d-b9ee569a6700 successfully passed unchanged custody/DPAPI guards, but failed with an unclassified connection/BEGIN error. Its original cause remains UNKNOWN because the diagnostic catch discarded distinctions. Preserve actual-restricted-profile-continuation.json unchanged; do not rewrite that failure as network or authentication. An independent NO-CREDENTIAL public test at13:08:12Z found directhost db.xlrubcwjqktzzunrvuns.supabase.co has noA, oneAAAA, no externalIPv6interface, and the actual Windows TCP connection returnedENOTFOUND. A separate public test at13:10:06Z of the ALREADY-approved sessionhost aws-0-ap-south-1.pooler.supabase.com:5432 connected onIPv4 and passed strict hostname/pinnedCA TLS1.3, with NOAuth orSQL. This is concrete network compatibility evidence, not an access-policy denial or permission to weaken trust.\n\nTwo established diagnostic defects in profile-original-custodian.mjs require bounded correction: distinguish finite Node network/TLS codes from PostgreSQL SQLSTATE (EPIPE must never become postgres_EPIPE); never export raw exception messages/stacks/DSNs/query text/private values. The stage currently stays restricted_connect while BEGIN READ ONLY runs. Set finite stage before each dispatched connect/transaction/metadata operation and count attempts separately from successful metadata queries, so BEGIN failure cannot claim zero SQL attempts. Keep unknown errors genuinely unclassified. Add only focused synthetic diagnostic cases for these defects and existing invocation/context invariants; no real private reconnect for tests.\n\nThen perform ONE actual read-only profile observation via the exact session-pooler route ALREADY allowed by unchanged database-transport.mjs: username n88_backend.xlrubcwjqktzzunrvuns, host aws-0-ap-south-1.pooler.supabase.com, port5432, databasepostgres. Use the SAME existing protected n88_backend credential in memory through original custody. This is explicit selection of an existing supported IPv4 transport, not a credential/role substitution or new endpoint. No direct retry, auto-fallback, guessed host/region, new secret, search for another credential or transport relaxation. Keep databaseConfig and assertRestrictedTransport unchanged, pinnedCA700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7, rejectUnauthorizedtrue, hostname andTLS1.2minimum. Both actual current/session roles must be n88_backend, nonsuperuser/nonbypass/noCREATE, upstreamSSLtrue andclientTLSauthorizedtrue. On any actual custody/authentication/authorization/TLS/transport-invariant denial, stop with its finite classification; no alternate route or retries.\n\nBind the helper to this NEW actual queue/checkpoint/run/session and integration lease; do not retain the previous hard-coded run. Use original-root cwd only for the private operation. Reuse unchanged createInheritedVerifier, exact immutable owner.json and CurrentUserDPAPI mechanism for the already-known phase drafts/n88-student-portal/activation/owned-custody-4ddd5df2-933f-4754-8d04-0d27be47bcff.tmp. Preserve owner/run/project/purpose, stable nonreparse identities and current-user-only inherited protection. No old activate/reconcile invocation, weak fallback reader, ACL change, elevation, secret/ciphertext/config write/removal, consumed marker reset or private material copied to a worktree. Read only that exact protected project configuration; no broad filesystem/environment/browser/keychain search. Secrets remain memory-only, are not placed in arguments/environment/logs/reports, and client/buffers/lease are cleaned in finally. Previously protected access success does not waive fresh guard checks.\n\nQueries remain exclusively READ ONLY transaction control, actual identity/TLS/role and the existing finite logging/timeout settings whitelist with units. No user/student/teacher/source/grade rows, server-log/filesystem SQL, arbitrary SQL, function/grant/role/RLS/config changes, provider secret writes, service/carrier/source-pin deployment, account/fixture creation or real messages. A successful profile qualifies actualLOGIN/TLS/effective settings against the corrected safeLoggingProfile only. It must NOT assert that new safe wrappers/hooks are already installed or that a teacher/student hosted journey passed. Do not invoke new runtime identity helpers before installation or use rootpostgres/SETROLE as LOGIN evidence.\n\nWrite the fresh finite record to v2-hosted-compat-1031/actual-restricted-profile-session.json, preserving BOTH earlier profile records and all first failures. Update the report and INSTALL.md accurately; include independent public network evidence separately from old unclassified failure. On actual success, reuse exact unchanged12native+4package proofs and publish the qualified inactive candidate plus this bounded helper/evidence through the sole publisher. No blanket rebuild/requalification. Required actualprofile check may PASS only from the successful actual restricted connection. If effective settings or guards fail, preserve BLOCKED and the concrete reason. All public/service/gateway V2 switches remain OFF, actual install/deploy/journey NOT_RUN. N88 stays OPEN; publication is source delivery only. The already-admitted student-scope task remains unchanged and can start after this task delivers.",
+      "releaseAuthority": "User requested resumption and correction of established defects. Authorizes only this public source/pure guard repair after actual authentication denial, with exact existing semantics retained. No private custody or database/provider operation is authorized by this continuation; actual authentication remains BLOCKED.",
+      "objective": "SOURCE-ONLY FINAL GUARD CORRECTION; NO FURTHER PRIVATE READ OR CONNECTION. Resume SAME original session01a14fc3-b292-7390-9952-8549a286c80f, owned task worktree and preserved CLEAN candidatef9f361693f6f1a7fc058acafcf2518b43d4ed80c. Last run269dc6b9-d3e1-4f2c-a5d3-14e741b2a92a received actual authentication SQLSTATE28P01; preserve that BLOCKED condition and all three profile records unchanged. Do not read/decrypt private custody, check protected metadata, acquire an integration lease for private access, open any database connection, request/reset credentials, use another route/identity, or run hosted/provider/browser operations. This continuation fixes an independently established PUBLIC SOURCE omission only; it is NOT authorization to retry authentication.\n\nConcrete finding: public denied-read-20261023/runtime-expectations.mjs contains the original state-only provenance predicate at the start of originalRuntimeExpectations. It checks directVerified, exactdirectSource, finalRelease.publicEnabled, exactrecoveryVersion, recovery/password presence, and rejects loginDisarmed/directAuthRefused. The new v2-hosted-compat-1031/profile-original-custodian.mjs instead accepted any nonempty state.password after filesystem/DPAPI guards and cleared state before connection construction. Protected file provenance does not establish credential eligibility. We do NOT know the actual encrypted state flags and MUST NOT inspect them now or assert this caused28P01.\n\nMake the smallest semantics-preserving correction: extract the EXACT existing state-only predicate into an exported pure guard within runtime-expectations.mjs, retain its call at the original position inside originalRuntimeExpectations, and invoke that same guard immediately after JSON parsing in the profile helper BEFORE assigning/using password or constructing configuration/client. Preserve every original predicate, refusal behavior and all remaining public-config/runtime-key verification. Do not weaken/rewrite custody, ACL, DPAPI, invocation, lease, TLS, logging or runtime-source guards. The original activation module change is authorized ONLY for this pure shared guard extraction with unchanged existing semantics. Do not invoke its original activate/reconcile entrypoints. Keep the profile helper's state/buffer clearing in finally. A fixed safe provenance-refusal code may be recognized by the bounded classifier without exporting original errors or private values.\n\nUse fabricated state only for focused pure checks: valid exact provenance; every invalid predicate; explicit loginDisarmed and directAuthRefused with a nonempty fake password; refusal before mock connection use; clearing on rejection and fixed diagnostics. Reuse unchanged diagnostic tests and12native/4package qualifications by source identity; no new native cluster, full Auth/SQL/browser campaign or actual private operation. Preserve the actual source/statement/dispatch counts and all first failures. Fix the report header's observed encoding corruption while updating its precise source-only findings; no unrelated copy edits.\n\nUpdate existing bounded qualification-session.json and report with this source-only repair, or add qualification-provenance.json without changing historical actual profile files. Original required actualprofile check remains FAIL/BLOCKED: no fabricated PASS from pure tests. A new n88_original_credential_provenance_guard_preserved check may PASS only from the described source/pure evidence. Commit the owned source delta cleanly, report stateBLOCKED with the same actual authentication blocker, and identify that legitimate working original service authentication is still needed before any new privately authorized attempt. Keep public/service/gateway V2 flags OFF; hosted install/service journey NOT_RUN. No deployment or actualaccount/data/schema/config changes, no secret export or consumed allowance reset. Original controller/publisher only.",
       "preflight": {
         "version": 1,
-        "sourceCommit": "e2c8ba5b07b2f0dc5feed907d846e4de60708cd6",
+        "sourceCommit": "f9f361693f6f1a7fc058acafcf2518b43d4ed80c",
         "requiredSourcePaths": [
           "drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs",
-          "drafts/n88-student-portal/activation/read-service-20261023/inherited-custody.mjs",
-          "drafts/n88-student-portal/activation/denied-read-20261023/original-custodian.mjs",
           "drafts/n88-student-portal/activation/denied-read-20261023/runtime-expectations.mjs",
-          "drafts/n88-student-portal/activation/database-transport.mjs",
-          "drafts/n88-student-portal/activation/ca/supabase-prod-ca-2021.crt",
-          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
-          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
-          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/boundary.mjs",
-          "tests/n88-hosted-compat-1031/results.json"
+          "drafts/n88-student-portal/activation/denied-read-20261023/runtime-configuration.mjs",
+          "drafts/n88-student-portal/activation/denied-read-20261023/transition-guards.mjs"
         ],
         "editPaths": [
           "drafts/n88-student-portal/activation/v2-hosted-compat-1031/profile-original-custodian.mjs",
-          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-session.json",
-          "tests/n88-hosted-compat-1031/profile-network.test.mjs",
-          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/denied-read-20261023/runtime-expectations.mjs",
+          "tests/n88-hosted-compat-1031/profile-provenance.test.mjs",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-provenance.json",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-session.json",
           "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md"
         ],
         "newPaths": [
-          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/actual-restricted-profile-session.json",
-          "tests/n88-hosted-compat-1031/profile-network.test.mjs"
+          "tests/n88-hosted-compat-1031/profile-provenance.test.mjs",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/qualification-provenance.json"
         ],
         "workerChecks": [
           "n88_actual_restricted_profile_and_supported_safe_error_boundary",
@@ -99,7 +96,8 @@
           "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
           "n88_combined_native_owner_packet_and_private_service_assets_default_off",
           "n88_existing_custody_guards_and_private_values_not_exported",
-          "n88_profile_error_phase_and_network_classification"
+          "n88_profile_error_phase_and_network_classification",
+          "n88_original_credential_provenance_guard_preserved"
         ],
         "publisherChecks": []
       }
