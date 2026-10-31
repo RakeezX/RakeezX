@@ -11,3 +11,9 @@ The full whitespace check remains FAIL solely for the exact historical `provenan
 LOCAL_READY applies only to publication of this inactive source snapshot through the sole original publisher. Public/service/gateway V2 flags remain OFF; published V1 behavior is preserved. No new safe wrappers or writer hooks have been installed, no credential/consumer/service setting has been updated, and hosted installation and teacher/student service journey remain NOT_RUN. Generic publisher source/asset verification cannot establish hosted acceptance.
 
 The original hosted-runtime task remains BLOCKED with its actual profile check FAIL from SQLSTATE `28P01`. Its cause is not attributed to the source omission or to uninspected protected state. Legitimate working original service authentication and separately authorized private continuation are still required before any further actual attempt. N88 remains OPEN. This separate source milestone permits delivery of useful qualified engineering without retrying authentication or changing the successor task.
+
+## Source-release result correction
+
+Continuation run `546a1dfd-2aff-44ba-a28d-14f338a6dfdc` preserves candidate `566c34385701231f356249740366e8e7cfcda13b`. Its prior delivery validation rejected an extra historical whitespace FAIL in the worker result. The corrected result reports only the three required affected source-release checks, which passed. The historical full-diff whitespace failure above and the original authentication FAIL/BLOCKED remain unchanged and visible; neither is relabeled PASS.
+
+Only these two release records change. All 61 copied file blobs/bytes and 14 qualification-record hashes still match. Existing syntax/composition/native/package/diagnostic/provenance evidence is reused without replay. No implementation, validator, policy, historical evidence, flags or hosted state changes.

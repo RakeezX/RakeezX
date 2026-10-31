@@ -2,7 +2,7 @@
   "version": 1,
   "aiAuthored": true,
   "taskId": "continuous-n88-qualified-source-release-20261031",
-  "runId": "87f9e945-6b36-4e41-a7be-948b1b90cebf",
+  "runId": "546a1dfd-2aff-44ba-a28d-14f338a6dfdc",
   "createdAt": "2026-10-31T15:09:57.935542+00:00",
   "scope": "inactive source publication only",
   "integrationBase": "3a1464e31d41c44583a54c1791bfcf869dfc3a0d",
@@ -438,5 +438,16 @@
     "leases": 0
   },
   "publicationOwner": "sole original controller/publisher",
-  "productStatus": "N88 OPEN"
+  "productStatus": "N88 OPEN",
+  "deliveryValidationCorrection": {
+    "previousRunId": "87f9e945-6b36-4e41-a7be-948b1b90cebf",
+    "preservedCandidate": "566c34385701231f356249740366e8e7cfcda13b",
+    "previousFailure": "Candidate validation: An affected check must pass and no recorded check may fail",
+    "correction": "Final checks contain only this source milestone's three required affected checks. Historical whitespace failure remains unchanged in whitespace and original evidence; original authentication remains FAIL/BLOCKED. No validator, policy, implementation or historical result changed.",
+    "changedScope": [
+      "drafts/n88-student-portal/activation/v2-source-release-1031/manifest.json",
+      "docs/automation-evidence/20261031/N88_QUALIFIED_SOURCE_RELEASE.md"
+    ],
+    "verification": "61 copied file blobs/bytes and14 qualification records still match retained hashes; no qualification rerun."
+  }
 }
