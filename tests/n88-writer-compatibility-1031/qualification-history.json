@@ -1,0 +1,464 @@
+{
+  "taskId": "continuous-n88-writer-compatibility-20261031",
+  "runId": "13eebd91-b5c1-4135-bafd-d732ce30867f",
+  "originalCandidate": "0b17ef977446304f8236daf406575a717ce8471c",
+  "note": "Original results retained unchanged; each PASS has only its recorded scope. Prior altered-writer proof is not compatibility evidence. New final12-check and packet4-check proofs supersede incomplete local attempts; failures are never relabelled.",
+  "reports": [
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-7940b9e8-5feb-4d47-a7e1-41f947ae0585.tmp/report.json",
+      "sha256": "ca5f62a1c2a60bdf8c00ff25354ba5062a074b1a48503c34d1dbad733637b03f",
+      "startedAt": "2026-10-31T11:32:04.056Z",
+      "finishedAt": "2026-10-31T11:32:20.161Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        }
+      ],
+      "failure": {
+        "name": "TypeError",
+        "code": null,
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at differential (file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:68:110)"
+      },
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 30864,
+        "birth": "2026-10-31T11:32:14.2080340Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-9aa93cd3-3bd1-407a-b016-0d4ed346e1e5.tmp/report.json",
+      "sha256": "0306fd13dd6671131204d88e369cd8f958c91acf9cbdd22bcf491fc00d033905",
+      "startedAt": "2026-10-31T11:32:43.866Z",
+      "finishedAt": "2026-10-31T11:33:00.553Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "original_current_protocol_differential",
+          "status": "PASS"
+        },
+        {
+          "name": "native_restart_preserves_corrected_attachment",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 13616,
+        "birth": "2026-10-31T11:32:57.5908210Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-fd702667-14a1-4496-8147-766cd634a856.tmp/report.json",
+      "sha256": "e44d11f7240c99c8647eeae1b8f775bbcf4858b82b4ec77915003e669e9d8acb",
+      "startedAt": "2026-10-31T11:38:26.705Z",
+      "finishedAt": "2026-10-31T11:38:41.823Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "error",
+        "code": "42601",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:78:3"
+      },
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 2768,
+        "birth": "2026-10-31T11:38:36.4117770Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-ced9136d-4f6b-4fe8-9c6a-e88c3a8e7adf.tmp/report.json",
+      "sha256": "8598bedb1dd603a9e95698b8cf803b2a53596f5e7a5e07b007081393e54f566c",
+      "startedAt": "2026-10-31T11:39:14.576Z",
+      "finishedAt": "2026-10-31T11:39:28.851Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "error",
+        "code": "42601",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:78:7"
+      },
+      "installError": {
+        "code": "42601",
+        "message": "syntax error at or near \"END\"",
+        "position": "28634"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 30376,
+        "birth": "2026-10-31T11:39:23.4767400Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-0f079f55-95c8-43bc-8197-31b353ea6c4c.tmp/report.json",
+      "sha256": "9565b8c0dd42ed3f62ae0c8431f0c29ff5218826002bab67349996f31f11567b",
+      "startedAt": "2026-10-31T11:39:47.610Z",
+      "finishedAt": "2026-10-31T11:40:00.955Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "error",
+        "code": "P0001",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:78:7"
+      },
+      "installError": {
+        "code": "P0001",
+        "message": "n88_current_body_wrapper_metadata_mismatch",
+        "where": "PL/pgSQL function inline_code_block line 2 at RAISE"
+      },
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 25148,
+        "birth": "2026-10-31T11:39:55.4548770Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-76da620c-a9a7-4f9b-8f61-3bf9a2430ca9.tmp/report.json",
+      "sha256": "449f0b2c6b9e954a15b543951bceda8a54ed92f33ecf62a2a0bcea10363aa6a5",
+      "startedAt": "2026-10-31T11:41:11.166Z",
+      "finishedAt": "2026-10-31T11:41:32.701Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_current_41_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "original_current_protocol_differential",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n71_delete_restore_between_reads_no_old_link_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_score_configuration_removal_and_score_restore_retirement",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical_n88_original_receipt_failure_roll_back_together",
+          "status": "PASS"
+        },
+        {
+          "name": "both_lock_schedules_use_genuine_score_configuration_entry",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n77_parent_delete_retires_child_links_only_by_original_cascade",
+          "status": "PASS"
+        },
+        {
+          "name": "original_invoker_security_and_owner_isolation_preserved",
+          "status": "PASS"
+        },
+        {
+          "name": "native_restart_preserves_corrected_attachment",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 9160,
+        "birth": "2026-10-31T11:41:29.4482310Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-fa5b26de-53d3-4ad8-b95c-7619ccddae59.tmp/report.json",
+      "sha256": "36576fae938cfd6b51c82ee1779dac05c223172d585066d25bd8a01ebe7ad00b",
+      "startedAt": "2026-10-31T11:44:45.551Z",
+      "finishedAt": "2026-10-31T11:44:59.619Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "original_current_protocol_differential",
+          "status": "PASS"
+        },
+        {
+          "name": "early_declaration_preserves_initial_found_and_row_count",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_current_n94_command_and_distribution_copy",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "error",
+        "code": "22023",
+        "message": "Native qualification operation failed; no raw SQL/credentials logged",
+        "location": "at async file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:105:3"
+      },
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 31340,
+        "birth": "2026-10-31T11:44:53.7388690Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-67c0dc35-62bf-42c5-9d7b-6ce6d14be068.tmp/report.json",
+      "sha256": "445214363478305b4692e04e917d6032e09bfa1d68dc9ee239688aefab734c63",
+      "startedAt": "2026-10-31T11:48:29.674Z",
+      "finishedAt": "2026-10-31T11:48:53.552Z",
+      "status": "FAIL",
+      "checks": [
+        {
+          "name": "actual_current_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "original_current_protocol_differential",
+          "status": "PASS"
+        },
+        {
+          "name": "early_declaration_preserves_initial_found_and_row_count",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_current_n94_command_and_distribution_copy",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n71_delete_restore_between_reads_no_old_link_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_score_configuration_removal_and_score_restore_retirement",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical_n88_original_receipt_failure_roll_back_together",
+          "status": "PASS"
+        },
+        {
+          "name": "both_lock_schedules_use_genuine_score_configuration_entry",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n77_parent_delete_retires_child_links_only_by_original_cascade",
+          "status": "FAIL"
+        }
+      ],
+      "failure": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "The expression evaluated to a falsy value:\n\n  assert(state.length>0&&state.every(r=>r.tombstone))\n",
+        "location": "at file:///C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-writer-compatibility-20261031/tests/n88-writer-compatibility-1031/cases.mjs:165:110"
+      },
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 2736,
+        "birth": "2026-10-31T11:48:41.8253240Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-55a09580-002a-404f-a6a8-823b29898132.tmp/report.json",
+      "sha256": "40f52d146adf947c01aa52d4fe2a063ef7dcb9b95f03928bcd83c73d46006fd6",
+      "startedAt": "2026-10-31T11:49:54.908Z",
+      "finishedAt": "2026-10-31T11:50:16.764Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_current_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "original_current_protocol_differential",
+          "status": "PASS"
+        },
+        {
+          "name": "early_declaration_preserves_initial_found_and_row_count",
+          "status": "PASS"
+        },
+        {
+          "name": "actual_current_n94_command_and_distribution_copy",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n71_delete_restore_between_reads_no_old_link_revival",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_score_configuration_removal_and_score_restore_retirement",
+          "status": "PASS"
+        },
+        {
+          "name": "canonical_n88_original_receipt_failure_roll_back_together",
+          "status": "PASS"
+        },
+        {
+          "name": "both_lock_schedules_use_genuine_score_configuration_entry",
+          "status": "PASS"
+        },
+        {
+          "name": "genuine_n77_parent_delete_retires_child_links_only_by_original_cascade",
+          "status": "PASS"
+        },
+        {
+          "name": "original_invoker_security_and_owner_isolation_preserved",
+          "status": "PASS"
+        },
+        {
+          "name": "native_restart_preserves_corrected_attachment",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 26112,
+        "birth": "2026-10-31T11:50:13.8644290Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    },
+    {
+      "path": "artifacts/continuous-n88-writer-compatibility-20261031-52c71a28-2565-415f-924e-e951bc82fb08.tmp/report.json",
+      "sha256": "6e758634bf51bd5301d5b7b1c5478fce43167568d05b1ed0f4c06fabce39e054",
+      "startedAt": "2026-10-31T11:51:15.610Z",
+      "finishedAt": "2026-10-31T11:51:32.441Z",
+      "status": "PASS",
+      "checks": [
+        {
+          "name": "actual_current_function_and_trigger_baselines",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_single_owner_admin_install_preserves_current_bodies",
+          "status": "PASS"
+        },
+        {
+          "name": "corrected_fixed_readback_and_default_unbound_refusal",
+          "status": "PASS"
+        },
+        {
+          "name": "native_restart_preserves_corrected_attachment",
+          "status": "PASS"
+        }
+      ],
+      "failure": null,
+      "installError": null,
+      "nativeError": null,
+      "cleanup": {
+        "stopped": true,
+        "pid": 7484,
+        "birth": "2026-10-31T11:51:29.4095950Z",
+        "pidAbsent": true,
+        "portFree": true,
+        "ownedDataRemoved": true
+      },
+      "leaseRelease": "RELEASED integration"
+    }
+  ]
+}

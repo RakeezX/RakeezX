@@ -1,5 +1,6 @@
-/** AI-authored SOURCE ONLY. No DB implementation, deployment or live enablement.
- * Required port: a synthetic serial transaction over {scopes:[],receipts:[]}.
+import {publicationRuntimeAllowed} from './activation/v2-runtime-writer-1031/capability.mjs';
+/** AI-authored SOURCE ONLY. No deployment or live enablement.
+ * Required port: an owned serial transaction over {scopes:[],receipts:[]}.
  * It owns locks, rollback, beforeCommit guards and ACK-after-COMMIT. Auth and
  * readCurrent are trusted injected server ports, NEVER request-derived proofs.
  * Browser lease/context are echo fences only, not server workspace authority.
@@ -133,10 +134,10 @@ function validStored(stored) {
         !/^[1-9][0-9]*$/.test(s.revision) || typeof s.retired !== 'boolean')) fail();
 }
 
-export function createPublicationV2Service({ executionMode, enabled = false, origin, transaction, authenticate, readCurrent }) {
-  // No live adapter exists. Even an accidentally enabled non-synthetic service
-  // cannot enter this source prototype. No environment/query/body flag is read.
-  if (enabled !== true || executionMode !== 'synthetic') return async () => response(401, { error: 'unavailable' });
+export function createPublicationV2Service({ executionMode, runtimeCapability, enabled = false, origin, transaction, authenticate, readCurrent }) {
+  // Server construction requires an actual-session capability. No client,
+  // query/body flag or mode string alone grants access; the default stays OFF.
+  if (enabled !== true || !publicationRuntimeAllowed(executionMode,runtimeCapability)) return async () => response(401, { error: 'unavailable' });
   if (![transaction, authenticate, readCurrent].every(fn => typeof fn === 'function') || !origin) fail();
   return async request => {
     const student = request.path === PUBLICATION_V2_PATHS[1], r = request.body;

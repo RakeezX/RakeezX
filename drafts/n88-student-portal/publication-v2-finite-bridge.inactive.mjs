@@ -1,6 +1,7 @@
+import {publicationRuntimeAllowed} from './activation/v2-runtime-writer-1031/capability.mjs';
 /** AI-authored INACTIVE composition. No transport, acquisition, environment or route
  * installation. The only public capability is the existing OFF service handler.
- * Repository and admission ports are trusted LOCAL synthetic dependencies, never
+ * Repository and admission ports are trusted server-owned dependencies, never
  * request fields. The old query port retains its ORIGINAL finite allowlist; it
  * must not be replaced with a general SQL executor for hosted use.
  */
@@ -53,11 +54,11 @@ function decodeNumeric(op, result) {
  * Numeric locator -> original authenticated student upgrade is owned by that
  * trusted port, with the catalogue enforcing exact locked tuple continuity.
  */
-export function createInactivePublicationV2FiniteBridge({ executionMode, enabled = false, origin,
+export function createInactivePublicationV2FiniteBridge({ executionMode, runtimeCapability, enabled = false, origin,
   catalogSha256, repository, verifyAdmission, canonical, now = Date.now,
   budgetMs = 5000, maxOperations = 20000 } = {}) {
-  if (enabled !== true || executionMode !== 'synthetic')
-    return createPublicationV2Service({ executionMode, origin });
+  if (enabled !== true || !publicationRuntimeAllowed(executionMode,runtimeCapability))
+    return createPublicationV2Service({ executionMode, runtimeCapability, origin });
   must(catalogSha256 === publicationV2FiniteCatalogSha256 && typeof repository?.transaction === 'function' &&
     typeof verifyAdmission === 'function' && typeof now === 'function' && canonical &&
     Number.isSafeInteger(budgetMs) && budgetMs >= 10 && budgetMs <= 10000 &&
@@ -73,7 +74,7 @@ export function createInactivePublicationV2FiniteBridge({ executionMode, enabled
         typeof original.canonicalReadMode === 'function' && typeof original.executePublicationV2 === 'function');
       // One catalogue state for the entire service request, including COMMIT guards.
       must(!finite);
-      finite = createInactivePublicationV2FiniteCatalog({ executionMode, now, budgetMs: Math.max(10, deadline - now()), maxOperations,
+      finite = createInactivePublicationV2FiniteCatalog({ executionMode, runtimeCapability, now, budgetMs: Math.max(10, deadline - now()), maxOperations,
         verifyAdmission: async (sameRequest, signal) => {
           fence(); must(sameRequest === request);
           const context = await verifyAdmission(sameRequest, original, signal); fence();
@@ -106,7 +107,7 @@ export function createInactivePublicationV2FiniteBridge({ executionMode, enabled
       }));
     }) };
     try {
-      const ports = createCanonicalPublicationV2Ports({ ...canonical, executionMode, repository: wrappedRepository, origin, now });
+      const ports = createCanonicalPublicationV2Ports({ ...canonical, executionMode, runtimeCapability, repository: wrappedRepository, origin, now });
       const authenticate = async (r, tx, role) => {
         fence(); must(r === request);
         const auth = await ports.authenticate(r, tx, role); fence();
@@ -120,11 +121,11 @@ export function createInactivePublicationV2FiniteBridge({ executionMode, enabled
         fence(); must(admitted && auth.ownerId === admitted.ownerId && auth.sessionId === admitted.sessionId);
         const snapshot = await ports.readCurrent(tx, auth, scope); fence(); sourceReady = true; return snapshot;
       };
-      return await createPublicationV2Service({ executionMode, enabled: true, origin,
+      return await createPublicationV2Service({ executionMode, runtimeCapability, enabled: true, origin,
         transaction: ports.transaction, authenticate, readCurrent })(request);
     } catch {
       // Same private response and UNKNOWN semantics as the original service.
-      return await createPublicationV2Service({ executionMode, enabled: true, origin,
+      return await createPublicationV2Service({ executionMode, runtimeCapability, enabled: true, origin,
         transaction: async () => fail(), authenticate: () => null, readCurrent: () => null })(request);
     } finally { live = false; finite?.close(request); }
   };

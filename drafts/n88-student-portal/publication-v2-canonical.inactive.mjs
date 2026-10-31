@@ -1,3 +1,4 @@
+import {publicationRuntimeAllowed} from './activation/v2-runtime-writer-1031/capability.mjs';
 /** AI: INACTIVE canonical/session binding. No route, env, DSN, SQL dispatcher,
  * provider activation or positive issuance. Hosted finite boundary is unchanged.
  * Reuses actual teacher SDK verifier, numeric READ handler, canonical adapter,
@@ -23,9 +24,9 @@ const receiptScope = (c, owner, teachingId) => {
   return { ownerId: owner, teachingId: t.id, sectionId: t.sectionId, termId: t.termId, subjectId: t.subjectId };
 };
 
-export function createCanonicalPublicationV2Ports({ executionMode, repository, teacher, numeric, rollout,
+export function createCanonicalPublicationV2Ports({ executionMode, runtimeCapability, repository, teacher, numeric, rollout,
   verifyIngress, origin, studentTeachingId, now = Date.now, onVerifiedIdentity }) {
-  if (executionMode !== 'synthetic' || typeof verifyIngress !== 'function' || !id(studentTeachingId) ||
+  if (!publicationRuntimeAllowed(executionMode,runtimeCapability) || typeof verifyIngress !== 'function' || !id(studentTeachingId) ||
       typeof now !== 'function' || !rollout?.configured || !numeric) fail();
   const verifyTeacher = createTeacherVerifier({ ...teacher, now });
   const numbers = createNumericCredentialOperations({ ...numeric, rollout, now });
@@ -51,7 +52,7 @@ export function createCanonicalPublicationV2Ports({ executionMode, repository, t
           classId: scope.sectionId, teachingId: scope.teachingId })) fail();
     return { canonical: c, now: today };
   };
-  const ports = createPublicationV2PostgresPorts({ executionMode, repository,
+  const ports = createPublicationV2PostgresPorts({ executionMode, runtimeCapability, repository,
     authenticate: async (request, tx, role) => {
       await admitted(request, tx);
       if (role === 'teacher') {
