@@ -1,4 +1,6 @@
-# N88 runtime/writer integration — inactive engineering candidate
+# Historical N88 runtime/writer integration — corrected successor required
+
+**Current correction:** [N88_WRITER_COMPATIBILITY.md](N88_WRITER_COMPATIBILITY.md), task `continuous-n88-writer-compatibility-20261031`, supersedes the attachment and installation packet described below. The old native PASS tested altered canonical behavior (stricter delete CAS/cascades/score override) and is **not compatibility evidence**. Original result/failure files remain historical. Unchanged restricted runtime/Auth/LOGIN/bridge/gateway/ACK evidence is reused by exact byte identity. The corrected packet uses the full observed current bodies, original invoker security and N88-only retirement hooks; no hosted activation is claimed.
 
 AI-authored. Task `continuous-n88-runtime-writer-integration-20261031`; run `fac941dc-b3df-4d7a-bf59-57918a1bb9d7`; base `85f0638f4feb515795f9d34a377a26392f6c19a2`. Source-only delivery. No push, deployment, hosted DDL, account/token/grade mutation, queue/ledger edit or Product closure.
 

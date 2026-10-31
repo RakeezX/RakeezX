@@ -1,90 +1,56 @@
--- AI: inactive exact writer-owned helpers. No browser/backend execution grant.
-create function n88_private.v2_writer_capture_1031(p_owner uuid,p_entity text,p_id text,p_old jsonb) returns jsonb
-language plpgsql security invoker set search_path=pg_catalog as $$
-declare result jsonb; teaching text;
-begin
- if p_owner is distinct from auth.uid() or p_entity not in ('items','score_subitems') or p_old->>'id' is distinct from p_id then raise exception 'n88_writer_capture';end if;
- if p_entity='items' then teaching:=p_old->>'teaching_id';
- else select teaching_id into strict teaching from rakeezx.items where owner_id=p_owner and id=p_old->>'item_id' for update;end if;
- select coalesce(jsonb_agg(jsonb_build_object('scope',s.scope_key,'family',q.family,'id',q.id,'parent',q.parent,'revision',q.revision) order by s.scope_key,q.family,q.id),'[]'::jsonb) into result
- from n88_private.publication_v2_scopes s cross join lateral (
- select 'items'::text as family,p_id as id,p_id as parent,(p_old->>'revision')::bigint as revision where p_entity='items'
- union all select 'scoreSubitems',d.id,d.item_id,d.revision from rakeezx.score_subitems d where d.owner_id=p_owner and
- (p_entity='items' and d.item_id=p_id or p_entity='score_subitems' and d.id=p_id)
- ) q where s.owner_id=p_owner and s.payload->'scope'->>'teachingId'=teaching;
- if jsonb_array_length(result)>8000 or octet_length(result::text)>2097152 then raise exception 'n88_writer_capture_budget';end if;
- return result;
+-- AI: N88-only observation. No canonical writes, grade overrides or admission policy.
+create function n88_private.v2_writer_lock_1031() returns trigger
+language plpgsql security invoker set search_path=pg_catalog as $$begin
+ perform pg_advisory_xact_lock(1312307256,88);return null;
 end $$;
 
-create function n88_private.v2_writer_delete_children_1031(p_owner uuid,p_entity text,p_id text) returns void
+create function n88_private.v2_writer_retire_1031(p_owner uuid,p_scope text,p_item text,p_subitem text,p_revision bigint) returns void
 language plpgsql security invoker set search_path=pg_catalog as $$
-declare dependency record; has_live boolean; inspected integer:=0;
+declare teaching text;
 begin
- if p_owner is distinct from auth.uid() then raise exception 'n88_writer_owner';end if;
- -- Higher-level lifecycle commands must delete their genuine dependencies first.
- -- Reject generic parent-only deletions rather than inventing a domain cascade.
- if p_entity in ('items','score_subitems') then
-  -- The accepted source deletion is one atomic score-domain removal. No score
-  -- value, rounding, manual/derived algorithm or existing trigger is rewritten.
-  perform set_config('rakeezx.score_domain_write','on',true);
-  update rakeezx.score_subitem_completions c set deleted_at=clock_timestamp() where c.owner_id=p_owner and c.deleted_at is null and exists(
-   select 1 from rakeezx.score_subitems d where d.owner_id=p_owner and c.subitem_id=d.id and (p_entity='items' and d.item_id=p_id or p_entity='score_subitems' and d.id=p_id));
-  if p_entity='items' then
-   update rakeezx.score_subitems set deleted_at=clock_timestamp() where owner_id=p_owner and item_id=p_id and deleted_at is null;
-   update rakeezx.scores set deleted_at=clock_timestamp() where owner_id=p_owner and item_id=p_id and deleted_at is null;
-  end if;
- end if;
-  for dependency in
-   select n.nspname,c.relname,a.attname,
-    exists(select 1 from pg_attribute d where d.attrelid=c.oid and d.attname='deleted_at' and not d.attisdropped) as soft_delete
-   from pg_constraint f join pg_class c on c.oid=f.conrelid join pg_namespace n on n.oid=c.relnamespace
-   cross join lateral unnest(f.confkey,f.conkey) keys(parent_key,child_key)
-   join pg_attribute parent_col on parent_col.attrelid=f.confrelid and parent_col.attnum=keys.parent_key
-   join pg_attribute a on a.attrelid=c.oid and a.attnum=keys.child_key
-   where f.contype='f' and f.confrelid=to_regclass(format('rakeezx.%I',p_entity)) and n.nspname='rakeezx' and parent_col.attname='id'
-    and exists(select 1 from pg_attribute o where o.attrelid=c.oid and o.attname='owner_id' and not o.attisdropped)
-  loop
-   inspected:=inspected+1;if inspected>128 then raise exception 'n88_dependency_budget';end if;
-   execute format('select exists(select 1 from %I.%I where owner_id=$1 and %I=$2%s)',dependency.nspname,dependency.relname,dependency.attname,case when dependency.soft_delete then ' and deleted_at is null' else '' end) into has_live using p_owner,p_id;
-   if has_live then raise exception 'n88_parent_has_live_children';end if;
-  end loop;
-
+ select payload->'scope'->>'teachingId' into strict teaching from n88_private.publication_v2_scopes where owner_id=p_owner and scope_key=p_scope;
+ insert into n88_private.publication_v2_high_water(owner_id,scope_key,source_key,canonical_revision,retired)
+ select p_owner,p_scope,key,max(rev),true from (
+  select 'items:'||i.id as key,i.revision as rev from rakeezx.items i where i.owner_id=p_owner and i.teaching_id=teaching and p_subitem is null and (p_item is null or i.id=p_item)
+  union all select 'scoreSubitems:'||d.id,d.revision from rakeezx.score_subitems d where d.owner_id=p_owner and (p_subitem is null or d.id=p_subitem) and
+   (p_item is not null and d.item_id=p_item or p_item is null and exists(select 1 from rakeezx.items i where i.owner_id=p_owner and i.id=d.item_id and i.teaching_id=teaching))
+  union all select case when p_subitem is null then 'items:'||p_item else 'scoreSubitems:'||p_subitem end,greatest(p_revision,1) where p_item is not null
+ ) sources group by key
+ on conflict(owner_id,scope_key,source_key) do update set canonical_revision=greatest(publication_v2_high_water.canonical_revision,excluded.canonical_revision),retired=true;
+ update n88_private.publication_v2_high_water set retired=true where owner_id=p_owner and scope_key=p_scope and p_item is null;
+ update n88_private.publication_v2_items set publication_revision=publication_revision+1,tombstone=true,
+  payload=payload||jsonb_build_object('publicationRevision',publication_revision+1,'tombstone',true,'decisions',jsonb_build_object('required',false,'scheduled',false,'completed',false,'grade',false))
+ where owner_id=p_owner and scope_key=p_scope and not tombstone and (p_item is null or
+  p_subitem is null and row_id::jsonb->>1=p_item or p_subitem is not null and row_id::jsonb->>0='subitem' and row_id::jsonb->>2=p_subitem);
+ update n88_private.publication_v2_scopes set store_revision=store_revision+1 where owner_id=p_owner and scope_key=p_scope;
 end $$;
 
-create function n88_private.v2_writer_finalize_domain_1031(p_owner uuid,p_entity text,p_id text) returns void
-language plpgsql security invoker set search_path=pg_catalog as $$
-declare parent text; pupil text; n integer:=0; previous_flag text:=current_setting('rakeezx.score_domain_write',true);
+create function n88_private.v2_writer_after_1031() returns trigger
+language plpgsql security definer set search_path=pg_catalog as $$
+declare r jsonb;v_owner uuid;source text;parent text;teaching text;s record;revision bigint;
 begin
- if p_owner is distinct from auth.uid() then raise exception 'n88_writer_owner';end if;
- if p_entity='score_subitems' then
-  select item_id into strict parent from rakeezx.score_subitems where owner_id=p_owner and id=p_id;
-  for pupil in select distinct student_id from rakeezx.scores where owner_id=p_owner and item_id=parent and deleted_at is null loop
-   n:=n+1;if n>2000 then raise exception 'n88_writer_score_budget';end if;
-   perform rakeezx.recompute_subitem_score(p_owner,parent,pupil,'n88-source-delete');
-  end loop;
- end if;
- perform set_config('rakeezx.score_domain_write',coalesce(previous_flag,''),true);
-end $$;
-
-create function n88_private.v2_writer_complete_1031(p_owner uuid,p_capture jsonb,p_deleted boolean) returns void
-language plpgsql security invoker set search_path=pg_catalog as $$
-declare r jsonb; current_revision bigint; gone boolean;
-begin
- if p_owner is distinct from auth.uid() or jsonb_typeof(p_capture)<>'array' then raise exception 'n88_writer_owner';end if;
- for r in select value from jsonb_array_elements(p_capture) loop
-  if r->>'family'='items' then select revision,deleted_at is not null into strict current_revision,gone from rakeezx.items where owner_id=p_owner and id=r->>'id';
-  else select revision,deleted_at is not null into strict current_revision,gone from rakeezx.score_subitems where owner_id=p_owner and id=r->>'id';end if;
-  if p_deleted then
-   if not gone then raise exception 'n88_writer_incomplete_child_delete';end if;
-   perform n88_private.publication_v2_retire_source(p_owner,r->>'scope',r->>'family',r->>'id',current_revision);
-  else
-   -- Accepted definition edit invalidates publication decisions, not receipts.
-   update n88_private.publication_v2_items set publication_revision=publication_revision+1,
-    payload=payload||jsonb_build_object('publicationRevision',publication_revision+1,'decisions',jsonb_build_object('required',false,'scheduled',false,'completed',false,'grade',false))
-    where owner_id=p_owner and scope_key=r->>'scope' and not tombstone and
-    (r->>'family'='items' and row_id::jsonb->>1=r->>'id' or r->>'family'='scoreSubitems' and row_id::jsonb->>0='subitem' and row_id::jsonb->>2=r->>'id');
-   update n88_private.publication_v2_scopes set store_revision=store_revision+1 where owner_id=p_owner and scope_key=r->>'scope';
-  end if;
+ if tg_table_schema<>'rakeezx' or tg_table_name not in ('items','score_subitems','teachings','sections','terms','years','subjects') then raise exception 'n88_invalid_trigger_binding';end if;
+ r:=to_jsonb(old);
+ if tg_op='UPDATE' then
+  if r->>'deleted_at' is not null or to_jsonb(new)->>'deleted_at' is null then return new;end if;
+  revision:=(to_jsonb(new)->>'revision')::bigint;
+ else revision:=(r->>'revision')::bigint;end if;
+ v_owner:=(r->>'owner_id')::uuid;source:=r->>'id';
+ if tg_table_name='items' then parent:=source;teaching:=r->>'teaching_id';
+ elsif tg_table_name='score_subitems' then parent:=r->>'item_id';select teaching_id into teaching from rakeezx.items where owner_id=v_owner and id=parent;end if;
+ for s in select scope_key from n88_private.publication_v2_scopes v where v.owner_id=v_owner and
+  case tg_table_name
+   when 'items' then v.payload->'scope'->>'teachingId'=teaching
+   when 'score_subitems' then v.payload->'scope'->>'teachingId'=teaching or exists(select 1 from n88_private.publication_v2_items p where p.owner_id=v_owner and p.scope_key=v.scope_key and p.row_id::jsonb->>1=parent)
+   when 'teachings' then v.payload->'scope'->>'teachingId'=source
+   when 'sections' then v.payload->'scope'->>'sectionId'=source
+   when 'terms' then v.payload->'scope'->>'termId'=source
+   when 'subjects' then v.payload->'scope'->>'subjectId'=source
+   when 'years' then exists(select 1 from rakeezx.terms t where t.owner_id=v_owner and t.id=v.payload->'scope'->>'termId' and t.year_id=source)
+  end
+ loop
+  perform n88_private.v2_writer_retire_1031(v_owner,s.scope_key,parent,case when tg_table_name='score_subitems' then source else null end,revision);
  end loop;
+ if tg_op='DELETE' then return old;end if;return new;
 end $$;
-revoke all on function n88_private.v2_writer_capture_1031(uuid,text,text,jsonb),n88_private.v2_writer_delete_children_1031(uuid,text,text),n88_private.v2_writer_finalize_domain_1031(uuid,text,text),n88_private.v2_writer_complete_1031(uuid,jsonb,boolean) from public,anon,authenticated,n88_backend;
+revoke all on function n88_private.v2_writer_lock_1031(),n88_private.v2_writer_after_1031(),n88_private.v2_writer_retire_1031(uuid,text,text,text,bigint) from public,anon,authenticated,n88_backend;

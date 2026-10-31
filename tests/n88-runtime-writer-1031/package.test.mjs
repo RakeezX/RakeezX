@@ -23,16 +23,15 @@ test('actual session admission refuses privileged/mismatched physical target and
 });
 test('immutable packet binds all source components and full installer stays unbound',async()=>{
  const {manifest:m,sql}=await verifyPackage();assert.equal(m.serviceEnabled,false);assert.equal(m.hostedExecuted,false);assert.equal(m.storageReinstall,false);assert.equal(m.delta.newCredentials,0);assert.equal(m.delta.newPermanentMemberships,0);assert.equal(m.delta.rawTableGrants,0);
- assert.equal(m.delta.newRuntimeFixedExecute,14);assert.equal(m.delta.newWriterHelpers,4);assert.equal(m.delta.newTables,0);
+ assert.equal(m.delta.newRuntimeFixedExecute,14);assert.equal(m.delta.newWriterHelpers,3);assert.equal(m.delta.newTables,0);
  assert(sql.includes("expected_authority jsonb := 'null'::jsonb;"));assert.equal((await bindPackage()).inactive,true);
  assert.equal((await bindPackage({operation:'disable'})).inactive,true);assert.equal((await bindPackage({operation:'privacy'})).inactive,true);await assert.rejects(bindPackage({operation:'arbitrary'}),/n88_exact_package_operation_required/);
  await assert.rejects(bindPackage({authorityPath:'./fabricated-authority.json',authoritySha256:'0'.repeat(64)}),/n88_original_authority_path_required/);
  for(const name of ['runtime-role.sql','writer-helpers.sql','writer-replacement.sql']){const source=(await readFile(new URL('../../drafts/n88-student-portal/activation/v2-runtime-writer-1031/'+name,import.meta.url),'utf8')).replaceAll('\r\n','\n');assert(sql.includes(source));}
  const observed=JSON.parse(await readFile(new URL('../../drafts/n88-student-portal/activation/v2-runtime-writer-1031/observed-writer.json',import.meta.url),'utf8'));
  assert.equal(observed.rows.length,2);for(const r of observed.rows)assert.equal(createHash('sha256').update(r.definition).digest('hex'),r.sha256);
- const native=JSON.parse(await readFile(new URL('./install-results.json',import.meta.url),'utf8'));assert.equal(native.status,'PASS');
- const qualified=sql.replaceAll(m.bundleSha256,native.installQualification.bundleSha256).replace('$function$;\n-- END EXACT QUALIFIED DELTA','$function$;\n\n-- END EXACT QUALIFIED DELTA');
- assert.equal(createHash('sha256').update(qualified).digest('hex'),native.installQualification.sourceInstallerSha256,'qualified installer differs only in source-bundle binding and one blank statement separator outside the function');
+ const native=JSON.parse(await readFile(new URL('../n88-writer-compatibility-1031/packet-results.json',import.meta.url),'utf8'));assert.equal(native.status,'PASS');
+ assert.equal(createHash('sha256').update(sql.replaceAll(m.bundleSha256,native.packetQualification.bundleSha256)).digest('hex'),native.packetQualification.sourceInstallerSha256,'corrected qualified packet; historical altered-writer proof is not compatibility evidence');
 });
 test('new gateway refuses disabled/query/foreign/subrequest without reaching service',async()=>{
  let sends=0;const gateway=createRuntimeWriterGateway({fetch:async()=>{sends++;throw Error('unexpected');}});

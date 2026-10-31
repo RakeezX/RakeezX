@@ -1,0 +1,56 @@
+{
+  "taskId": "continuous-n88-writer-compatibility-20261031",
+  "runId": "13eebd91-b5c1-4135-bafd-d732ce30867f",
+  "baseSha": "55470b978b93efc09602140245b97ea014e6eaf5",
+  "checkedAt": "2026-10-31T12:02:11.918Z",
+  "scope": "PASS",
+  "syntax": {
+    "status": "PASS",
+    "files": [
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/gateway.inactive.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+      "drafts/n88-student-portal/existing-host.mjs",
+      "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+      "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+      "drafts/n88-student-portal/web-entry.mjs",
+      "tests/n88-runtime-writer-1031/cases.mjs",
+      "tests/n88-runtime-writer-1031/native.mjs",
+      "tests/n88-runtime-writer-1031/package.test.mjs",
+      "drafts/n88-student-portal/activation/v2-runtime-writer-1031/build-attachment.mjs",
+      "tests/n88-writer-compatibility-1031/cases.mjs",
+      "tests/n88-writer-compatibility-1031/native.mjs",
+      "tests/n88-writer-compatibility-1031/package.test.mjs"
+    ]
+  },
+  "preservedUi": "97e39d269d0a19686a9e7e9764a017cec7232780",
+  "unchangedFrontendSwMigrationsInstalledPackets": "PASS",
+  "proofs": {
+    "results.json": {
+      "sha256": "3d57a3f8e30937e0deceab72639bffc8911d53bddde303fc11b7cfc777427f45",
+      "checks": 12,
+      "finishedAt": "2026-10-31T11:50:16.764Z",
+      "status": "PASS"
+    },
+    "packet-results.json": {
+      "sha256": "a0db505921cbd65699cbbd08ba63fbdcdee8be046dbc03bcd6229b52fc8f20b9",
+      "checks": 4,
+      "finishedAt": "2026-10-31T11:51:32.441Z",
+      "status": "PASS"
+    }
+  },
+  "unit": {
+    "status": "PASS",
+    "checks": 8,
+    "command": "node --test tests/n88-writer-compatibility-1031/package.test.mjs tests/n88-runtime-writer-1031/package.test.mjs"
+  },
+  "bundleSha256": "b2524bc39fd6b2394c0ee8c7cd91af61b360285033c29b06791f436e0f25525c",
+  "installerSha256": "9341ac629db61b68c353d41b647a7fb691eabbaec8dcba142f3689e4679d926f",
+  "hostedInstallation": "NOT_RUN",
+  "hostedActivation": "NOT_RUN",
+  "renderedUi": "NOT_RUN"
+}
