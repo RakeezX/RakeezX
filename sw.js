@@ -4,7 +4,7 @@
  * غيّر VERSION عند كل تحديث ليُحدَّث المخزون على أجهزة المعلّم.
  */
 
-const VERSION = 'rakeezx-v102';
+const VERSION = 'rakeezx-v103';
 const CACHE_PREFIX = 'rakeezx-v';
 const CACHE_GENERATION = Number(VERSION.slice(CACHE_PREFIX.length));
 
@@ -78,6 +78,10 @@ const SHELL = [
   './src/lib/student-portal-client.js',
   './src/lib/student-portal-runtime.js',
   './src/lib/student-portal-class-client.js',
+  './src/lib/student-portal-publication-client.js',
+  './src/lib/n88-item-publication-proposal.js',
+  './src/lib/n88-manual-task-link-safety.js',
+  './src/views/student-portal-publications.js',
   './src/lib/student-portal-task-guidance-client.js',
   './src/views/student-portal-class.js',
   './src/styles/student-portal-class.css',
@@ -269,6 +273,17 @@ self.addEventListener('install', (event) => {
         './src/lib/notification-push-core.js',
         './src/store.js',
         './src/views/calendar.js',
+        // Atomic N88 browser contract graph: never activate a partially updated UI.
+        './src/lib/student-portal-runtime.js',
+        './src/lib/student-portal-publication-client.js',
+        './src/lib/student-portal-unified-client.js',
+        './src/lib/n88-item-publication-proposal.js',
+        './src/lib/n88-manual-task-link-safety.js',
+        './src/views/student-portal-class.js',
+        './src/views/student-portal-publications.js',
+        './src/views/student-portal-login.js',
+        './src/styles/student-portal-class.css',
+        './src/styles/student-portal.css',
       ].map(url => cache.add(new Request(url, { cache: 'reload' }))));
       // ملف واحد مفقود يجب ألا يفشل التثبيت كله
       await Promise.all(

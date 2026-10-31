@@ -1,0 +1,111 @@
+/** AI: actual mounted app route/runtime/store guards, native fetch and published synthetic service. */
+import assert from 'node:assert/strict';import {writeFile} from 'node:fs/promises';import {execFileSync} from 'node:child_process';
+import {start} from './host.mjs';
+import {withIsolatedLocalBrowser} from 'file:///C:/Users/Abody/Projects/RakeezX/scripts/ops-supervisor-v4/isolated-local-browser.mjs';
+const canonical='C:/Users/Abody/Projects/RakeezX',taskId='continuous-n88-publication-ui-integration-20261031',runId='2545599f-e57e-4ae1-aed1-edef492f27b2';
+const taskFile=`${canonical}/artifacts/ops-supervisor-v4/queue/${taskId}.json`,dir='tests/n88-publication-ui-1031';
+const lease=action=>execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-File',canonical+'/scripts/ops-supervisor-v4/resource-lease.ps1','-Name','integration','-Action',action,'-TaskFile',taskFile,'-RuntimeRoot',canonical+'/artifacts/ops-supervisor-v4','-WaitSeconds','0','-OwnerToken',runId],{encoding:'utf8',windowsHide:true,timeout:20000}).trim();
+const report={taskId,runId,status:'FAIL',checks:[],pageErrors:[],externalRequests:[],realAccountOperations:0,providerOperations:0,cleanup:{}};
+let server,owned=false,stage='lease',teacher;
+async function boot(page,enabled=true){
+ await page.goto(server.url+'#/teaching/teaching');await page.waitForFunction(()=>!!window.uiFixture);
+ await page.evaluate(enabled=>{window.uiFixture.enabled=enabled;},enabled);
+ await page.getByRole('link',{name:/مساحة الطلاب/}).first().click();
+ await page.waitForFunction(()=>document.querySelector('.n88-class')?.getAttribute('aria-busy')==='false');
+ if(enabled)await page.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&document.querySelector('[data-publication-source]'));
+}
+async function choose(page,title,flags){
+ await page.locator('[data-publication-source]').selectOption({label:title});
+ for(const [name,value] of Object.entries(flags))await page.locator('[data-publication-save] [name='+name+']').setChecked(value);
+ await page.locator('[data-publication-save] [type=submit]').click();
+ await page.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&document.querySelector('.n88-publications [role=status]')?.textContent.includes('حُفظت'));
+}
+try{
+ lease('acquire');owned=true;server=await start();
+ await withIsolatedLocalBrowser({taskFile,runId,url:server.url,timeoutMs:120000},async({createContext})=>{
+  const context=await createContext({viewport:{width:1100,height:900},locale:'ar-SA'});
+  context.on('page',p=>{p.on('pageerror',e=>report.pageErrors.push(e.message));p.on('request',r=>{if(new URL(r.url()).origin!==new URL(server.url).origin)report.externalRequests.push(r.url());});});
+  teacher=await context.newPage();stage='actual app teacher boot';await boot(teacher);
+  const pub=teacher.locator('.n88-publications');assert.equal(await pub.locator('input[type=checkbox]:checked').count(),0);
+  stage='four explicit choices';
+  await choose(teacher,'مهمة مطلوبة — بند فرعي',{required:true});
+  await choose(teacher,'مهمة قادمة — بند فرعي',{scheduled:true});
+  await choose(teacher,'مهمة مكتملة — بند فرعي',{completed:true,grade:true});
+  await choose(teacher,'اختبار مستقل',{grade:true});
+  report.checks.push('Actual app route -> mountClassService -> mountClassPortal -> V2 source controls, four choices, server revisions and ACK save PASS');
+  stage='manual unsafe and safe link';await pub.locator('.n88-manual-editor>summary').click();
+  await pub.locator('[data-publication-manual] [name=title]').fill('مهمة المعلم اليدوية');
+  await pub.locator('[data-publication-manual] [name=description]').fill('<img src=x onerror=alert(1)> نص فقط');
+  await pub.locator('[data-publication-manual] [name=startDate]').fill('٢٠٢٦-١٠-٣١');
+  await pub.locator('[data-publication-manual] [name=link]').fill('http://example.test');
+  const previews=server.f.state.teacherCalls.filter(b=>b.action==='manual-preview').length;
+  await pub.locator('[data-publication-manual] [type=submit]').click();assert.equal(server.f.state.teacherCalls.filter(b=>b.action==='manual-preview').length,previews);
+  assert.match(await pub.locator('[role=status]').textContent(),/HTTPS/);
+  await pub.locator('[data-publication-manual] [name=link]').fill('https://example.test/lesson');
+  await pub.locator('[data-publication-manual] [type=submit]').click();
+  await teacher.getByRole('heading',{name:'مهمة المعلم اليدوية'}).waitFor();
+  assert.equal(await pub.locator('[data-publication-save] input:checked').count(),0);
+  assert.equal(await pub.locator('[data-publication-save] [name=grade]').count(),0);
+  await pub.locator('[data-publication-save] [name=required]').check();await pub.locator('[data-publication-save] [type=submit]').click();
+  await teacher.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&document.querySelector('.n88-publications [role=status]').textContent.includes('حُفظت'));
+  await teacher.setViewportSize({width:390,height:844});assert(await teacher.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await teacher.screenshot({path:dir+'/teacher-390.png',fullPage:true});
+  await pub.locator('[data-publication-source]').focus();await teacher.keyboard.press('ArrowUp');await teacher.keyboard.press('Tab');
+  report.checks.push('Actual manual submit handler rejects insecure link before service, uses approved date adapter, server preview, default-OFF creation; keyboard/mobile390 RTL PASS');
+  stage='actual numeric student claim';const student=await context.newPage();await student.goto(server.url+'fixture/student');
+  await student.locator('[data-claim] input:not(:disabled)').waitFor();await student.locator('[data-claim] input').fill(server.f.code);await student.locator('[data-claim] [type=submit]').click();
+  await student.getByRole('heading',{name:'مساحتي الدراسية'}).waitFor();
+  assert.equal(await student.locator('[data-work-id]').count(),4);assert.equal(await student.locator('.n88-v2-grades>div').count(),2);
+  assert.equal(await student.locator('.n88-unified-total').count(),0);assert.equal(await student.locator('article img,article script').count(),0);
+  assert.equal(await student.locator('a[href="https://example.test/lesson"]').getAttribute('rel'),'noopener noreferrer');
+  await student.setViewportSize({width:390,height:844});assert(await student.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await student.screenshot({path:dir+'/student-390.png',fullPage:true});
+  await student.reload();await student.getByRole('heading',{name:'مساحتي الدراسية'}).waitFor();
+  report.checks.push('Original six-digit claim/HttpOnly synthetic session, V2 GET renderer, permitted categories and individual grades only, manual link text and reload/read PASS');
+  stage='student error retires projection';server.f.state.fail=true;await student.locator('[data-read]').click();
+  await student.waitForFunction(()=>!document.querySelector('[data-work-id]'));assert.equal(await student.locator('.n88-v2-grades').count(),0);server.f.state.fail=false;
+  await student.reload();await student.getByRole('heading',{name:'مساحتي الدراسية'}).waitFor();
+  server.f.state.delay=400;await student.locator('[data-read]').click();
+  await student.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'rakeez.n88.student-retirement.v1',newValue:'untrusted'})));
+  assert.equal(await student.locator('[data-work-id]').count(),0);
+  await student.waitForTimeout(500);assert.equal(await student.locator('[data-work-id]').count(),0);server.f.state.delay=0;
+  report.checks.push('V2 failed fresh read and existing cross-tab retirement observer remove all private projection PASS');
+  stage='teacher unknown ACK and reload status';await teacher.locator('[data-publication-source]').selectOption({label:'مهمة مطلوبة — بند فرعي'});
+  await pub.locator('[data-publication-save] [name=grade]').check();server.f.state.lost=true;
+  const writes=server.f.state.teacherCalls.filter(b=>b.action==='item-publication-set').length;
+  await pub.locator('[data-publication-save] [type=submit]').click();await pub.locator('[data-publication-status]').waitFor();
+  assert(await pub.locator('[data-publication-save] [type=submit]').isDisabled());
+  await teacher.reload();await teacher.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false');
+  await teacher.locator('[data-publication-status]').click();await teacher.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&!document.querySelector('[data-publication-status]'));
+  assert.equal(server.f.state.teacherCalls.filter(b=>b.action==='item-publication-set').length,writes+1);
+  report.checks.push('Actual lost HTTP reply after service COMMIT, session-scoped original command survives reload; status-only resolution and zero replay PASS');
+  stage='actual predispatch guard refusal';await teacher.locator('[data-publication-source]').selectOption({label:'مهمة قادمة — بند فرعي'});
+  await teacher.evaluate(()=>{window.uiFixture.writeRefusal=true;});
+  await pub.locator('[data-publication-save] [type=submit]').click();await teacher.waitForFunction(()=>document.querySelector('.n88-publications [role=status]').textContent.includes('لم يبدأ'));
+  assert.equal(await teacher.locator('[data-publication-status]').count(),0);
+  await teacher.evaluate(()=>{window.uiFixture.writeRefusal=false;});
+  stage='mounted timeout and offline read';server.f.state.delay=1800;await teacher.locator('[data-publication-refresh]').click();
+  await teacher.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&!document.querySelector('[data-publication-source]'));
+  server.f.state.delay=0;await teacher.locator('[data-publication-refresh]').click();await teacher.locator('[data-publication-source]').waitFor();
+  await context.setOffline(true);await teacher.locator('[data-publication-refresh]').click();
+  await teacher.waitForFunction(()=>document.querySelector('.n88-publications')?.getAttribute('aria-busy')==='false'&&!document.querySelector('[data-publication-source]'));
+  await context.setOffline(false);await teacher.locator('[data-publication-refresh]').click();await teacher.locator('[data-publication-source]').waitFor();
+  report.checks.push('Mounted timeout and offline reads remove stale source controls; explicit online refresh recovers PASS');
+  stage='class/account context clears';server.f.state.delay=400;await teacher.locator('[data-publication-refresh]').click();
+  await teacher.evaluate(()=>window.n88Fixture.store.state.teachings[0].sectionId='other-class');await teacher.evaluate(()=>window.dispatchEvent(new Event('focus')));
+  await teacher.waitForFunction(()=>!document.querySelector('.n88-publications'));
+  await teacher.waitForTimeout(500);assert.equal(await teacher.locator('.n88-publications').count(),0);server.f.state.delay=0;
+  stage='default OFF legacy';await teacher.goto(server.url+'?publicationV2=true');
+  await teacher.evaluate(()=>{window.PUBLICATION_V2_READINESS={enabled:true,serviceRevision:'n88-item-publication-v2'};localStorage.setItem('publication-v2.enabled','true');});
+  await boot(teacher,false);assert.equal(await teacher.locator('.n88-publications').count(),0);
+  assert.equal(await teacher.locator('[data-visibility]').count(),1);assert.equal(await teacher.locator('.n88-code-management').count(),1);
+  await teacher.evaluate(()=>window.n88Fixture.switchOwner());await teacher.waitForFunction(()=>!document.querySelector('[data-visibility]'));
+  report.checks.push('Actual classBinding pre-dispatch guard, class/account replacement, V1 default-OFF route and legacy controls preserved PASS');
+  assert.deepEqual(report.pageErrors,[]);
+  // App attempts its existing optional external font requests; the helper blocks all of them.
+  report.externalRequests=[...new Set(report.externalRequests)];
+ });
+ report.status='PASS';
+}catch(error){report.stage=stage;report.error=error.message;if(teacher){try{report.dom=(await teacher.locator('body').innerText()).slice(-3000);await teacher.screenshot({path:dir+'/failure.png',fullPage:true});}catch{}}process.exitCode=1;}
+finally{if(server){report.hostErrors=server.f.hostErrors;await server.close();report.cleanup.serverClosed=true;}report.cleanup.browserClosedByHelper=true;if(owned)report.cleanup.integrationLease=lease('release');await writeFile(dir+'/browser-evidence.json',JSON.stringify(report,null,2)+'\n');}
+console.log(JSON.stringify(report,null,2));

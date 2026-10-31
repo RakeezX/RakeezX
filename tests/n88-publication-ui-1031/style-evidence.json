@@ -1,0 +1,14 @@
+{
+  "taskId": "continuous-n88-publication-ui-integration-20261031",
+  "runId": "2545599f-e57e-4ae1-aed1-edef492f27b2",
+  "status": "PASS",
+  "colors": {
+    "background": "rgb(20, 32, 26)",
+    "inputBackground": "rgb(20, 32, 26)",
+    "text": "rgb(238, 241, 245)",
+    "expected": "rgb(20, 32, 26)",
+    "overflow": false
+  },
+  "leaseRelease": "RELEASED integration",
+  "ownedBrowserAndServerClosed": true
+}

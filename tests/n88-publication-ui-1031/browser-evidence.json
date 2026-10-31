@@ -1,0 +1,29 @@
+{
+  "taskId": "continuous-n88-publication-ui-integration-20261031",
+  "runId": "2545599f-e57e-4ae1-aed1-edef492f27b2",
+  "status": "PASS",
+  "checks": [
+    "Actual app route -> mountClassService -> mountClassPortal -> V2 source controls, four choices, server revisions and ACK save PASS",
+    "Actual manual submit handler rejects insecure link before service, uses approved date adapter, server preview, default-OFF creation; keyboard/mobile390 RTL PASS",
+    "Original six-digit claim/HttpOnly synthetic session, V2 GET renderer, permitted categories and individual grades only, manual link text and reload/read PASS",
+    "V2 failed fresh read and existing cross-tab retirement observer remove all private projection PASS",
+    "Actual lost HTTP reply after service COMMIT, session-scoped original command survives reload; status-only resolution and zero replay PASS",
+    "Mounted timeout and offline reads remove stale source controls; explicit online refresh recovers PASS",
+    "Actual classBinding pre-dispatch guard, class/account replacement, V1 default-OFF route and legacy controls preserved PASS"
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "realAccountOperations": 0,
+  "providerOperations": 0,
+  "cleanup": {
+    "serverClosed": true,
+    "browserClosedByHelper": true,
+    "integrationLease": "RELEASED integration"
+  },
+  "hostErrors": [
+    {
+      "path": "/api/n88/teacher/class/publication-v2",
+      "error": "fabricated lost response after service COMMIT"
+    }
+  ]
+}

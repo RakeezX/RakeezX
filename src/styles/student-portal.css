@@ -9,3 +9,9 @@
 @media print{.n88-portal button,.n88-portal form{display:none}.n88-portal textarea{border:0;overflow-wrap:anywhere}}
 
 .n88-portal input[type=checkbox]{display:inline-block;width:1.25em;height:1.25em;min-height:0;vertical-align:middle;accent-color:var(--brand);margin-inline-end:8px}
+/* AI: V2 values are individually permitted components; no implicit total. */
+.n88-v2-grades { margin:0; }
+.n88-v2-grades>div { display:flex; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid var(--border,#d5dfda); }
+.n88-v2-grades dt { overflow-wrap:anywhere; }
+.n88-v2-grades dd { margin:0; font-variant-numeric:tabular-nums; }
+.n88-unified a { overflow-wrap:anywhere; }

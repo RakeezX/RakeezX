@@ -113,3 +113,16 @@
 .n88-code-body{padding:0 12px 12px}
 .n88-class-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
 .n88-code-management:not([open])>.n88-code-body{display:none}
+/* AI: scoped per-item publication controls; dormant until separate V2 readiness. */
+.n88-publications { margin:20px 0; padding:20px; border:1px solid var(--border,#bdcec6); border-radius:12px; background:var(--bg-elev,#fff); overflow-wrap:anywhere; }
+.n88-publications h2 { font-size:1.3rem; }
+.n88-publications label { display:flex; align-items:center; gap:10px; margin:10px 0; }
+.n88-publications label:has(select),.n88-publications .n88-manual-editor label { display:grid; gap:6px; }
+.n88-publications input:not([type=checkbox]),.n88-publications textarea,.n88-publications select { box-sizing:border-box; min-width:0; max-width:100%; width:100%; padding:10px; border:1px solid var(--border,#718d80); border-radius:6px; background:var(--bg-elev,#fff); color:inherit; font:inherit; }
+.n88-publications input[type=checkbox] { width:20px; height:20px; flex-shrink:0; }
+.n88-publications fieldset { min-width:0; border:1px solid var(--border,#bdcec6); padding:14px; margin:16px 0; }
+.n88-publications form { margin:16px 0; }
+.n88-publications .n88-publication-dates { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.n88-publication-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.n88-publications :focus-visible { outline:3px solid #b8790e; outline-offset:3px; }
+@media(max-width:480px) { .n88-publications{padding:12px;} .n88-publications .n88-publication-dates{grid-template-columns:1fr;} }

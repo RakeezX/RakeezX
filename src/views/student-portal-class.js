@@ -1,6 +1,7 @@
 import { html } from '../lib/dom.js';
 /** AI: reusable existing-class section; no route, runtime import, publication or network at import time. */
 import { classContextKey, PORTAL_FIELDS, classifyClassMutationError } from '../lib/student-portal-class-client.js';
+import { mountTeacherPublications } from './student-portal-publications.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 export function buildStudentAccessMessage(student, url) {
  return `مرحبًا ${student.label}،\nرمز دخولك: ${student.credential}\n${url}\nافتح صفحة الطالب وأدخل الرمز لعرض مساحتك الدراسية.`;
@@ -81,12 +82,14 @@ export function mountTaskGuidance(root,{client,getContext,subscribe}) {
  const unsub=subscribe(changed);reset();draw();scheduleRead();
  return {refresh,contextChanged:changed,dispose(){disposed=true;sequence++;clearTimeout(wakeTimer);drafts.clear();unsub?.();win.removeEventListener('pagehide',hide);win.removeEventListener('pageshow',wake);win.removeEventListener('focus',wake);root.ownerDocument.removeEventListener('visibilitychange',wake);root.removeEventListener('toggle',toggle,true);root.removeEventListener('input',input);root.removeEventListener('change',change);root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.replaceChildren();}};
 }
-export function mountClassPortal(root, { client, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
+export function mountClassPortal(root, { client, publicationClient = null, getContext = () => null, subscribe = () => () => {}, classLabel = () => 'الفصل الحالي', copy = text => navigator.clipboard.writeText(text), share = typeof navigator.share==='function' ? data=>navigator.share(data) : null, requestId = () => crypto.randomUUID() } = {}) {
   let deliveryIntent = null;
   let generation = 0, disposed = false, busy = false, roster = null, selected = null, outcomes = [], message = '', boundKey = null, expiryTimer, wakeTimer, readWork = null, mutating = false, queued = false, suspended = false, retry = false, draft = null, draftRevision = null, settingsOpen = true, rosterOpen = false, uncertainMutation = false;
   root.classList.add('n88-class'); root.dir = 'rtl';
   const panel=root.ownerDocument.createElement('div'),guidanceRoot=root.ownerDocument.createElement('div'),accessRoot=root.ownerDocument.createElement('div');root.append(panel,guidanceRoot,accessRoot);
   const guidance=mountTaskGuidance(guidanceRoot,{client,getContext,subscribe});
+  let publications=null;
+  if(publicationClient){const target=root.ownerDocument.createElement('div');guidanceRoot.after(target);publications=mountTeacherPublications(target,{client:publicationClient,getContext,subscribe});}
   const context = () => { try { return getContext(); } catch { return null; } };
   const key = () => classContextKey(context());
   const valid = (g, k) => !disposed && g === generation && k !== null && k === key();
@@ -283,7 +286,7 @@ export function mountClassPortal(root, { client, getContext = () => null, subscr
   root.ownerDocument.addEventListener('visibilitychange', visibility);
   const unsubscribe = subscribe(changed); void refresh();
   return { contextChanged: changed, refresh, dispose() {
-    guidance.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
+    guidance.dispose(); publications?.dispose(); clearSecrets(); disposed = true; generation++; clearTimeout(expiryTimer); clearTimeout(wakeTimer);
     roster = null; selected = null; draft = null; unsubscribe?.();
     root.removeEventListener('toggle', toggleRoster, true); root.removeEventListener('keydown', keydown); root.removeEventListener('click', click); root.removeEventListener('submit', submit); root.removeEventListener('change', change);
     win.removeEventListener('pagehide', pagehide); win.removeEventListener('pageshow', wake); win.removeEventListener('focus', wake);

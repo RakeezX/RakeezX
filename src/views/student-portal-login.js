@@ -1,6 +1,7 @@
 /** AI: reusable actual student page, deliberately unregistered in the teacher app. */
 import { brandLockup } from '../lib/brand.js';
 import { normalizeStudentCode, validStudentCode, projectUnifiedStudentData, parseStudentReadPhases, parseStudentFailure } from '../lib/student-portal-unified-client.js';
+import { renderStudentPublications } from './student-portal-publications.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const displayNumber = value => value === null ? 'لم تُرصد' : escape(value);
 // A display freshness bound, never a session lifetime or an authorization token.
@@ -15,6 +16,8 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   root.classList.add('n88-unified'); root.dir = 'rtl';
   const style = doc.createElement('link'); style.rel = 'stylesheet';
   style.href = new URL('../styles/student-portal-login.css', import.meta.url).href; doc.head.append(style);
+  let publicationStyle=null;
+  if(client?.publicationReadMode?.()){publicationStyle=doc.createElement('link');publicationStyle.rel='stylesheet';publicationStyle.href=new URL('../styles/student-portal.css',import.meta.url).href;doc.head.append(publicationStyle);}
   const enabled = readiness?.enabled === true && !!client;
   const paint = (content, focus = true) => {
     if (disposed) return;
@@ -28,6 +31,9 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     screen = 'entry';
     const cooling = Date.now() < cooldownUntil;
     paint(`<section class="n88-unified-entry first-run-auth"><h1 tabindex="-1">مساحة الطالب</h1><p class="n88-unified-welcome">أدخل رمز الدخول الذي زوّدك به معلّمك.</p><form data-claim novalidate><label class="field__label" for="n88-unified-code">رمز الدخول</label><p id="n88-code-help">6 أرقام تبدأ بـ1</p><input id="n88-unified-code" class="input first-run-auth__otp" type="text" inputmode="numeric" minlength="6" pattern="1[0-9]{5}" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="n88-code-help n88-message" required ${!enabled || cooling ? 'disabled' : ''}><p id="n88-message" role="status">${escape(!enabled ? 'مساحة الطالب غير متاحة حاليًا. لم تُفعّل الخدمة بعد.' : cooling ? 'يرجى الانتظار قليلًا قبل المحاولة مجددًا.' : message)}</p><button class="btn btn--primary" type="submit" ${!enabled || cooling ? 'disabled' : ''}>دخول الطالب</button></form></section>`);
+    if(enabled&&client.publicationReadMode?.()){
+      const check=doc.createElement('button');check.type='button';check.dataset.sessionRetry='';check.textContent='التحقق من الجلسة الحالية';root.querySelector('section').append(check);
+    }
     const field=root.querySelector('[data-claim] input');if(field)field.value=codeDraft;
     clearTimeout(timer);
     if (cooling) timer = setTimeout(() => entry('يمكنك المحاولة مجددًا.'), Math.max(1, cooldownUntil - Date.now()));
@@ -51,6 +57,8 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     screen = 'private';
     const profile = data.profile;
     let content = `<div class="n88-unified-profile"><div><h1 tabindex="-1">مساحتي الدراسية</h1>${profile?.name !== undefined ? `<p class="n88-unified-name">${escape(profile.name)}</p>` : ''}${profile?.classLabel !== undefined ? `<p class="n88-unified-class">${escape(profile.classLabel)}</p>` : ''}</div><div class="n88-unified-actions"><button data-read>تحديث</button><button data-end aria-label="تسجيل الخروج من مساحة الطالب">تسجيل الخروج</button></div></div><div class="n88-unified-sections">`;
+    if(data.version==='n88-publication-v2')content+=renderStudentPublications(data);
+    else {
     const workSection = (key, label) => {
       if (!data.work?.[key]?.length) return '';
       let content = '';
@@ -66,6 +74,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
     }
     content += workSection('completed', 'الأعمال المكتملة');
     if (!Object.values(data.work || {}).some(items => items.length) && !data.grades) content += '<p class="n88-unified-empty">لا توجد أعمال أو درجات منشورة حاليًا.</p>';
+    }
     paint(content + '</div><p role="status" data-refresh-status>يُحدّث العرض تلقائيًا كل خمس دقائق أثناء فتحه. يمكنك تحديثه الآن.</p>',!preserve);
     if(preserve){const completed = root.querySelector('.n88-completed-group');if(completed)completed.open=!!completedOpen;if(focus)root.querySelector('['+focus+']')?.focus({preventScroll:true});win.scrollTo(scroll.x,scroll.y);}
     scheduleFreshness();
@@ -185,6 +194,12 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
       if(result.errorKind==='publication'&&!result.ending){publicationReview();return;}
       // A denied or failed revalidation never leaves a private projection visible.
       if(result.quiet){clear(false,result.errorKind==='timeout'?'deadline':'context');return;}
+      // The staged V2 service uses UNKNOWN/503 for an absent session as well as
+      // unavailable reads. A read-only failure is not a rejected code. Keep the
+      // original numeric entry reachable; never offer a new claim after an uncertain claim.
+      if(result.resuming&&!result.claimState&&client.publicationReadMode?.()){
+        entry('تعذّر التحقق من الجلسة الحالية. يمكنك التحقق مجددًا أو إدخال رمزك.');return;
+      }
       const rejected = !result.resuming && result.claimState === 'rejected' && result.errorKind === 'session';
       const message = rejected ? 'تعذّر الدخول بهذا الرمز. تحقق منه أو راجع معلّمك.'
         : result.errorKind === 'session' ? 'الجلسة غير متاحة أو انتهت. أدخل رمزك أو راجع معلمك.'
@@ -293,7 +308,7 @@ export function mountUnifiedStudentPortal(root, { client, readiness = { enabled:
   else ready=run(() => client.read({phase:'initial'}),false,false,true);
   return { ready, clear, refresh, dispose() {
     if (disposed) return;
-    unsubscribeContext?.();clear(false,'disposed'); disposed = true; clearTimeout(timer);clearTimeout(freshnessTimer); client?.dispose?.(); root.replaceChildren(); style.remove();
+    unsubscribeContext?.();clear(false,'disposed'); disposed = true; clearTimeout(timer);clearTimeout(freshnessTimer); client?.dispose?.(); root.replaceChildren(); style.remove();publicationStyle?.remove();
     root.classList.remove('n88-unified'); if (previousDir === null) root.removeAttribute('dir'); else root.setAttribute('dir', previousDir);
     root.removeEventListener('beforeinput', beforeInput); root.removeEventListener('paste', paste); root.removeEventListener('submit', submit); root.removeEventListener('input', input); root.removeEventListener('click', click);
     win.removeEventListener('focus', visible);win.removeEventListener('blur', blur);win.removeEventListener('pagehide', hide); win.removeEventListener('pageshow', pageshow); doc.removeEventListener('visibilitychange', visible);

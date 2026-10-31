@@ -1,5 +1,6 @@
 /** AI: universal student transport; no identity lookup or private projection storage. Finite opt-in diagnostics only. */
 import { normalizeDateTimeDigits } from './rakeez-datetime-values.js';
+import { PUBLICATION_V2_READINESS, publicationV2Ready, parsePublicationStudentData, projectPublicationStudentData } from './student-portal-publication-client.js';
 export function parseStudentFailure(value){try{if(typeof value!=='string'||value.length>768)return null;const d=JSON.parse(value),keys=['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'];if(!d||typeof d!=='object'||Array.isArray(d)||Object.keys(d).filter(k=>!['site','requirement','exception'].includes(k)).sort().join(',')!==keys.sort().join(','))return null;if(!["acquire","guard","begin","snapshot","operation","synchronize-lock","synchronize-memberships","synchronize-sessions","synchronize-sources","synchronize-publications","synchronize-validate","projection-finalize","projection-membership-flush","projection-commitguards","projection-commit","unknown"].includes(d.phase)||!["acquire","guard","transaction","projection","commit","unknown","admission_denied","session_required","denied"].includes(d.category)||!["none","55P03","57014","42501","23503","23505","40001","40P01","08000","08001","08003","08004","08006","08007","08P01","28P01","28000","53300","53400","57P01","57P02","57P03","25P02","22001","22P02","42703","42883","42P01"].includes(d.sqlstate)||!['none','reset','timeout','refused','dns'].includes(d.connection)||typeof d.cancelled!=='boolean'||typeof d.deadline!=='boolean'||!['not_needed','acknowledged','unknown'].includes(d.rollback)||!['not_started','unknown','acknowledged'].includes(d.commit))return null;const tagged=['site','requirement','exception'].some(k=>Object.hasOwn(d,k));if(tagged&&(!["canonical-fetch","canonical-decode","term-selection","visibility-fetch","visibility-selection","guidance-fetch","guidance-decode","student-scope","visibility-validation","visibility-scope","grade-context","grade-score","work-projection","guidance-projection"].includes(d.site)||!["unknown","current-membership-and-policy","canonical-revision","canonical-row-identity","unique-current-enrollment","unique-student-item-score","unique-student-subitem-completion","canonical-atomic-subitem-score","bounded-years","bounded-terms","bounded-sections","bounded-students","bounded-enrollments","bounded-teachings","bounded-items","bounded-scores","bounded-scoreSubitems","bounded-scoreSubitemCompletions","bounded-sessions","bounded-attendance","bounded-logs","portable-grade-context","unique-current-term","canonical-source-bound","canonical-read-mode","guidance-contract","visibility-policy","score-decimals","canonical-date","subitem-date-order","subitem-late-score","subitem-count","score-student-identity"].includes(d.requirement)||!["rejected","type","range","syntax","other"].includes(d.exception)))return null;return Object.freeze({...Object.fromEntries(['phase','category','sqlstate','connection','cancelled','deadline','rollback','commit'].map(k=>[k,d[k]])),...(tagged?{site:d.site,requirement:d.requirement,exception:d.exception}:{})});}catch{return null;}}
 
 export const normalizeStudentCode = value => typeof value === 'string' ? normalizeDateTimeDigits(value).replace(/ /g, '') : '';
@@ -37,6 +38,7 @@ function list(value, rules, required = []) {
 }
 /** Fresh allowlisted projection: omitted sections stay omitted; null is never coerced. */
 export function projectUnifiedStudentData(data) {
+  if(data?.version==='n88-publication-v2')return projectPublicationStudentData(data);
   if (!object(data) || data.version !== 'n88-student-v3') throw fail();
   const result = { version: data.version };
   if (Object.hasOwn(data, 'profile')) result.profile = fields(data.profile, { name: text, classLabel: text });
@@ -85,7 +87,7 @@ function createRetirementObserver(onPeerChange) {
   };
 }
 
-export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000, bindingProof=null } = {}) {
+export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetch, timeoutMs = 15000, bindingProof=null, publicationReadiness=PUBLICATION_V2_READINESS } = {}) {
   if (typeof send !== 'function' || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 15000) throw fail();
   let generation = 0, retirement = 0, controller, disposed = false, lastDiagnostic = null, retireDiagnostic;
   const contextListeners = new Set();
@@ -124,10 +126,11 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       return await Promise.race([ (async () => {
       const proof=action==='read'?bindingProof?.reserve():null;
       clientStage='request';
-      const responsePending = send('/api/n88/student/' + action, {
+      const v2Read=action==='read'&&publicationV2Ready(publicationReadiness);
+      const responsePending = send('/api/n88/student/' + (v2Read?'publication-v2/read':action), {
         method: action === 'read' ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
         redirect: 'error', referrerPolicy: 'no-referrer', signal: owned.signal,
-        headers: action === 'read' ? { Accept: 'application/json',...proof?.headers } : { Accept: 'application/json', 'Content-Type': 'application/json', 'X-N88-CSRF': '1' },
+        headers: action === 'read' ? { Accept: 'application/json',...(v2Read?{'X-N88-CSRF':'1'}:{}),...proof?.headers } : { Accept: 'application/json', 'Content-Type': 'application/json', 'X-N88-CSRF': '1' },
         ...(action === 'read' ? {} : { body: JSON.stringify(body) })
       });
       clientStage='transport';
@@ -160,7 +163,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
       clientStage='decode';const data = await response.json();
       peer.sync();if (checkpoint !== generation) throw fail('stale');
       withinDeadline();
-      clientStage='projection';const projected = projectUnifiedStudentData(data);
+      clientStage='projection';const projected = v2Read?parsePublicationStudentData(data):projectUnifiedStudentData(data);
       await proof?.accept(response,()=>checkpoint===generation&&!owned.signal.aborted&&!disposed);
       if(checkpoint!==generation)throw fail('stale');withinDeadline();
       readPhases=parseStudentReadPhases(response.headers?.get('x-n88-student-read-phases'));
@@ -174,6 +177,7 @@ export function createUnifiedStudentPortalClient({ fetch: send = globalThis.fetc
     } finally { if(action==='claim'||action==='end')peer.finish(mutation,acknowledged);clearTimeout(timeout); body = null; if (checkpoint === generation) { controller = null; retireDiagnostic = null; } }
   }
   return Object.freeze({
+    publicationReadMode:()=>publicationV2Ready(publicationReadiness),
     async claim(value) {
       let code = normalizeStudentCode(value);
       if (!validStudentCode(code)) throw fail('format');
