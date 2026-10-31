@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "n44-manual-phone-readonly-service-20261031",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100027,
+      "scopeKey": "n44-manual-phone-readonly-service",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "live",
+      "liveMutation": true,
+      "liveAuthorizationRef": "direct-user-po-20261031-n44-readonly-service-repair",
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 65,
+      "idleMinutes": 12,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [],
+      "allowedPaths": [
+        "drafts/n44-push/backend.mjs",
+        "drafts/n44-push/existing-host.mjs",
+        "drafts/n44-push/web-entry.mjs",
+        "drafts/n44-push/activation/manual-phone-handoff-1031/**",
+        "drafts/n44-push/activation/manual-phone-service-1031/**",
+        "tests/n44-manual-phone-service-1031/**",
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_SERVICE.md"
+      ],
+      "verificationPaths": [
+        "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.mjs",
+        "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+        "drafts/n44-push/activation/manual-phone-service-1031/manifest.json",
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_SERVICE.md"
+      ],
+      "requiredChecks": [
+        "n44_manual_exact_qualified_source_and_real_paths",
+        "n44_global_off_authenticated_manual_readonly_gate",
+        "n44_actual_compiled_readonly_host_composition",
+        "n44_owned_native_service_and_atomic_config_readback",
+        "n44_original_finite_grant_and_archive_preserved"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "exact read-only manual-phone service source plus minimized actual delivery/config receipt; sole publisher",
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019",
+        "privateSourceOnlyPaths": [
+          "drafts/n44-push/activation/core-v1-host-handoff.mjs",
+          "drafts/n44-push/activation/core-v1-live.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs"
+        ],
+        "providerOperations": {
+          "nativeFunctionUploadsMax": 1,
+          "atomicConfigPromotionsMax": 1,
+          "configKeys": [
+            "N44_SERVICE_SOURCE_SHA",
+            "N44_SESSION_POLICY_JSON",
+            "N44_MANUAL_PHONE_READINESS_ENABLED"
+          ],
+          "sessionPolicyChange": "source binding only; identical authentication, owner, expiry and revision semantics"
+        },
+        "originalFiniteGrantOperations": 0,
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N44",
+        "projectId": "xlrubcwjqktzzunrvuns",
+        "liveAuthorizationRef": "direct-user-po-20261031-n44-readonly-service-repair"
+      },
+      "releaseAuthority": "Separate new direct-user delegated repair for the manual-phone read-only prerequisite. Authorizes same original custodian, after exact compiled qualification and unchanged ownership/account guards, to perform at most one exact native function upload and one atomic promotion of the three listed configuration keys. It does not use, replace, extend or spend the old finite grant or its install allowance. No global N44 enablement, credential rotation, new role/schema/Auth policy, customer mutation, notification, cron, challenge, phone capture or finite activation.",
+      "objective": "Resume original custodian session 01a14fcd-032c-7ec0-8b0c-0e0395862c61. This is a new read-only SERVICE prerequisite, not another readiness request and not a replay of the source task. The source task run fe43ccc4-d679-4dfd-ae40-37e6d3fa817d produced candidate 36a3e2e98097038bbb33002b3f8e6967ba86426d, four required PASS and 19 tests PASS. Its source was published on main c11d0569c8a878fbf073a6e5f7aa4089cd8412a3. Preserve VERIFICATION_ASSET_MISSING: the old card incorrectly requested attestation.inactive.mjs, while the actual tested file is attestation.mjs. Do not manufacture an alias, change publisher guards, rewrite old results or edit queued status. There is no dependency on the blocked source task: qualified source is already on main. Static source-readiness pin remains 36a3e2e98097038bbb33002b3f8e6967ba86426d; record any new service source/delivery pin separately.\n\nRead the qualified N44_MANUAL_PHONE_HANDOFF.md and the seven REAL manual-folder files listed in requiredSourcePaths. There is no ACTIVATION.md. Reuse exact source/proofs; confirm hashes against current main and preserve intervening changes. The report establishes existing endpoint optional manualRead, opaque pair ticket, server HMAC attestation derived from existing ingress key, canonical locked pair snapshots and existing append-only claim dependency. No phone authorization closures or credential export are needed.\n\nConcrete new gate defect: createExistingHost immediately returns privateResponse when N44_ENABLED != 'true', so enabling only N44_MANUAL_PHONE_READINESS_ENABLED cannot reach manual context/read under global OFF. Inspect and correct this exact composition. Preserve current N44_ENABLED value. If globally OFF, allow ONLY narrowly authenticated, ingress-signed manual context/read with the existing manual flag and valid optional manualRead contract. All normal/write/delivery/scheduler/trial routes remain OFF. Preserve original auth/signature/owner checks, both exact-session locks, canonical pair expiry/revision/consent semantics and legacy OFF response. No broad allowlist bypass or global enablement. Qualify the ACTUAL compiled host/entry configuration, not a direct backend call that bypasses the early gate. Add focused gate/host-composition delta cases; reuse unchanged 19 source tests and historical 29/14/11/15 by source identity.\n\nBuild exact service composition in the new manual-phone-service-1031 folder and record real artifact hashes. Root has now verified drafts/n44-push/web-entry.mjs exists in qualified candidate36a3e2e. Inspect its actual build imports/composition and edit only the allowed concrete files. Existing manual source algorithms stay exact unless a concrete composition defect requires a minimized change with affected qualification. Service-source and session-policy binding must name the actual new served identity, distinct from the static qualified-source pin.\n\nOnly original custodian may use existing guarded CLI/account/channel and read owned private N44 state. No raw keys, tokens, private source or logs in public output. Existing credentials may be used by unchanged tooling; no rotation or credential invention. Confirm actual ownership/admin/channel authority before mutations. If an actual denial occurs, stop that operation; no alternate identity/path. Acquire own integration/live-mutation leases only for actual provider phase and release all owned resources afterward.\n\nThis new authority permits at most ONE exact native function upload and ONE atomic config promotion, limited to N44_SERVICE_SOURCE_SHA, source-binding-only changes within existing N44_SESSION_POLICY_JSON, and N44_MANUAL_PHONE_READINESS_ENABLED. Preserve every other key and the exact current global N44_ENABLED, expiry/revision/auth semantics, delivery/scheduler/trial/cron disposition. Prefer one complete promotion after qualified exact upload; no exploratory uploads or config cycling. Use native provider supported upload/config/readback paths. Verify real returned service/config identity with bounded read-only readback; no actual manualRead ticket/challenge, PWA capture, registration, source, send or notification needed to prove installation. Capture only minimized nonsecret actual receipt and OFF/read-only invariants. If exact native delivery or safe atomic promotion cannot be completed within this authority, finish reviewable source/composition and report the concrete missing operation without extending limits.\n\nPreserve original grant efedbcea-f227-4a91-bbab-79cad814fc81, c13728f73a049135f337bd2c4856132b317c1413d70ad71a4eeda3600332d12c archive, authority/history/unused disposition and spent markers. This separately authorized read-only preparation is not the original finite installation. Prepare the exact archive supplement/composition requirement for a later bounded trial if needed; do not rewrite or activate old archive/grant. Private SOURCE glue, only if essential here, is limited to the three original custodian files listed in preparationAuthority, outside public Git and under existing guards; no broad private migration.\n\nPublish clean minimized service source and actual nonsecret delivery/config evidence through sole publisher with REAL verification paths. Current C2 credential worker and B source worker may run concurrently; this card is disjoint from their edits and canonical src/SW is READ-ONLY. Installed read-only service prerequisite PASS requires actual verified delivery/config, not source tests alone. All phone and original finite-trial checks remain NOT_RUN. Next UI card depends only on this actual verified service delivery. Do not ask owner for phones yet.\n\nOperational concurrency: N88 fresh-enrolment may legitimately promote only its own DB secret under the same shared live/integration lease. Secret updates can advance native metadata versions without changing N44 bytes. Verify exact current N44 source/map/pin/config, bind the observed current native version with any legitimate public operation receipt, and do not invent a fixed stale version integer or reject unrelated metadata movement alone. Hold only one shared live/integration provider phase at a time. Do not read, overwrite or promote N88 secrets. Main c11d0569c8a878fbf073a6e5f7aa4089cd8412a3 is verified Git integration only: Cloudflare/source asset verification remains uncompleted because the original card used the wrong filename. This new phase must actually verify existing attestation.mjs source and actual service delivery; retain the old failed publication receipt.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "36a3e2e98097038bbb33002b3f8e6967ba86426d",
+        "requiredSourcePaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/build.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/frontend.patch",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/inactive-config.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/producer.mjs",
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-source-readiness.js",
+          "sw.js",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md",
+          "drafts/n44-push/web-entry.mjs"
+        ],
+        "editPaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/web-entry.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/build.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/inactive-config.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-service-1031/build.mjs",
+          "drafts/n44-push/activation/manual-phone-service-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-service-1031/config-promotion.json",
+          "tests/n44-manual-phone-service-1031/gate.test.mjs",
+          "tests/n44-manual-phone-service-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_SERVICE.md"
+        ],
+        "newPaths": [
+          "drafts/n44-push/activation/manual-phone-service-1031/build.mjs",
+          "drafts/n44-push/activation/manual-phone-service-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-service-1031/config-promotion.json",
+          "tests/n44-manual-phone-service-1031/gate.test.mjs",
+          "tests/n44-manual-phone-service-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_SERVICE.md"
+        ],
+        "workerChecks": [
+          "n44_manual_exact_qualified_source_and_real_paths",
+          "n44_global_off_authenticated_manual_readonly_gate",
+          "n44_actual_compiled_readonly_host_composition",
+          "n44_owned_native_service_and_atomic_config_readback",
+          "n44_original_finite_grant_and_archive_preserved"
+        ],
+        "publisherChecks": []
+      }
+    },
+    {
+      "id": "n44-manual-phone-ui-offline-20261031",
+      "productId": "N44",
+      "activationId": "po-20261012-continuous",
+      "priority": -100026,
+      "scopeKey": "n44-manual-phone-ui-offline",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 55,
+      "idleMinutes": 12,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "n44-manual-phone-readonly-service-20261031"
+      ],
+      "allowedPaths": [
+        "src/lib/notification-push-runtime.js",
+        "src/lib/notification-source-readiness.js",
+        "src/lib/notification-manual-phone-readiness.js",
+        "sw.js",
+        "tests/n44-manual-phone-ui-1031/**",
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_UI.md"
+      ],
+      "verificationPaths": [
+        "docs/automation-evidence/20261031/N44_MANUAL_PHONE_UI.md",
+        "src/lib/notification-manual-phone-readiness.js",
+        "sw.js"
+      ],
+      "requiredChecks": [
+        "n44_verified_readonly_service_prerequisite_and_exact_patch",
+        "n44_mounted_manual_capture_and_session_fences",
+        "n44_manual_module_offline_precache_and_current_sw",
+        "n44_original_custodian_source_only_host_composition"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "frontend and offline module integration after actual verified read-only service delivery; sole publisher",
+        "originalPrivateCustodianOnly": "01a14fcd-032c-7ec0-8b0c-0e0395862c61",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n44-one-approved-closed-page-push-20261019",
+        "privateSourceOnlyPaths": [
+          "drafts/n44-push/activation/core-v1-host-handoff.mjs",
+          "drafts/n44-push/activation/core-v1-live.mjs",
+          "drafts/n44-push/activation/device-custodian.mjs"
+        ],
+        "privateRuntimeReads": 0,
+        "credentialReads": 0,
+        "providerOperations": 0,
+        "liveGrantOperations": 0,
+        "kind": "scoped_preview_and_fixture_ops",
+        "productId": "N44",
+        "projectId": "xlrubcwjqktzzunrvuns"
+      },
+      "releaseAuthority": "Separate new direct-user frontend/offline repair plus same-original-custodian SOURCE-only composition. Requires actual verified read-only service delivery from the named service prerequisite. Authorizes canonical three-file frontend delta and existing SW offline/cache integration, normal sole-publisher frontend delivery, and narrow private source-only glue. No real phone capture/challenge, private runtime/credential read, service configuration, finite trial or old grant operation.",
+      "objective": "Run only after n44-manual-phone-readonly-service-20261031 has actual verified service/config delivery evidence. A source-only PASS or publisher candidate is insufficient. Do not depend on N88 B task: controller write-scope conflict handling serializes sw.js access. Preserve all intervening main/frontend/SW changes. Use gpt-6.1-sol / medium / Standard.\n\nReuse qualified source candidate 36a3e2e98097038bbb33002b3f8e6967ba86426d, run fe43ccc4-d679-4dfd-ae40-37e6d3fa817d, four required checks and 19 tests PASS, source publication main c11d0569c8a878fbf073a6e5f7aa4089cd8412a3. Preserve original VERIFICATION_ASSET_MISSING failure from nonexistent attestation.inactive.mjs. The REAL qualified files are attestation.mjs, build.mjs, frontend.patch, host.mjs, inactive-config.json, manifest.json and producer.mjs. There is no ACTIVATION.md. Use qualified report prerequisites, not invented filenames. Reuse existing proof by exact identity and record service task's actual verified source/delivery binding separately.\n\nApply the exact prepared frontend.patch to src/lib/notification-push-runtime.js and src/lib/notification-source-readiness.js, installing exact prepared producer as src/lib/notification-manual-phone-readiness.js. Check recorded canonical base hashes; merge/rebase against intervening changes rather than overwrite current files or blindly accept CRLF matching. Preserve existing central teaching support disclosure/gesture and original encrypted-report download flow; no new settings request or UI route. The optional ticket invokes two local authenticated reads with existing owner/session/token/generation/lease/consent/controller fences, fixed same-origin endpoint and original final mounted checkpoint. Normal old capture remains compatible. No tokens or executable phone handles appear in exported input or output.\n\nAdd the exact new module to existing notification module offline shell/precache and bump current main's SW cache version using its established convention. Preserve current shared SW logic and all N88 changes. Verify actual mounted synthetic capture runs through original route/owner/Sync/calendar/runtime checks and actual module import/export, authenticated-read fences, logout/revision/generation changes and final-checkpoint rejection. Verify offline module availability/precache with actual app/SW mechanism, not text-only import assertions. Fabricated sessions/challenges/keys and non-network fixtures only; no real phone/browser-secret read. Do not rerun unchanged 19 or historical suites without a concrete changed risk.\n\nSame original custodian session 01a14fcd-032c-7ec0-8b0c-0e0395862c61 may wire createManualHost in ONLY the three listed private SOURCE files to its existing ingress-key dependency, existing durable append-only claimOnce journal, actual immutable producer helper and existing protected preactivation sealing path. This phase may edit source dependency injection but may NOT read runtime keys, credentials, private records or invoke actual private dispatchers. Raw private source stays outside public Git; record nonsecret source hashes. Bind verified service identity and the eventual sole-publisher UI receipt/pin as independent required inputs before any future challenge; never accept candidate/source tests as actual UI delivery proof. If receipt only exists after sole publication, composition must remain fail-closed pending exact receipt input, with no extra activation call. Preserve original card/session/lease/archive/unused-grant guards and failed-admission nonce consumption. No phone authorization closures are required by this path.\n\nUse REAL verificationPaths: new module, sw.js and N44_MANUAL_PHONE_UI.md report. Publish clean frontend source and minimized mounted/offline evidence through sole publisher; no helper guard edits or queue/result rewrite. Report exact service and UI identities and original-custodian source-composition status. Preserve grant efedbcea-f227-4a91-bbab-79cad814fc81/c137 archive/history and all actual finite acceptance NOT_RUN. No service upload/config operation, real challenge, phone capture, registration, install under old grant, source creation, notification/send, scheduler/cron or finite clock.\n\nGoal is a usable verified installed manual-phone path. After service delivery, UI delivery and fail-closed original-custodian composition are concretely verified, root can ask owner ONCE for the two normal PWA support captures under a separately eligible guarded execution. This card must not issue expiring challenges or ask owner to repeat settings. Future Riyadh midnight/calendar/full trial remains NOT_RUN and is not inferred from today's date.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "36a3e2e98097038bbb33002b3f8e6967ba86426d",
+        "requiredSourcePaths": [
+          "drafts/n44-push/backend.mjs",
+          "drafts/n44-push/existing-host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/attestation.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/build.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/frontend.patch",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/host.mjs",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/inactive-config.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/manifest.json",
+          "drafts/n44-push/activation/manual-phone-handoff-1031/producer.mjs",
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-source-readiness.js",
+          "sw.js",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_HANDOFF.md"
+        ],
+        "editPaths": [
+          "src/lib/notification-push-runtime.js",
+          "src/lib/notification-source-readiness.js",
+          "src/lib/notification-manual-phone-readiness.js",
+          "sw.js",
+          "tests/n44-manual-phone-ui-1031/mounted.test.mjs",
+          "tests/n44-manual-phone-ui-1031/offline.test.mjs",
+          "tests/n44-manual-phone-ui-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_UI.md"
+        ],
+        "newPaths": [
+          "src/lib/notification-manual-phone-readiness.js",
+          "tests/n44-manual-phone-ui-1031/mounted.test.mjs",
+          "tests/n44-manual-phone-ui-1031/offline.test.mjs",
+          "tests/n44-manual-phone-ui-1031/results.json",
+          "docs/automation-evidence/20261031/N44_MANUAL_PHONE_UI.md"
+        ],
+        "workerChecks": [
+          "n44_verified_readonly_service_prerequisite_and_exact_patch",
+          "n44_mounted_manual_capture_and_session_fences",
+          "n44_manual_module_offline_precache_and_current_sw",
+          "n44_original_custodian_source_only_host_composition"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
