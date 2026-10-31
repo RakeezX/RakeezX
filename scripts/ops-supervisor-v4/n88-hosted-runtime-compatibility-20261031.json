@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "activationId": "po-20261012-continuous",
+  "tasks": [
+    {
+      "id": "continuous-n88-hosted-runtime-compatibility-20261031",
+      "productId": "N88",
+      "activationId": "po-20261012-continuous",
+      "priority": -100033,
+      "scopeKey": "n88-durable-publication-runtime-writer",
+      "riskClass": "SENSITIVE",
+      "validationTier": "SENSITIVE",
+      "executionMode": "local",
+      "liveMutation": false,
+      "liveAuthorizationRef": null,
+      "sessionId": "01a14fc3-b292-7390-9952-8549a286c80f",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "budgetMinutes": 110,
+      "idleMinutes": 18,
+      "executionProfile": {
+        "singleAgent": true
+      },
+      "dependsOn": [
+        "continuous-n88-writer-compatibility-20261031",
+        "continuous-n88-publication-ui-integration-20261031"
+      ],
+      "allowedPaths": [
+        "drafts/n88-student-portal/existing-host.mjs",
+        "drafts/n88-student-portal/runtime.mjs",
+        "drafts/n88-student-portal/web-entry.mjs",
+        "drafts/n88-student-portal/integrated-service.mjs",
+        "drafts/n88-student-portal/publication-v2-host.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-canonical.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+        "drafts/n88-student-portal/publication-v2-service.inactive.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/**",
+        "tests/n88-runtime-writer-1031/**",
+        "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md",
+        "drafts/n88-student-portal/activation/v2-hosted-compat-1031/**",
+        "tests/n88-writer-compatibility-1031/**",
+        "tests/n88-hosted-compat-1031/**",
+        "docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md",
+        "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md"
+      ],
+      "verificationPaths": [
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+        "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs"
+      ],
+      "requiredChecks": [
+        "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+        "n88_private_markers_cancellation_whole_transaction_rollback",
+        "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+        "n88_combined_native_owner_packet_and_private_service_assets_default_off"
+      ],
+      "postDeliveryChecks": [],
+      "preparationAuthority": {
+        "publication": true,
+        "publicationScope": "inactive source-only hosted-compatible runtime and exact service/asset packet; original custodian read-only profile only",
+        "originalPrivateCustodianOnly": "01a14fc3-b292-7390-9952-8549a286c80f",
+        "originalCustodianRoot": "C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018"
+      },
+      "releaseAuthority": "Latest explicit PO requests fixing actual defects and solving blockers toward stable RakeezX. Authorizes this concrete runtime correction, original-custodian metadata reads, native qualification and inactive source-only publication through sole publisher. No hosted configuration/DDL/service/account/fixture mutation or data reads; no denied operation or consumed allowance replay.",
+      "objective": "Finish the concrete N88 HOSTED runtime compatibility gap after the canonical writer correction dependency has published. Resume ORIGINAL PRIVATE CUSTODIAN session01a14fc3-b292-7390-9952-8549a286c80f; its original custody root remains C:/Users/Abody/Projects/RakeezX/.worktrees/continuous-n88-official-student-portal-activation-20261018. Work on current main in this new isolated owned worktree. sourceCommit0b17ef is for declared-path readiness only: do NOT cherry-pick/revert its obsolete writer attachment over the corrected dependency. Read latest docs/automation-evidence/20261031/N88_WRITER_COMPATIBILITY.md and exact published packet. Reuse the actual installed four tables/fourteen operations, prior host/Auth/numeric/finite/login/UI proofs and correction evidence.\n\nEstablished provider observations, not a hypothetical: absolute C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/n88-hosted-logging-compatibility-review-20261031.json contains two read-only metadata results at2026-10-31T11:22Z. Backend LOGIN is n88_backend NOSUPERUSER/NOBYPASS/NO CREATE; no role logging overrides. Observed globals are default error verbosity, log_statement=ddl, error parameters0, duration/sample logs disabled, pgauditnone, auto_explain10000ms. Existing postgres installer lacks SET privileges on the restricted logging parameters. Current capability.mjs already accepts ddl, but requires terse and explain disabled, so its native local profile is not a viable hosted assumption. Do not execute private-log-profile.inactive.sql, grant SET/elevate roles, change provider/global logging, request new credentials or repeat any denied ACL/cleanup action. This is a code/transport compatibility correction using existing legitimate access.\n\nThrough ONLY original protected custodian and existing restricted transport, obtain fresh read-only effective logging/current+session role/TLS identity metadata for an actual n88_backend connection. Output only finite fields/booleans, no credentials/session values/records or new nine-query inventory. Keep earlier aggregate/config/custody history and refusals intact; no private cross-custody access or ACL changes. If original custody access is actually unavailable/refused, preserve that fact and still complete the unaffected native/source correction rather than inventing a grant workaround.\n\nImplement the smallest actual supported database-side error boundary for the same fourteen finite V2 operations. Existing installed14 are hash-pinned and have no catches; JavaScript catch occurs after database logging. Prefer a separately versioned bounded set of fixed wrappers using the existing ASCII parameter/error-boundary pattern and explicit success/failure envelopes, retaining installed14 unchanged. No arbitrary SQL/table/function/role selection and no DROP/reinstall storage. All type/decode conversion of private payloads must be inside the protected boundary. Fixed failure envelope contains no original SQLERRM/DETAIL/HINT/CONTEXT/parameters; a failed read can never look like a successful empty result. Cancellation and assertion errors need explicit treatment (OTHERS excludes them); never swallow cancellation as success or continue work. Preserve same operation argument/result semantics, exact owner predicates, RLS/roles, no raw runtime table grants and no new public callable capability. Unused uninstalled grants from the earlier packet may be replaced with exact safe-wrapper grants; do not alter already-consumed source history.\n\nHost must recognize any fixed failure, latch failure for that entire request/transaction, roll back ALL previous canonical/N88/receipt operations, release the connection and return existing UNKNOWN/unavailable with original identity and NO automatic replay. Do not rely solely on throwing an exception that an outer service layer could catch before COMMIT. Preserve original authenticated source/session/current-membership admissions and finite allowlist; do not weaken the legacy private-error-boundary map. Relax the terse-only gate ONLY when the exact safe DB boundary has been verified on that session. DDL logging is already accepted; allow a positive auto_explain threshold only if verified effective DATABASE statement_timeout for private statements is strictly smaller with a conservative margin. Current allowed transactionMs can reach10000; constrain the hosted maximum appropriately, not merely a JS timer or magic accepted profile. Any active data query/parameter/audit logging or unsafe explain threshold still denies. Primary PostgreSQL17 docs on exception trapping/logging/auto_explain are linked in the review.\n\nBefore packaging also read ABSOLUTE C:/Users/Abody/Projects/RakeezX/artifacts/ops-supervisor-v4/n88-runtime-writer-compatibility-review-20261031.json correctionReview. Verify latest published candidate already resolves any WIP findings, and do not repeat fixed work. Required if still present: scope-wide parent retirement must keep manualTasks and tombstoned manual publications consistent and must not poison another surviving scope; inspect three invoker transfer/renumber entrypoints for lock-order coverage while preserving INVOKER/RLS semantics. Fix any remaining established case within this same final compatibility packet and run only affected proof.\n\nUse owned native PG17 with actual restricted LOGIN and provider-like logging. Focused evidence: valid operation mapping and malformed conversion/constraint failure with unique synthetic private marker; cancellation; no marker in retained driver responses/available OWNED native server logs; whole-transaction rollback and unchanged original receipts; no successful empty-read confusion; UNKNOWN/status no replay; timeout/profile unsafe negatives. Preserve actual first failures. Reuse unaffected Auth/owner/student/projection/UI/native campaigns. Actual provider log-files are NOT accessed through SQL/OS primitives; no real account/student data or service writes. Metadata-only actual restricted login proves profile, not a hosted positive teacher journey.\n\nProduce ONE exact native-qualified combined installer/disable/readback/manifest in the owned new compatibility folder, composed with corrected writer packet and existing storage. Qualify legitimate non-superuser postgres owner/admin permissions with all temporary edges restored. Preserve original canonical writer bodies and completed semantics. Prepare the concrete current service/gateway bundle and the current actual private student entry+CSS asset package/allowlist from already-published UI97e39d..., with all activation flags OFF. Do not edit/re-enable frontend readiness. The next live step must be one clearly enumerated exact original-custodian install/deploy/acceptance sequence, not missing callbacks or a generic request for approval.\n\nThis card authorizes source implementation, original-custodian READ-ONLY metadata and inactive publication, NOT hosted SQL/config/schema/Auth/data/service mutation, new account/fixture, private browser action or real messages. No old allowance is reset. Original controller/publisher only. Root carries standing PO authority into the concrete next installation once this exact corrected packet exists; report readiness versus actual hosted acceptance truthfully.",
+      "preflight": {
+        "version": 1,
+        "sourceCommit": "0b17ef977446304f8236daf406575a717ce8471c",
+        "requiredSourcePaths": [
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-role.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-replacement.sql",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/activation/v2-package-1028/schema.sql",
+          "drafts/n88-student-portal/activation/v2-package-1028/boundary-operations.json",
+          "drafts/n88-student-portal/activation/private-error-boundary.mjs",
+          "scripts/n88-activation-bundle.mjs",
+          "supabase/functions/n88-student-portal/index.ts",
+          "src/lib/student-portal-runtime.js",
+          "src/views/student-portal-login.js",
+          "docs/automation-evidence/20261031/N88_RUNTIME_WRITER_INTEGRATION.md"
+        ],
+        "editPaths": [
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/host.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/capability.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/package.mjs",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/runtime-role.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-helpers.sql",
+          "drafts/n88-student-portal/activation/v2-runtime-writer-1031/writer-replacement.sql",
+          "drafts/n88-student-portal/publication-v2-postgres.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-bridge.inactive.mjs",
+          "drafts/n88-student-portal/publication-v2-finite-catalog.inactive.mjs",
+          "drafts/n88-student-portal/existing-host.mjs",
+          "drafts/n88-student-portal/web-entry.mjs",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/error-boundary.sql",
+          "tests/n88-hosted-compat-1031/native.mjs",
+          "tests/n88-hosted-compat-1031/results.json",
+          "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md"
+        ],
+        "newPaths": [
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/manifest.json",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/INSTALL.md",
+          "drafts/n88-student-portal/activation/v2-hosted-compat-1031/error-boundary.sql",
+          "tests/n88-hosted-compat-1031/native.mjs",
+          "tests/n88-hosted-compat-1031/results.json",
+          "docs/automation-evidence/20261031/N88_HOSTED_RUNTIME_COMPATIBILITY.md"
+        ],
+        "workerChecks": [
+          "n88_actual_restricted_profile_and_supported_safe_error_boundary",
+          "n88_private_markers_cancellation_whole_transaction_rollback",
+          "n88_preserved_canonical_manual_scope_and_invoker_lock_contracts",
+          "n88_combined_native_owner_packet_and_private_service_assets_default_off"
+        ],
+        "publisherChecks": []
+      }
+    }
+  ]
+}
